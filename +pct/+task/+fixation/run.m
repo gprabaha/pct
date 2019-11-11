@@ -1,13 +1,9 @@
-function run(varargin)
+function run(program)
 
-program = pct.task.fixation.setup( varargin{:} );
+task = program.Value.task;
+states = program.Value.states;
 
-try
-  pct.task.run_fixation( program );
-catch err
-  warning( err.message );
-end
-
-delete( program );
+initial_state = states('new_trial');
+run( task, initial_state );
 
 end
