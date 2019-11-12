@@ -29,6 +29,18 @@ make_targets( program, updater, window, sampler, stimuli, conf );
 
 make_structure( program, conf );
 
+handle_cursor( program, conf );
+
+end
+
+function handle_cursor(program, conf)
+
+interface = get_interface( conf );
+
+if ( interface.use_mouse && interface.allow_hide_mouse )
+  HideCursor();
+end
+
 end
 
 function program = make_program()
