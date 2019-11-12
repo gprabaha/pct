@@ -28,6 +28,7 @@ stimuli = make_stimuli( program, conf );
 make_targets( program, updater, window, sampler, stimuli, conf );
 
 make_structure( program, conf );
+make_interface( program, conf );
 
 handle_cursor( program, conf );
 
@@ -55,6 +56,13 @@ function structure = make_structure(program, conf)
 
 structure = get_structure( conf );
 program.Value.structure = structure;
+
+end
+
+function interface = make_interface(program, conf)
+
+interface = get_interface( conf );
+program.Value.interface = interface;
 
 end
 
@@ -169,6 +177,8 @@ switch ( stim_descr.class )
     bounds = ptb.bounds.Rect();
     bounds.BaseRect = ptb.rects.MatchRectangle( stimulus );
     bounds.BaseRect.Rectangle.Window = window;
+    bounds.Padding = stim_descr.target_padding;
+    
   otherwise
     error( 'Unrecognized stimulus class "%s".', description.class );
 end

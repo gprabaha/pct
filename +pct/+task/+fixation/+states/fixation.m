@@ -36,10 +36,8 @@ function exit(state, program)
 fix_acq_state = state.UserData.fixation_acquired_state;
 
 if ( fix_acq_state.Acquired )
-  disp( 'Acquired fixation - going to present_patches.' );
   next( state, program.Value.states('present_patches') );
 else
-  disp( 'Failed to acquire fixation - going back to new trial' );
   next( state, program.Value.states('new_trial') );
 end
 

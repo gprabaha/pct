@@ -51,10 +51,17 @@ function draw_targets(program)
 num_patches = count_patches( program );
 stimuli = program.Value.stimuli;
 window = program.Value.window;
+patch_targets = program.Value.patch_targets;
+
+is_debug = program.Value.interface.is_debug;
 
 for i = 1:num_patches
   stimulus = stimuli.(pct.util.nth_patch_stimulus_name(i));
   draw( stimulus, window );
+  
+  if ( is_debug )
+    draw( patch_targets{i}.Bounds, window );
+  end
 end
 
 end
