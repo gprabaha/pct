@@ -27,6 +27,8 @@ sampler = make_gaze_sampler( program, updater, tracker, conf );
 stimuli = make_stimuli( program, conf );
 make_targets( program, updater, window, sampler, stimuli, conf );
 
+make_structure( program, conf );
+
 end
 
 function program = make_program()
@@ -34,6 +36,13 @@ function program = make_program()
 program = ptb.Reference( struct() );
 program.Destruct = @(prog) pct.task.fixation.shutdown( prog );
 program.Value.debug = struct();
+
+end
+
+function structure = make_structure(program, conf)
+
+structure = get_structure( conf );
+program.Value.structure = structure;
 
 end
 
@@ -82,7 +91,7 @@ for i = 1:numel(stim_names)
   if ( strcmp(stim_name, 'patch') )
     % Generate structure.num_patches patch stimuli.
     for j = 1:structure.num_patches
-      use_name = sprintf( 'stim_name%d', j );
+      use_name = pct.util.nth_patch_stimulus_name( j );
       stimuli.(use_name) = make_stimulus( stim_setup.(stim_name) );
     end
   else
@@ -92,6 +101,7 @@ for i = 1:numel(stim_names)
 end
 
 program.Value.stimuli = stimuli;
+program.Value.stimuli_setup = stim_setup;
 
 end
 
@@ -99,37 +109,60 @@ function targets = make_targets(program, updater, window, sampler, stimuli, conf
 
 stim_setup = get_stimuli_setup( conf );
 stim_names = fieldnames( stim_setup );
+structure = get_structure( conf );
 
 targets = struct();
+patch_targets = {};
 
 for i = 1:numel(stim_names)
   stim_name = stim_names{i};
   stim_descr = stim_setup.(stim_name);
   
-  if ( isfield(stimuli, stim_name) && stim_descr.has_target )
-    target = ptb.XYTarget();
-    target.Sampler = sampler;
-    
-    switch ( stim_descr.class )
-      case 'Rect'
-        bounds = ptb.bounds.Rect();
-        bounds.BaseRect = ptb.rects.MatchRectangle( stimuli.(stim_name) );
-        bounds.BaseRect.Rectangle.Window = window;
-      case 'Oval'
-        bounds = ptb.bounds.Circle();
-      otherwise
-        error( 'Unrecognized stimulus class "%s".', description.class );
+  if ( stim_descr.has_target )
+    if ( strcmp(stim_name, 'patch') )
+      num_patches = structure.num_patches;
+      patch_targets = cell( num_patches, 1 );
+      
+      for j = 1:num_patches
+        stim_name = pct.util.nth_patch_stimulus_name( j );
+        stimulus = stimuli.(stim_name);
+        
+        target = make_target( stim_descr, stimulus, sampler, window );
+        updater.add_component( target );
+        
+        targets.(stim_name) = target;
+        patch_targets{j} = target;
+      end
+    else
+      stimulus = stimuli.(stim_name);
+      target = make_target( stim_descr, stimulus, sampler, window );
+      updater.add_component( target );
+      targets.(stim_name) = target;
     end
-    
-    target.Bounds = bounds;
-    target.Duration = stim_descr.target_duration;
   end
-  
-  updater.add_component( target );
-  targets.(stim_name) = target;
 end
 
 program.Value.targets = targets;
+program.Value.patch_targets = patch_targets;
+
+end
+
+function target = make_target(stim_descr, stimulus, sampler, window)
+
+target = ptb.XYTarget();
+target.Sampler = sampler;
+
+switch ( stim_descr.class )
+  case {'Rect', 'Oval'}
+    bounds = ptb.bounds.Rect();
+    bounds.BaseRect = ptb.rects.MatchRectangle( stimulus );
+    bounds.BaseRect.Rectangle.Window = window;
+  otherwise
+    error( 'Unrecognized stimulus class "%s".', description.class );
+end
+
+target.Bounds = bounds;
+target.Duration = stim_descr.target_duration;
 
 end
 
@@ -149,7 +182,7 @@ if ( isfield(description, 'position') )
   stim.Position.Units = 'normalized';
 end
 
-stim.Scale = ptb.Transform( description.size );
+stim.Scale = ptb.WindowDependent( description.size );
 stim.Scale.Units = 'px';
 stim.FaceColor = set( ptb.Color(), description.color );
 
