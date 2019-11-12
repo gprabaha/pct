@@ -54,10 +54,16 @@ end
 
 function draw_target(program)
 
+is_debug = program.Value.interface.is_debug;
 window = program.Value.window;
 fix_square = program.Value.stimuli.fix_square;
+fix_target = program.Value.targets.fix_square;
 
 draw( fix_square, window );
+
+if ( is_debug )
+  draw( fix_target.Bounds, window );
+end
 
 end
 

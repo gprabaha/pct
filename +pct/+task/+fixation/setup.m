@@ -180,7 +180,7 @@ switch ( stim_descr.class )
     bounds.Padding = stim_descr.target_padding;
     
   otherwise
-    error( 'Unrecognized stimulus class "%s".', description.class );
+    error( 'Unrecognized stimulus class "%s".', stim_descr.class );
 end
 
 target.Bounds = bounds;
