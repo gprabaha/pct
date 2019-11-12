@@ -1,8 +1,18 @@
 function program = setup(varargin)
 
 conf = pct.config.reconcile( pct.util.require_config(varargin{:}) );
-
 program = make_program();
+
+try
+  make_all( program, conf );
+catch err
+  delete( program );
+  throw( err );
+end
+
+end
+
+function make_all(program, conf)
 
 make_task( program, conf );
 make_states( program, conf );
