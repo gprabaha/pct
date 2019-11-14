@@ -53,7 +53,7 @@ stimuli = program.Value.stimuli;
 window = program.Value.window;
 patch_targets = program.Value.patch_targets;
 
-is_debug = program.Value.interface.is_debug;
+is_debug = pct.util.is_debug( program );
 
 for i = 1:num_patches
   stimulus = stimuli.(pct.util.nth_patch_stimulus_name(i));

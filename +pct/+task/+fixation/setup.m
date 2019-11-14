@@ -7,7 +7,7 @@ try
   make_all( program, conf );
 catch err
   delete( program );
-  throw( err );
+  rethrow( err );
 end
 
 end
