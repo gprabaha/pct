@@ -24,7 +24,7 @@ DEPENDS.repositories = { 'ptb', 'ptb_helpers', 'serial_comm' };
 
 %	INTERFACE
 INTERFACE = struct();
-INTERFACE.stop_key = KbName( 'escape' );
+INTERFACE.stop_key = ptb.keys.esc();
 INTERFACE.use_mouse = true;
 INTERFACE.use_reward = false;
 INTERFACE.allow_hide_mouse = true;
