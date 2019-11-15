@@ -240,12 +240,13 @@ end
 function task = make_task(program, conf)
 
 time_in = get_time_in( conf );
+interface = get_interface( conf );
 
 task = ptb.Task();
 
 task.Duration = time_in.task;
 task.Loop = @(task) pct.task.fixation.loop(task, program);
-task.exit_on_key_down( ptb.keys.esc() );
+task.exit_on_key_down( interface.stop_key );
 
 program.Value.task = task;
 
