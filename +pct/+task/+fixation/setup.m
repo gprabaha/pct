@@ -47,7 +47,7 @@ end
 function program = make_program()
 
 program = ptb.Reference( struct() );
-program.Destruct = @(prog) pct.task.fixation.shutdown( prog );
+program.Destruct = @pct.task.fixation.shutdown;
 program.Value.debug = struct();
 
 end
