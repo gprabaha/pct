@@ -50,6 +50,8 @@ time_in.task = Inf;
 time_in.new_trial = 0;
 time_in.fixation = 1;
 time_in.present_patches = Inf;
+time_in.fix_hold_patch = 1;
+time_in.just_patches = Inf;
 
 TIMINGS.time_in = time_in;
 

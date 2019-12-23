@@ -36,7 +36,7 @@ function exit(state, program)
 fix_acq_state = state.UserData.fixation_acquired_state;
 
 if ( fix_acq_state.Acquired )
-  next( state, program.Value.states('present_patches') );
+  next( state, program.Value.states('fix_hold_patch') );
 else
   next( state, program.Value.states('new_trial') );
 end
