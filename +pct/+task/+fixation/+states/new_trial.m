@@ -42,6 +42,10 @@ data_scaffold.fix_hold_patch.entry_time = nan;
 data_scaffold.fix_hold_patch.exit_time = nan;
 data_scaffold.fix_hold_patch.did_fixate = nan;
 
+data_scaffold.just_patches.entry_time = nan;
+data_scaffold.just_patches.exit_time = nan;
+data_scaffold.just_patches.did_fixate = nan;
+
 data_scaffold.error_penalty.entry_time = nan;
 data_scaffold.error_penalty.exit_time = nan;
 data_scaffold.error_penalty.did_fixate = nan;
