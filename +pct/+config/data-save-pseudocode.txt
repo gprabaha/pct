@@ -1,0 +1,8 @@
+%
+%   for each trial:
+%       Time-stamps for entry into each state.
+%       Time-stamps for fixation events (entered, acquired, etc).
+%           + patch ids.
+%       Record any errors (fixation or otherwise)
+%           failed_to_acquire_fixation = true;
+%    also save the `conf` variable used to setup the task.

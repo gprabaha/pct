@@ -40,7 +40,7 @@ SCREEN.rect = [ 0, 0, 400, 400 ];
 
 % STRUCTURE
 STRUCTURE = struct();
-STRUCTURE.num_patches = 10;
+STRUCTURE.num_patches = 1;
 
 %	TIMINGS
 TIMINGS = struct();
@@ -49,9 +49,10 @@ time_in = struct();
 time_in.task = Inf;
 time_in.new_trial = 0;
 time_in.fixation = 1;
-time_in.present_patches = Inf;
 time_in.fix_hold_patch = 1;
 time_in.just_patches = Inf;
+time_in.error_penalty = 3;
+time_in.present_patches = Inf;
 
 TIMINGS.time_in = time_in;
 

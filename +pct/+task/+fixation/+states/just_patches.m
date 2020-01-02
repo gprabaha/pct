@@ -21,7 +21,6 @@ state.UserData.num_patches_remaining = count_patches( program );
 state.UserData.patch_elapsed_state = false( 1, count_patches(program) );
 
 reset_targets( program );
-%position_stimuli( state, program );
 
 end
 
@@ -42,7 +41,11 @@ end
 
 function exit(state, program)
 
-next( state, program.Value.states('new_trial') );
+if ( state.UserData.num_patches_remaining == 0 )
+    next( state, program.Value.states('new_trial') );
+else
+    next( state, program.Value.states('error_penalty') );
+end
 
 end
 

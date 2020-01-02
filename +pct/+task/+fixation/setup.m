@@ -16,6 +16,7 @@ function make_all(program, conf)
 
 make_task( program, conf );
 make_states( program, conf );
+make_data( program, conf );
 
 updater = make_component_updater( program );
 window = make_window( program, conf );
@@ -31,6 +32,7 @@ make_structure( program, conf );
 make_interface( program, conf );
 
 handle_cursor( program, conf );
+handle_keyboard( program, conf );
 
 end
 
@@ -44,11 +46,24 @@ end
 
 end
 
+function handle_keyboard(program, conf)
+
+ListenChar( 2 );
+
+end
+
 function program = make_program()
 
 program = ptb.Reference( struct() );
 program.Destruct = @pct.task.fixation.shutdown;
 program.Value.debug = struct();
+
+end
+
+function data = make_data(program, conf)
+
+data = ptb.Reference();
+program.Value.data = data;
 
 end
 
@@ -86,7 +101,8 @@ end
 function states = make_states(program, conf)
 
 states = containers.Map();
-state_names = { 'new_trial', 'fixation', 'fix_hold_patch', 'just_patches' };
+state_names = { 'new_trial', 'fixation', 'fix_hold_patch', ...
+    'just_patches', 'error_penalty' };
 
 for i = 1:numel(state_names)
   state_func = sprintf( 'pct.task.fixation.states.%s', state_names{i} );
@@ -247,6 +263,7 @@ task = ptb.Task();
 task.Duration = time_in.task;
 task.Loop = @(task) pct.task.fixation.loop(task, program);
 task.exit_on_key_down( interface.stop_key );
+% task.add_exit_condition( @() numel(program.Value.data.Value) > 10 );
 
 program.Value.task = task;
 

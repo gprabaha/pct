@@ -1,7 +1,11 @@
-function state = new_trial(program, conf)
+function state = error_penalty(program, conf)
+
+time_in = conf.TIMINGS.time_in;
 
 state = ptb.State();
-state.Name = 'new_trial';
+state.Name = 'error_penalty';
+
+state.Duration = time_in.(state.Name);
 
 state.Entry = @(state) entry(state, program);
 state.Loop = @(state) loop(state, program);
@@ -11,11 +15,7 @@ end
 
 function entry(state, program)
 
-if ( isempty(program.Value.data.Value) )
-    program.Value.data.Value = struct();
-else
-    program.Value.data.Value(end+1) = struct();
-end
+flip( program.Value.window );
 
 end
 
@@ -26,6 +26,6 @@ end
 function exit(state, program)
 
 states = program.Value.states;
-next( state, states('fixation') );
+next( state, states('new_trial') );
 
 end

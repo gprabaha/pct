@@ -38,7 +38,7 @@ fix_acq_state = state.UserData.fixation_acquired_state;
 if ( fix_acq_state.Acquired )
   next( state, program.Value.states('fix_hold_patch') );
 else
-  next( state, program.Value.states('new_trial') );
+  next( state, program.Value.states('error_penalty') );
 end
 
 end
