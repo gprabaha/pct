@@ -18,7 +18,7 @@ function entry(state, program)
 % Reset fix acquired state and target state.
 state.UserData.fixation_acquired_state = fixation_acquired_state();
 reset( program.Value.targets.fix_square );
-timestamp_entry( program );
+timestamp_entry( state, program );
 
 end
 
@@ -37,12 +37,12 @@ function exit(state, program)
 fix_acq_state = state.UserData.fixation_acquired_state;
 
 if ( fix_acq_state.Acquired )
-  timestamp_exit( program );
-  did_fixate( program, fix_acq_state.Acquired );
+  timestamp_exit( state, program );
+  did_fixate( state, program, fix_acq_state.Acquired );
   next( state, program.Value.states('fix_hold_patch') );
 else
-  timestamp_exit( program );
-  did_fixate( program, fix_acq_state.Acquired );
+  timestamp_exit( state, program );
+  did_fixate( state, program, fix_acq_state.Acquired );
   next( state, program.Value.states('error_penalty') );
 end
 
@@ -57,13 +57,13 @@ fix_state.Broke = false;
 
 end
 
-function timestamp_entry(program)
+function timestamp_entry(state, program)
 
 program.Value.data.Value(end).(state.Name).entry_time = elapsed( program.Value.task );
 
 end
 
-function timestamp_exit(program)
+function timestamp_exit(state, program)
 
 program.Value.data.Value(end).(state.Name).exit_time = elapsed( program.Value.task );
 
@@ -114,6 +114,8 @@ state.UserData.fixation_acquired_state = fix_acq_state;
 
 end
 
-function did_fixate(program,fix_acq_state)
-  program.Value.data.Value(end).(state.Name).did_fixate = fix_acq_state;
+function did_fixate(state,program,fix_acq_state)
+
+program.Value.data.Value(end).(state.Name).did_fixate = fix_acq_state;
+  
 end

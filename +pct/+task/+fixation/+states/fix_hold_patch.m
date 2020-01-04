@@ -22,6 +22,8 @@ reset( program.Value.targets.fix_square );
 reset_targets( program );
 position_stimuli( state, program );
 
+timestamp_entry( state, program );
+
 end
 
 function loop(state, program)
@@ -40,8 +42,12 @@ function exit(state, program)
 fix_acq_state = state.UserData.fixation_acquired_state;
 
 if ( fix_acq_state.Acquired )
+  timestamp_exit( state, program );
+  did_fixate( state, program, fix_acq_state.Acquired );
   next( state, program.Value.states('just_patches') );
 else
+  timestamp_exit( state, program );
+  did_fixate( state, program, fix_acq_state.Acquired );
   next( state, program.Value.states('error_penalty') );
 end
 
@@ -53,6 +59,18 @@ fix_state = struct();
 fix_state.Acquired = false;
 fix_state.Entered = false;
 fix_state.Broke = false;
+
+end
+
+function timestamp_entry(state, program)
+
+program.Value.data.Value(end).(state.Name).entry_time = elapsed( program.Value.task );
+
+end
+
+function timestamp_exit(state, program)
+
+program.Value.data.Value(end).(state.Name).exit_time = elapsed( program.Value.task );
 
 end
 
@@ -166,4 +184,10 @@ function color = default_patch_color(program)
 
 color = program.Value.stimuli_setup.patch.color;
 
+end
+
+function did_fixate(state,program,fix_acq_state)
+
+program.Value.data.Value(end).(state.Name).did_fixate = fix_acq_state;
+  
 end

@@ -22,6 +22,8 @@ state.UserData.patch_elapsed_state = false( 1, count_patches(program) );
 
 reset_targets( program );
 
+timestamp_entry( state, program );
+
 end
 
 function loop(state, program)
@@ -42,10 +44,24 @@ end
 function exit(state, program)
 
 if ( state.UserData.num_patches_remaining == 0 )
-    next( state, program.Value.states('new_trial') );
+  timestamp_exit( state, program );
+  next( state, program.Value.states('new_trial') );
 else
-    next( state, program.Value.states('error_penalty') );
+  timestamp_exit( state, program );
+  next( state, program.Value.states('error_penalty') );
 end
+
+end
+
+function timestamp_entry(state, program)
+
+program.Value.data.Value(end).(state.Name).entry_time = elapsed( program.Value.task );
+
+end
+
+function timestamp_exit(state, program)
+
+program.Value.data.Value(end).(state.Name).exit_time = elapsed( program.Value.task );
 
 end
 
