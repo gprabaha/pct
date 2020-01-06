@@ -41,7 +41,7 @@ end
 function path = save_path()
 
 rep_path = repdir;
-path = [rep_path 'pct/+pct/+dat/+training/'];
+path = [rep_path 'pct/+pct/+data/+training/'];
 which path
 
 end
@@ -50,9 +50,11 @@ function save_data(program, path)
 
 try
   data = program.Value.data;
+  conf = program.Value.config;
   %data.config = pct.config.load;
+  %data.Value.config = pct.config.load();
   data_filename = [datestr(datetime, 'yyyy-mm-dd_HH-MM-SS') '-pct-training-data'];
-  save([path data_filename], data);
+  save([path data_filename], 'data', 'conf');
 catch err
   warning( err.message )
 end

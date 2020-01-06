@@ -1,7 +1,7 @@
 function program = setup(varargin)
 
 conf = pct.config.reconcile( pct.util.require_config(varargin{:}) );
-program = make_program();
+program = make_program( conf );
 
 try
   make_all( program, conf );
@@ -52,11 +52,12 @@ ListenChar( 2 );
 
 end
 
-function program = make_program()
+function program = make_program(conf)
 
 program = ptb.Reference( struct() );
 program.Destruct = @pct.task.fixation.shutdown;
 program.Value.debug = struct();
+program.Value.config = conf;
 
 end
 

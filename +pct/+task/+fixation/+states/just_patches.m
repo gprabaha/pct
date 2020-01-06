@@ -19,6 +19,10 @@ function entry(state, program)
 state.UserData.num_patches_remaining = count_patches( program );
 % No patches were acquired
 state.UserData.patch_elapsed_state = false( 1, count_patches(program) );
+% No patches were entered
+state.UserData.mark_entered = false( 1, count_patches( program ) );
+% No patches were exited
+state.UserData.mark_exited = false( 1, count_patches( program ) );
 
 reset_targets( program );
 
@@ -96,14 +100,28 @@ function check_targets(state, program)
 patch_targets = program.Value.patch_targets;
 stimuli = program.Value.stimuli;
 
+
 for i = 1:numel(patch_targets)
   stim_name = pct.util.nth_patch_stimulus_name( i );
   stimulus = stimuli.(stim_name);
+  
+  if ( patch_targets{i}.IsInBounds && ~state.UserData.mark_entered(i) && ~patch_targets{i}.IsDurationMet )
+    % Entered one of the patches
+    patch_entry_timestamp( state, program, i );
+    state.UserData.mark_entered(i) = true;
+  
+  elseif ( state.UserData.mark_entered(i) && ~patch_targets{i}.IsInBounds && ~patch_targets{i}.IsDurationMet )
+    % Exited one of the patches before duration was met
+    patch_exit_timestamp( state, program, i );
+    state.UserData.mark_entered(i) = false;
+  end
     
   if ( patch_targets{i}.IsDurationMet )
     stimulus.FaceColor = [0, 0, 0];
     
     if ( ~state.UserData.patch_elapsed_state(i) )
+      % The patch has already been acquired
+      patch_acquired_timestamp( state, program, i );
       state.UserData.patch_elapsed_state(i) = true;
       state.UserData.num_patches_remaining = state.UserData.num_patches_remaining - 1;
     end
@@ -141,5 +159,28 @@ end
 function color = default_patch_color(program)
 
 color = program.Value.stimuli_setup.patch.color;
+
+end
+
+function patch_entry_timestamp( state, program, patch_id )
+
+program.Value.data.Value(end).(state.Name).patch_entry_times{patch_id} = ...
+    [program.Value.data.Value(end).(state.Name).patch_entry_times{patch_id} ...
+    elapsed( program.Value.task )];
+
+end
+
+function patch_exit_timestamp( state, program, patch_id )
+
+program.Value.data.Value(end).(state.Name).patch_exit_times{patch_id} = ...
+    [program.Value.data.Value(end).(state.Name).patch_exit_times{patch_id} ...
+    elapsed( program.Value.task )];
+
+end
+
+function patch_acquired_timestamp( state, program, patch_id )
+
+program.Value.data.Value(end).(state.Name).patch_acquired_times(patch_id) = ...
+    elapsed( program.Value.task );
 
 end
