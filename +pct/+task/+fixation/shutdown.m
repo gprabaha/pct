@@ -49,12 +49,9 @@ end
 function save_data(program, path)
 
 try
-  data = program.Value.data;
-  conf = program.Value.config;
-  %data.config = pct.config.load;
-  %data.Value.config = pct.config.load();
+  program_data = program.Value;
   data_filename = [datestr(datetime, 'yyyy-mm-dd_HH-MM-SS') '-pct-training-data'];
-  save([path data_filename], 'data', 'conf');
+  save([path data_filename], 'program_data');
 catch err
   warning( err.message )
 end

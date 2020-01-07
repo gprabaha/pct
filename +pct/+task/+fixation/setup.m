@@ -23,7 +23,10 @@ window = make_window( program, conf );
 open( window );
 
 tracker = make_eye_tracker( program, updater, conf );
+make_eye_tracker_sync( program, conf );
 sampler = make_gaze_sampler( program, updater, tracker, conf );
+
+make_arduino_reward_manager( program, conf );
 
 stimuli = make_stimuli( program, conf );
 make_targets( program, updater, window, sampler, stimuli, conf );
@@ -243,6 +246,18 @@ program.Value.tracker = tracker;
 
 end
 
+function make_eye_tracker_sync(program, conf)
+
+sync_info = struct();
+sync_info.timer = nan;
+sync_info.times = [];
+sync_info.next_iteration = 1;
+sync_info.tracker_sync_interval = conf.INTERFACE.tracker_sync_interval;
+
+program.Value.tracker_sync = sync_info;
+
+end
+
 function sampler = make_gaze_sampler(program, updater, tracker, conf)
 
 sampler = ptb.samplers.Pass();
@@ -268,6 +283,37 @@ task.exit_on_key_down( interface.stop_key );
 
 program.Value.task = task;
 
+end
+
+function make_arduino_reward_manager(program, conf)
+
+serial = get_serial( conf );
+interface = get_interface( conf );
+rewards = get_rewards( conf );
+
+port = serial.port;
+messages = struct();
+channels = serial.channels;
+
+if ( interface.use_reward )
+    arduino_reward_manager = serial_comm.SerialManager( port, messages, channels );
+    start( arduino_reward_manager );
+else
+    arduino_reward_manager = [];
+end
+
+program.Value.arduino_reward_manager = arduino_reward_manager;
+program.Value.rewards = rewards;
+
+end
+
+function rewards = get_rewards(conf)
+rewards = conf.REWARDS;
+end
+
+
+function serial = get_serial(conf)
+serial = conf.SERIAL;
 end
 
 function structure = get_structure(conf)

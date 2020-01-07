@@ -16,7 +16,7 @@ end
 function entry(state, program)
 
 flip( program.Value.window );
-give_juice_reward( state.Duration );
+give_juice_reward( program );
 
 end
 
@@ -28,5 +28,18 @@ function exit(state, program)
 
 states = program.Value.states;
 next( state, states('new_trial') );
+
+end
+
+function give_juice_reward(program)
+
+reward_manager = program.Value.arduino_reward_manager;
+
+if ( isempty(reward_manager) )
+    return;
+end
+
+quantity = program.Value.rewards.training;
+reward( reward_manager, 1, quantity );
 
 end

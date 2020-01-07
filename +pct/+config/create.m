@@ -29,6 +29,11 @@ INTERFACE.use_mouse = true;
 INTERFACE.use_reward = false;
 INTERFACE.allow_hide_mouse = true;
 INTERFACE.is_debug = false;
+INTERFACE.tracker_sync_interval = 1;
+
+%   META
+META = struct();
+META.subject = '';
 
 %	SCREEN
 SCREEN = struct();
@@ -101,6 +106,10 @@ SERIAL = struct();
 SERIAL.port = 'COM3';
 SERIAL.channels = { 'A' };
 
+%   REWARDS
+REWARDS = struct();
+REWARDS.training = 300;
+
 % EXPORT
 conf.PATHS = PATHS;
 conf.DEPENDS = DEPENDS;
@@ -110,6 +119,8 @@ conf.SCREEN = SCREEN;
 conf.INTERFACE = INTERFACE;
 conf.STRUCTURE = STRUCTURE;
 conf.SERIAL = SERIAL;
+conf.META = META;
+conf.REWARDS = REWARDS;
 
 if ( do_save )
   pct.config.save( conf );
