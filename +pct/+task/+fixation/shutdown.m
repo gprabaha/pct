@@ -41,7 +41,7 @@ end
 function path = save_path()
 
 rep_path = repdir;
-path = [rep_path 'pct/+pct/+data/+training/'];
+path = fullfile( rep_path, 'pct/+pct/+data/+training/' );
 which path
 
 end
