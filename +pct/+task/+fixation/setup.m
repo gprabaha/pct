@@ -97,6 +97,7 @@ function window = make_window(program, conf)
 window = ptb.Window();
 window.BackgroundColor = conf.SCREEN.background_color;
 window.Rect = conf.SCREEN.rect;
+window.SkipSyncTests = conf.INTERFACE.skip_sync_tests;
 
 program.Value.window = window;
 
@@ -106,7 +107,7 @@ function states = make_states(program, conf)
 
 states = containers.Map();
 state_names = { 'new_trial', 'fixation', 'fix_hold_patch', ...
-    'just_patches', 'error_penalty' };
+    'just_patches', 'error_penalty', 'juice_reward' };
 
 for i = 1:numel(state_names)
   state_func = sprintf( 'pct.task.fixation.states.%s', state_names{i} );
@@ -239,6 +240,8 @@ if ( use_mouse )
   tracker = ptb.sources.Mouse();
 else
   tracker = ptb.sources.Eyelink();
+  initialize( tracker );
+  start_recording( tracker );
 end
 
 updater.add_component( tracker );

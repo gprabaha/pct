@@ -49,7 +49,7 @@ function exit(state, program)
 
 if ( state.UserData.num_patches_remaining == 0 )
   timestamp_exit( state, program );
-  next( state, program.Value.states('new_trial') );
+  next( state, program.Value.states('juice_reward') );
 else
   timestamp_exit( state, program );
   next( state, program.Value.states('error_penalty') );

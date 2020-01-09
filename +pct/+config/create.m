@@ -30,6 +30,7 @@ INTERFACE.use_reward = false;
 INTERFACE.allow_hide_mouse = true;
 INTERFACE.is_debug = false;
 INTERFACE.tracker_sync_interval = 1;
+INTERFACE.skip_sync_tests = false;
 
 %   META
 META = struct();
@@ -58,6 +59,7 @@ time_in.fix_hold_patch = 1;
 time_in.just_patches = Inf;
 time_in.error_penalty = 3;
 time_in.present_patches = Inf;
+time_in.juice_reward = 0;
 
 TIMINGS.time_in = time_in;
 
