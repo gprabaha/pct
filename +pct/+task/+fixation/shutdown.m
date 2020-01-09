@@ -1,10 +1,26 @@
 function shutdown(program)
 
 close_window( program );
+close_arduino( program );
 handle_cursor();
 handle_keyboard();
 path = save_path();
 save_data( program, path );
+
+end
+
+function close_arduino(program)
+
+try
+  reward_manager = program.Value.arduino_reward_manager;
+  
+  if ( ~isempty(reward_manager) )
+    close( reward_manager );
+  end
+  
+catch err
+  warning( err.message );
+end
 
 end
 
