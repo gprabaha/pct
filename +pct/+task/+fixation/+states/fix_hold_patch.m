@@ -29,9 +29,17 @@ end
 function loop(state, program)
 
 draw_target( program );
-draw_patches( program )
+draw_patches( program );
 draw_cursor( program );
 flip( program.Value.window );
+
+debug_window_is_present = program.Value.debug_window_is_present;
+if (debug_window_is_present)
+  draw_debug_target( program );
+  draw_debug_patches( program );
+  draw_debug_cursor( program );
+  flip( program.Value.debug_window );
+end
 
 check_target( state, program );
 
@@ -89,6 +97,21 @@ end
 
 end
 
+function draw_debug_target(program)
+
+is_debug = true;
+window = program.Value.debug_window;
+fix_square = program.Value.stimuli.fix_square;
+fix_target = program.Value.targets.fix_square;
+
+draw( fix_square, window );
+
+if ( is_debug )
+  draw( fix_target.Bounds, window );
+end
+
+end
+
 function draw_patches( program )
 
 num_patches = count_patches( program );
@@ -109,9 +132,38 @@ end
 
 end
 
+function draw_debug_patches(program)
+
+num_patches = count_patches( program );
+stimuli = program.Value.stimuli;
+window = program.Value.debug_window;
+patch_targets = program.Value.patch_targets;
+
+is_debug = true;
+
+for i = 1:num_patches
+  stimulus = stimuli.(pct.util.nth_patch_stimulus_name(i));
+  draw( stimulus, window );
+  
+  if ( is_debug )
+    draw( patch_targets{i}.Bounds, window );
+  end
+end
+
+end
+
+
 function draw_cursor(program)
 
-pct.util.draw_gaze_cursor( program );
+is_debug = pct.util.is_debug( program );
+pct.util.draw_gaze_cursor( program, is_debug );
+
+end
+
+function draw_debug_cursor(program)
+
+is_debug = true;
+pct.util.draw_gaze_cursor( program, is_debug );
 
 end
 

@@ -44,6 +44,21 @@ SCREEN.index = 0;
 SCREEN.background_color = [ 0 0 0 ];
 SCREEN.rect = [ 0, 0, 400, 400 ];
 
+
+% DEBUG_SCREEN
+DEBUG_SCREEN = struct();
+
+if (length(Screen('Screens')) > 1)
+  DEBUG_SCREEN.is_present = true;
+else
+  DEBUG_SCREEN.is_present = false;
+end
+DEBUG_SCREEN.full_size = get( 0, 'screensize' );
+DEBUG_SCREEN.index = 2;
+DEBUG_SCREEN.background_color = [ 0 0 0 ];
+DEBUG_SCREEN.rect = [ 0, 0, 400, 400 ];
+
+
 % STRUCTURE
 STRUCTURE = struct();
 STRUCTURE.num_patches = 1;
@@ -118,6 +133,7 @@ conf.DEPENDS = DEPENDS;
 conf.TIMINGS = TIMINGS;
 conf.STIMULI = STIMULI;
 conf.SCREEN = SCREEN;
+conf.DEBUG_SCREEN = DEBUG_SCREEN;
 conf.INTERFACE = INTERFACE;
 conf.STRUCTURE = STRUCTURE;
 conf.SERIAL = SERIAL;

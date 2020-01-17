@@ -36,6 +36,13 @@ draw_targets( program );
 draw_cursor( program );
 flip( program.Value.window );
 
+debug_window_is_present = program.Value.debug_window_is_present;
+if (debug_window_is_present)
+  draw_debug_targets( program );
+  draw_debug_cursor( program );
+  flip( program.Value.debug_window );
+end
+
 check_targets( state, program );
 
 % Exit if all patches were acquired.
@@ -89,9 +96,37 @@ end
 
 end
 
+function draw_debug_targets(program)
+
+num_patches = count_patches( program );
+stimuli = program.Value.stimuli;
+window = program.Value.debug_window;
+patch_targets = program.Value.patch_targets;
+
+is_debug = true;
+
+for i = 1:num_patches
+  stimulus = stimuli.(pct.util.nth_patch_stimulus_name(i));
+  draw( stimulus, window );
+  
+  if ( is_debug )
+    draw( patch_targets{i}.Bounds, window );
+  end
+end
+
+end
+
 function draw_cursor(program)
 
-pct.util.draw_gaze_cursor( program );
+is_debug = pct.util.is_debug( program );
+pct.util.draw_gaze_cursor( program, is_debug );
+
+end
+
+function draw_debug_cursor(program)
+
+is_debug = true;
+pct.util.draw_gaze_cursor( program, is_debug );
 
 end
 
