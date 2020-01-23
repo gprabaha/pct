@@ -11,7 +11,7 @@ conf.INTERFACE.skip_sync_tests = true;
 % conf.SCREEN.rect = [0, 0, 1024, 768];
 conf.SCREEN.rect = [];
 conf.SCREEN.index = 3;
-conf.SCREEN.calibration_rect = [0, 0, 1024, 768];
+conf.SCREEN.calibration_rect = [0, 0, 1280, 1024];
 
 conf.DEBUG_SCREEN.is_present = true;
 conf.DEBUG_SCREEN.index = 0;
