@@ -1,8 +1,6 @@
 function loop(task, program)
 
-if ( ~isempty(program.Value.ni_scan_input) )
-  update( program.Value.ni_scan_input );
-end
+handle_ni_daq_update( program );
 
 update( program.Value.updater );
 
@@ -12,6 +10,22 @@ end
 
 if ( ~program.Value.interface.use_mouse )
     sync_eyelink( task, program );
+end
+
+end
+
+function handle_ni_daq_update(program)
+
+if ( ~isempty(program.Value.ni_reward_manager) )
+  update( program.Value.ni_reward_manager );
+end
+
+if ( ~isempty(program.Value.ni_scan_output) )
+  update( program.Value.ni_scan_output );
+end
+
+if ( ~isempty(program.Value.ni_scan_input) )
+  update( program.Value.ni_scan_input );
 end
 
 end

@@ -26,6 +26,7 @@ DEPENDS.repositories = { 'ptb', 'ptb_helpers', 'serial_comm' };
 INTERFACE = struct();
 INTERFACE.stop_key = ptb.keys.esc();
 INTERFACE.gaze_source_type = 'mouse'; % 'digital_eyelink', 'analog_input'
+INTERFACE.reward_output_type = 'none';  % 'arduino', 'ni'
 INTERFACE.use_reward = false;
 INTERFACE.allow_hide_mouse = true;
 INTERFACE.is_debug = false;
@@ -43,7 +44,7 @@ SCREEN.full_size = get( 0, 'screensize' );
 SCREEN.index = 0;
 SCREEN.background_color = [ 0 0 0 ];
 SCREEN.rect = [ 0, 0, 400, 400 ];
-
+SCREEN.calibration_rect = [0, 0, 400, 400];
 
 % DEBUG_SCREEN
 DEBUG_SCREEN = struct();

@@ -20,6 +20,7 @@ make_data( program, conf );
 
 ni_session = make_ni_daq_session( program, conf );
 ni_scan_input = make_ni_scan_input( program, conf, ni_session );
+ni_scan_output = make_ni_scan_output( program, conf, ni_session );
 
 updater = make_component_updater( program );
 window = make_window( program, conf );
@@ -36,7 +37,7 @@ tracker = make_eye_tracker( program, updater, ni_scan_input, conf );
 make_eye_tracker_sync( program, conf );
 sampler = make_gaze_sampler( program, updater, tracker, conf );
 
-make_arduino_reward_manager( program, conf );
+make_reward_manager( program, conf, ni_scan_output );
 
 stimuli = make_stimuli( program, conf );
 make_targets( program, updater, window, sampler, stimuli, conf );
@@ -86,8 +87,9 @@ function ni_session = make_ni_daq_session(program, conf)
 ni_session = [];
 signal = get_signal( conf );
 
-if ( ~is_analog_input_gaze_source(conf) )
-  program.Value.ni_daq_session = ni_session;
+if ( ~need_make_ni_session(conf) )
+  program.Value.ni_session = ni_session;
+  program.Value.ni_device_id = '';
   return
 end
 
@@ -103,7 +105,10 @@ for i = 1:numel(channels)
   addAnalogInputChannel( ni_session, ni_device_id, channels{i}, 'Voltage' );
 end
 
-program.Value.ni_daq_session = ni_session;
+addAnalogOutputChannel( ni_session, ni_device_id, 0, 'Voltage' );
+
+program.Value.ni_session = ni_session;
+program.Value.ni_device_id = ni_device_id;
 
 end
 
@@ -117,6 +122,19 @@ end
 
 ni_scan_input = ptb.signal.SingleScanInput( ni_session );
 program.Value.ni_scan_input = ni_scan_input;
+
+end
+
+function ni_scan_output = make_ni_scan_output(program, conf, ni_session)
+
+ni_scan_output = [];
+if ( isempty(ni_session) )
+  program.Value.ni_scan_output = [];
+  return
+end
+
+ni_scan_output = ptb.signal.SingleScanOutput( ni_session );
+program.Value.ni_scan_output = ni_scan_output;
 
 end
 
@@ -146,6 +164,7 @@ function window = make_window(program, conf)
 window = ptb.Window();
 window.BackgroundColor = conf.SCREEN.background_color;
 window.Rect = conf.SCREEN.rect;
+window.Index = conf.SCREEN.index;
 window.SkipSyncTests = conf.INTERFACE.skip_sync_tests;
 
 program.Value.window = window;
@@ -319,7 +338,7 @@ end
 function tracker = make_analog_input_tracker(ni_scan_input, conf)
 
 tracker = ptb.sources.XYAnalogInput( ni_scan_input );
-tracker.CalibrationRect = conf.SCREEN.rect;
+tracker.CalibrationRect = conf.SCREEN.calibration_rect;
 tracker.OutputVoltageRange = [-5, 5];
 tracker.CalibrationRectPaddingFract = [0.2, 0.2];
 tracker.ChannelMapping = [1, 2];
@@ -365,26 +384,62 @@ program.Value.task = task;
 
 end
 
+function make_reward_manager(program, conf, ni_scan_output)
+
+initialize_reward_manager_variables( program, conf );
+
+if ( is_arduino_reward_source(conf) )
+  make_arduino_reward_manager( program, conf );
+elseif ( is_ni_reward_source(conf) )
+  make_ni_reward_manager( program, conf, ni_scan_output );  
+end
+
+program.Value.rewards = get_rewards( conf );
+
+end
+
+function initialize_reward_manager_variables(program, conf)
+
+program.Value.arduino_reward_manager = [];
+program.Value.ni_reward_manager = [];
+
+end
+
+function make_ni_reward_manager(program, conf, ni_scan_output)
+
+channel_index = 1;
+reward_manager = ptb.signal.AnalogOutputPulseManager( ni_scan_output, channel_index );
+
+program.Value.ni_reward_manager = reward_manager;
+
+end
+
 function make_arduino_reward_manager(program, conf)
 
 serial = get_serial( conf );
-interface = get_interface( conf );
-rewards = get_rewards( conf );
 
 port = serial.port;
 messages = struct();
 channels = serial.channels;
 
-if ( interface.use_reward )
-    arduino_reward_manager = serial_comm.SerialManager( port, messages, channels );
-    start( arduino_reward_manager );
-else
-    arduino_reward_manager = [];
-end
+arduino_reward_manager = serial_comm.SerialManager( port, messages, channels );
+start( arduino_reward_manager );
 
 program.Value.arduino_reward_manager = arduino_reward_manager;
-program.Value.rewards = rewards;
 
+end
+
+function tf = need_make_ni_session(conf)
+tf = strcmp( conf.INTERFACE.reward_output_type, 'ni' ) || ...
+  is_analog_input_gaze_source( conf );
+end
+
+function tf = is_ni_reward_source(conf)
+tf = strcmp( conf.INTERFACE.reward_output_type, 'ni' );
+end
+
+function tf = is_arduino_reward_source(conf)
+tf = strcmp( conf.INTERFACE.reward_output_type, 'arduino' );
 end
 
 function tf = is_analog_input_gaze_source(conf)
@@ -398,7 +453,6 @@ end
 function rewards = get_rewards(conf)
 rewards = conf.REWARDS;
 end
-
 
 function serial = get_serial(conf)
 serial = conf.SERIAL;

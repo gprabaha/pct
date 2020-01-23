@@ -38,13 +38,7 @@ end
 
 function give_juice_reward(program)
 
-reward_manager = program.Value.arduino_reward_manager;
-
-if ( isempty(reward_manager) )
-    return;
-end
-
 quantity = program.Value.rewards.training;
-reward( reward_manager, 1, quantity );
+pct.util.deliver_reward( program, 1, quantity );
 
 end

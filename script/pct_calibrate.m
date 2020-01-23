@@ -7,11 +7,12 @@ else
 end
 
 full_rect = conf.SCREEN.rect;
-cal_rect = conf.SCREEN.rect;
+screen_index = conf.SCREEN.index;
+
+cal_rect = conf.SCREEN.calibration_rect;
 
 target_size = 50; % px;
 n_cal_pts = 5;
-screen_index = 0;
 skip_sync_tests = 1;
 
 key_callback = @() fprintf('\n Key pressed.' );
