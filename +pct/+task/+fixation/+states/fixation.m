@@ -28,6 +28,13 @@ draw_target( program );
 draw_cursor( program );
 flip( program.Value.window );
 
+debug_window_is_present = program.Value.debug_window_is_present;
+if (debug_window_is_present)
+  draw_debug_target( program );
+  draw_debug_cursor( program );
+  flip( program.Value.debug_window );
+end
+
 check_target( state, program );
 
 end
@@ -86,7 +93,26 @@ end
 
 function draw_cursor(program)
 
-pct.util.draw_gaze_cursor( program );
+is_debug = pct.util.is_debug( program );
+pct.util.draw_gaze_cursor( program, is_debug );
+
+end
+
+function draw_debug_target(program)
+
+window = program.Value.debug_window;
+fix_square = program.Value.stimuli.fix_square;
+fix_target = program.Value.targets.fix_square;
+
+draw( fix_square, window );
+draw( fix_target.Bounds, window );
+
+end
+
+function draw_debug_cursor(program)
+
+is_debug = true;
+pct.util.draw_gaze_cursor( program, is_debug );
 
 end
 

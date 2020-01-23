@@ -16,6 +16,11 @@ end
 function entry(state, program)
 
 flip( program.Value.window );
+debug_window_is_present = program.Value.debug_window_is_present;
+if (debug_window_is_present)
+  flip( program.Value.debug_window );
+end
+
 give_juice_reward( program );
 
 end

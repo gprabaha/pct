@@ -21,6 +21,13 @@ make_data( program, conf );
 updater = make_component_updater( program );
 window = make_window( program, conf );
 open( window );
+debug_window_is_present = conf.DEBUG_SCREEN.is_present;
+if (debug_window_is_present)
+  debug_window = make_debug_window( program, conf );
+  open( debug_window );
+else
+  program.Value.debug_window_is_present = false;
+end
 
 tracker = make_eye_tracker( program, updater, conf );
 make_eye_tracker_sync( program, conf );
@@ -100,6 +107,19 @@ window.Rect = conf.SCREEN.rect;
 window.SkipSyncTests = conf.INTERFACE.skip_sync_tests;
 
 program.Value.window = window;
+
+end
+
+function debug_window = make_debug_window(program, conf)
+
+debug_window = ptb.Window();
+debug_window.Index = conf.DEBUG_SCREEN.index;
+debug_window.BackgroundColor = conf.DEBUG_SCREEN.background_color;
+debug_window.Rect = conf.DEBUG_SCREEN.rect;
+debug_window.SkipSyncTests = conf.INTERFACE.skip_sync_tests;
+
+program.Value.debug_window_is_present = true;
+program.Value.debug_window = debug_window;
 
 end
 
