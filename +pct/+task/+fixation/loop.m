@@ -1,5 +1,9 @@
 function loop(task, program)
 
+if ( ~isempty(program.Value.ni_scan_input) )
+  update( program.Value.ni_scan_input );
+end
+
 update( program.Value.updater );
 
 if ( pct.util.is_debug(program) )

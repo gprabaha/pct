@@ -18,6 +18,9 @@ make_task( program, conf );
 make_states( program, conf );
 make_data( program, conf );
 
+ni_session = make_ni_daq_session( program, conf );
+ni_scan_input = make_ni_scan_input( program, conf, ni_session );
+
 updater = make_component_updater( program );
 window = make_window( program, conf );
 open( window );
@@ -29,7 +32,7 @@ else
   program.Value.debug_window_is_present = false;
 end
 
-tracker = make_eye_tracker( program, updater, conf );
+tracker = make_eye_tracker( program, updater, ni_scan_input, conf );
 make_eye_tracker_sync( program, conf );
 sampler = make_gaze_sampler( program, updater, tracker, conf );
 
@@ -50,7 +53,7 @@ function handle_cursor(program, conf)
 
 interface = get_interface( conf );
 
-if ( interface.use_mouse && interface.allow_hide_mouse )
+if ( is_mouse_gaze_source(conf) && interface.allow_hide_mouse )
   HideCursor();
 end
 
@@ -75,6 +78,45 @@ function data = make_data(program, conf)
 
 data = ptb.Reference();
 program.Value.data = data;
+
+end
+
+function ni_session = make_ni_daq_session(program, conf)
+
+ni_session = [];
+signal = get_signal( conf );
+
+if ( ~is_analog_input_gaze_source(conf) )
+  program.Value.ni_daq_session = ni_session;
+  return
+end
+
+ni_session = daq.createSession( 'ni' );
+ni_device_id = pct.util.get_ni_daq_device_id();
+
+m1_channel_x = signal.analog_channel_m1x;
+m1_channel_y = signal.analog_channel_m1y;
+
+channels = { m1_channel_x, m1_channel_y };
+
+for i = 1:numel(channels)
+  addAnalogInputChannel( ni_session, ni_device_id, channels{i}, 'Voltage' );
+end
+
+program.Value.ni_daq_session = ni_session;
+
+end
+
+function ni_scan_input = make_ni_scan_input(program, conf, ni_session)
+
+ni_scan_input = [];
+if ( isempty(ni_session) )
+  program.Value.ni_scan_input = [];
+  return
+end
+
+ni_scan_input = ptb.signal.SingleScanInput( ni_session );
+program.Value.ni_scan_input = ni_scan_input;
 
 end
 
@@ -251,21 +293,36 @@ stim.FaceColor = set( ptb.Color(), description.color );
 
 end
 
-function tracker = make_eye_tracker(program, updater, conf)
+function tracker = make_eye_tracker(program, updater, ni_scan_input, conf)
 
 interface = get_interface( conf );
-use_mouse = interface.use_mouse;
+source_type = interface.gaze_source_type;
 
-if ( use_mouse )
-  tracker = ptb.sources.Mouse();
-else
-  tracker = ptb.sources.Eyelink();
-  initialize( tracker );
-  start_recording( tracker );
+switch ( source_type )
+  case 'mouse'
+    tracker = ptb.sources.Mouse();
+  case 'digital_eyelink'
+    tracker = ptb.sources.Eyelink();
+    initialize( tracker );
+    start_recording( tracker );
+  case 'analog_input'
+    tracker = make_analog_input_tracker( ni_scan_input, conf );
+  otherwise
+    error( 'Unrecognized source type "%s".', source_type );
 end
 
 updater.add_component( tracker );
 program.Value.tracker = tracker;
+
+end
+
+function tracker = make_analog_input_tracker(ni_scan_input, conf)
+
+tracker = ptb.sources.XYAnalogInput( ni_scan_input );
+tracker.CalibrationRect = conf.SCREEN.rect;
+tracker.OutputVoltageRange = [-5, 5];
+tracker.CalibrationRectPaddingFract = [0.2, 0.2];
+tracker.ChannelMapping = [1, 2];
 
 end
 
@@ -330,6 +387,14 @@ program.Value.rewards = rewards;
 
 end
 
+function tf = is_analog_input_gaze_source(conf)
+tf = strcmp( conf.INTERFACE.gaze_source_type, 'analog_input' );
+end
+
+function tf = is_mouse_gaze_source(conf)
+tf = strcmp( conf.INTERFACE.gaze_source_type, 'mouse' );
+end
+
 function rewards = get_rewards(conf)
 rewards = conf.REWARDS;
 end
@@ -353,4 +418,8 @@ end
 
 function time_in = get_time_in(conf)
 time_in = conf.TIMINGS.time_in;
+end
+
+function signal = get_signal(conf)
+signal = conf.SIGNAL;
 end

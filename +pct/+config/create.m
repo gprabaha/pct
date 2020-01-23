@@ -25,7 +25,7 @@ DEPENDS.repositories = { 'ptb', 'ptb_helpers', 'serial_comm' };
 %	INTERFACE
 INTERFACE = struct();
 INTERFACE.stop_key = ptb.keys.esc();
-INTERFACE.use_mouse = true;
+INTERFACE.gaze_source_type = 'mouse'; % 'digital_eyelink', 'analog_input'
 INTERFACE.use_reward = false;
 INTERFACE.allow_hide_mouse = true;
 INTERFACE.is_debug = false;
@@ -183,6 +183,11 @@ SERIAL = struct();
 SERIAL.port = 'COM3';
 SERIAL.channels = { 'A' };
 
+% SIGNAL
+SIGNAL = struct();
+SIGNAL.analog_channel_m1x = 'ai0';
+SIGNAL.analog_channel_m1y = 'ai1';
+
 %   REWARDS
 REWARDS = struct();
 REWARDS.training = 300;
@@ -199,6 +204,7 @@ conf.STRUCTURE = STRUCTURE;
 conf.SERIAL = SERIAL;
 conf.META = META;
 conf.REWARDS = REWARDS;
+conf.SIGNAL = SIGNAL;
 
 if ( do_save )
   pct.config.save( conf );
