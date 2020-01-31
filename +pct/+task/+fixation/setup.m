@@ -54,7 +54,7 @@ function handle_cursor(program, conf)
 
 interface = get_interface( conf );
 
-if ( is_mouse_gaze_source(conf) && interface.allow_hide_mouse )
+if ( interface.allow_hide_mouse )
   HideCursor();
 end
 
@@ -408,7 +408,7 @@ end
 function make_ni_reward_manager(program, conf, ni_scan_output)
 
 channel_index = 1;
-reward_manager = ptb.signal.AnalogOutputPulseManager( ni_scan_output, channel_index );
+reward_manager = ptb.signal.SingleScanOutputPulseManager( ni_scan_output, channel_index );
 
 program.Value.ni_reward_manager = reward_manager;
 

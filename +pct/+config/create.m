@@ -41,10 +41,16 @@ META.subject = '';
 SCREEN = struct();
 
 SCREEN.full_size = get( 0, 'screensize' );
-SCREEN.index = 0;
+SCREEN.index = 3;
 SCREEN.background_color = [ 0 0 0 ];
-SCREEN.rect = [ 0, 0, 400, 400 ];
-SCREEN.calibration_rect = [0, 0, 400, 400];
+SCREEN.rect = [0, 0, 1280, 1024];
+
+% CALIBRATION SCREEN
+CALIB_SCREEN = struct();
+
+CALIB_SCREEN.full_size = get( 0, 'screensize' );
+CALIB_SCREEN.index = 3;
+CALIB_SCREEN.rect = [0, 0, 1280, 1024];
 
 % DEBUG_SCREEN
 DEBUG_SCREEN = struct();
@@ -199,6 +205,7 @@ conf.DEPENDS = DEPENDS;
 conf.TIMINGS = TIMINGS;
 conf.STIMULI = STIMULI;
 conf.SCREEN = SCREEN;
+conf.CALIB_SCREEN = CALIB_SCREEN;
 conf.DEBUG_SCREEN = DEBUG_SCREEN;
 conf.INTERFACE = INTERFACE;
 conf.STRUCTURE = STRUCTURE;
