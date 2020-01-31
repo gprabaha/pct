@@ -4,11 +4,11 @@ conf = pct.config.reconcile( pct.config.load() );
 
 conf.TIMINGS.time_in.fixation = 10;
 
-conf.META.subject = '';
+conf.META.subject = 'hitch';
 
 % conf.INTERFACE.gaze_source_type = 'analog_input';
-% conf.INTERFACE.gaze_source_type = 'digital_eyelink';
-conf.INTERFACE.gaze_source_type = 'mouse';
+conf.INTERFACE.gaze_source_type = 'digital_eyelink';
+% conf.INTERFACE.gaze_source_type = 'mouse';
 conf.INTERFACE.reward_output_type = 'ni'; 
 conf.INTERFACE.skip_sync_tests = true;
 
