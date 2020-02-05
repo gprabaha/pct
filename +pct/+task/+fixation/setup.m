@@ -17,6 +17,7 @@ function make_all(program, conf)
 make_task( program, conf );
 make_states( program, conf );
 make_data( program, conf );
+make_online_data_rep( program, conf );
 
 ni_session = make_ni_daq_session( program, conf );
 ni_scan_input = make_ni_scan_input( program, conf, ni_session );
@@ -79,6 +80,13 @@ function data = make_data(program, conf)
 
 data = ptb.Reference();
 program.Value.data = data;
+
+end
+
+function online_data_rep = make_online_data_rep(program, conf)
+
+online_data_rep = ptb.Reference();
+program.Value.online_data_rep = online_data_rep;
 
 end
 

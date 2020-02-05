@@ -1,0 +1,6 @@
+Things to do for the task code:
+- Figure out how to have a square PTB screen with the flanking regions covered
+- Set up various patch types
+- Set up separate cursor types
+- Set up patch acquiring conditions for various types of patches
+- Set up a computer program for one monkey to compete with

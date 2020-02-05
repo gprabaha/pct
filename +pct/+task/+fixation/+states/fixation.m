@@ -19,6 +19,7 @@ function entry(state, program)
 state.UserData.fixation_acquired_state = fixation_acquired_state();
 reset( program.Value.targets.fix_square );
 timestamp_entry( state, program );
+update_last_state( state, program );
 
 end
 
@@ -73,6 +74,12 @@ end
 function timestamp_exit(state, program)
 
 program.Value.data.Value(end).(state.Name).exit_time = elapsed( program.Value.task );
+
+end
+
+function update_last_state(state, program)
+
+program.Value.data.Value(end).last_state = 'fix';
 
 end
 

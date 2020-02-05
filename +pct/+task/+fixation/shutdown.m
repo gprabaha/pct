@@ -64,12 +64,14 @@ end
 
 function save_data(program, path)
 
-try
-  program_data = program.Value;
-  data_filename = [datestr(datetime, 'yyyy-mm-dd_HH-MM-SS') '-pct-training-data'];
-  save([path data_filename], 'program_data');
-catch err
-  warning( err.message )
+if( program.Value.interface.save_data )
+  try
+    program_data = program.Value;
+    data_filename = [datestr(datetime, 'yyyy-mm-dd_HH-MM-SS') '-pct-training-data'];
+    save([path data_filename], 'program_data');
+  catch err
+    warning( err.message )
+  end
 end
 
 end
