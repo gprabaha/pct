@@ -17,8 +17,8 @@ else
     program.Value.data.Value(end+1) = make_trial_data_scaffold( program );
 end
 
-display_training_stage( program );
 process_data( program );
+display_training_stage( program );
 update_training_stages( program );
 
 end
@@ -117,34 +117,32 @@ end
 function display_data( online_data_rep )
 
 clc;
-trial_no_str = sprintf( '%s ', 'Trial:');
-trial_correct_str = sprintf( '%s ', 'Correct:' );
-last_state_str = sprintf( '%s ', 'Last state:' );
-response_time_str = sprintf( '%s ', 'Resp. time:' );
 
 if( length( online_data_rep.Value ) < 11 )
+  data_cell = cell( length( online_data_rep.Value ), 4 );
   for trial = 1:length( online_data_rep.Value )
-    trial_no_str = sprintf( '%s \t %d', trial_no_str, trial );
-    trial_correct_str = sprintf( '%s \t %d', trial_correct_str, online_data_rep.Value(trial).did_correctly );
-    last_state_str = sprintf( '%s \t %s', last_state_str, online_data_rep.Value(trial).last_state_reached );
-    response_time_str = sprintf( '%s \t %0.2f', response_time_str, online_data_rep.Value(trial).response_times );
+    data_cell(trial,:) = {trial online_data_rep.Value(trial).did_correctly ...
+      online_data_rep.Value(trial).last_state_reached ...
+      online_data_rep.Value(trial).response_times};
   end
+  data_table = cell2table(data_cell,...
+    'VariableNames',{'Trial_no' 'Correct' 'Last_state' 'Resp_time'});
 else
+  data_cell = cell( 10, 4 );
   for trial = (length( online_data_rep.Value ) - 9):length( online_data_rep.Value )
-    trial_no_str = sprintf( '%s \t %d', trial_no_str, trial );
-    trial_correct_str = sprintf( '%s \t %d', trial_correct_str, online_data_rep.Value(trial).did_correctly );
-    last_state_str = sprintf( '%s \t %s', last_state_str, online_data_rep.Value(trial).last_state_reached );
-    response_time_str = sprintf( '%s \t %0.2f', response_time_str, online_data_rep.Value(trial).response_times );
+    data_cell(trial - ( length( online_data_rep.Value ) - 10 ),:) = ...
+      {trial online_data_rep.Value(trial).did_correctly ...
+      online_data_rep.Value(trial).last_state_reached ...
+      online_data_rep.Value(trial).response_times};
   end
+  data_table = cell2table(data_cell,...
+    'VariableNames',{'Trial_no' 'Correct' 'Last_state' 'Resp_time'});
 end
 
 overall_accuracy = mean([online_data_rep.Value(1:end).did_correctly])*100;
 
-fprintf( 'The overall accuracy is: %f percent\n', overall_accuracy );
-fprintf( '\n%s \n', trial_no_str );
-fprintf( '%s \n', trial_correct_str );
-fprintf( '%s \n', last_state_str );
-fprintf( '%s \n', response_time_str );
+fprintf( 'The overall accuracy is: %0.2f percent\n', overall_accuracy );
+disp(data_table)
 
 end
 
