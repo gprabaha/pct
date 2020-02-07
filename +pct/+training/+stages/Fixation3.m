@@ -9,6 +9,7 @@ classdef Fixation3 < pct.training.stages.FixationTrainingStage
       patch_dur = 0.1;
       
       obj@pct.training.stages.FixationTrainingStage( fix_dur, fix_hold_dur, patch_dur );
+      obj.Name = 'Fixation3';
     end
   end
 end

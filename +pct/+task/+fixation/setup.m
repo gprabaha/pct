@@ -29,6 +29,7 @@ make_task( program, conf );
 make_states( program, conf );
 make_data( program, conf );
 make_online_data_rep( program, conf );
+make_training_stage_name( program, conf );
 
 training_stage_manager = make_training_stage_manager( program, conf );
 make_training_stages( program, conf, params, training_stage_manager );
@@ -107,6 +108,12 @@ end
 function make_training_stages(program, conf, params, manager)
 
 params.training_stage_manager_config_func( manager );
+
+end
+
+function make_training_stage_name(program, conf)
+
+program.Value.training_stage_name = '';
 
 end
 

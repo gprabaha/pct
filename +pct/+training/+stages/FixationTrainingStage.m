@@ -1,5 +1,6 @@
 classdef FixationTrainingStage < pct.util.TrainingStage
   properties
+    Name;
     FixDur;
     FixHoldDur;
     PatchDur;
@@ -18,6 +19,7 @@ classdef FixationTrainingStage < pct.util.TrainingStage
     end
     
     function apply(obj, program)
+      program.Value.training_stage_name = obj.Name;
       fix_square = program.Value.targets.fix_square;
       fix_hold_square = program.Value.targets.fix_hold_square;
       

@@ -17,6 +17,7 @@ else
     program.Value.data.Value(end+1) = make_trial_data_scaffold( program );
 end
 
+display_training_stage( program );
 process_data( program );
 update_training_stages( program );
 
@@ -106,6 +107,13 @@ response_times = data(trials_so_far).just_patches.patch_acquired_times - ...
 
 end
 
+function display_training_stage( program )
+
+fprintf( '\nThe current training stage is: %s\n ', program.Value.training_stage_name );
+
+end
+
+
 function display_data( online_data_rep )
 
 clc;
@@ -130,6 +138,9 @@ else
   end
 end
 
+overall_accuracy = mean([online_data_rep.Value(1:end).did_correctly])*100;
+
+fprintf( 'The overall accuracy is: %f percent\n', overall_accuracy );
 fprintf( '\n%s \n', trial_no_str );
 fprintf( '%s \n', trial_correct_str );
 fprintf( '%s \n', last_state_str );
