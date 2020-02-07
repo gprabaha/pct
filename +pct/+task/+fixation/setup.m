@@ -1,10 +1,21 @@
-function program = setup(varargin)
+function program = setup(conf, varargin)
 
-conf = pct.config.reconcile( pct.util.require_config(varargin{:}) );
+defaults = struct();
+defaults.training_stage_manager_config_func = @noop;
+
+params = shared_utils.general.parsestruct( defaults, varargin );
+
+if ( nargin == 0 )
+  conf = pct.config.load();
+else
+  pct.util.assertions.assert__is_config( conf );
+end
+
+conf = pct.config.reconcile( conf );
 program = make_program( conf );
 
 try
-  make_all( program, conf );
+  make_all( program, conf, params );
 catch err
   delete( program );
   rethrow( err );
@@ -12,12 +23,15 @@ end
 
 end
 
-function make_all(program, conf)
+function make_all(program, conf, params)
 
 make_task( program, conf );
 make_states( program, conf );
 make_data( program, conf );
 make_online_data_rep( program, conf );
+
+training_stage_manager = make_training_stage_manager( program, conf );
+make_training_stages( program, conf, params, training_stage_manager );
 
 ni_session = make_ni_daq_session( program, conf );
 ni_scan_input = make_ni_scan_input( program, conf, ni_session );
@@ -80,6 +94,19 @@ function data = make_data(program, conf)
 
 data = ptb.Reference();
 program.Value.data = data;
+
+end
+
+function manager = make_training_stage_manager(program, conf)
+
+manager = pct.util.TrainingStageManager();
+program.Value.training_stage_manager = manager;
+
+end
+
+function make_training_stages(program, conf, params, manager)
+
+params.training_stage_manager_config_func( manager );
 
 end
 
@@ -484,4 +511,8 @@ end
 
 function signal = get_signal(conf)
 signal = conf.SIGNAL;
+end
+
+function varargout = noop(varargin)
+% Do nothing.
 end

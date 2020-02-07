@@ -17,6 +17,7 @@ conf.SCREEN.index = 0;
 % conf.SCREEN.calibration_rect = [0, 0, 1280, 1024];
 
 conf.STIMULI.setup.fix_square.size = [100, 100];
+conf.STIMULI.setup.fix_hold_square.size = [100, 100];
 conf.STIMULI.setup.patch.size = [100, 100];
 
 conf.DEBUG_SCREEN.is_present = false;
@@ -27,4 +28,8 @@ conf.DEBUG_SCREEN.rect = [ 1600, 0, 1600 + 1280, 1024 ];
 
 conf.REWARDS.training = 0.3;
 
-pct.task.fixation.start( conf );
+pct.config.save( conf );
+
+pct.task.fixation.start( conf ...
+  , 'training_stage_manager_config_func', @pct.training.configure.fixation_training ...
+);

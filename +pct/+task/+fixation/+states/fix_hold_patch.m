@@ -17,7 +17,7 @@ function entry(state, program)
 
 % Reset fix acquired state and target state.
 state.UserData.fixation_acquired_state = fixation_acquired_state();
-reset( program.Value.targets.fix_square );
+reset( program.Value.targets.fix_hold_square );
 
 reset_targets( program );
 position_stimuli( state, program );
@@ -93,13 +93,13 @@ function draw_target(program)
 
 is_debug = pct.util.is_debug( program );
 window = program.Value.window;
-fix_square = program.Value.stimuli.fix_square;
-fix_target = program.Value.targets.fix_square;
+fix_hold_square = program.Value.stimuli.fix_hold_square;
+fix_hold_target = program.Value.targets.fix_hold_square;
 
-draw( fix_square, window );
+draw( fix_hold_square, window );
 
 if ( is_debug )
-  draw( fix_target.Bounds, window );
+  draw( fix_hold_target.Bounds, window );
 end
 
 end
@@ -108,13 +108,13 @@ function draw_debug_target(program)
 
 is_debug = true;
 window = program.Value.debug_window;
-fix_square = program.Value.stimuli.fix_square;
-fix_target = program.Value.targets.fix_square;
+fix_hold_square = program.Value.stimuli.fix_hold_square;
+fix_hold_target = program.Value.targets.fix_hold_square;
 
-draw( fix_square, window );
+draw( fix_hold_square, window );
 
 if ( is_debug )
-  draw( fix_target.Bounds, window );
+  draw( fix_hold_target.Bounds, window );
 end
 
 end
@@ -176,15 +176,15 @@ end
 
 function check_target(state, program)
 
-fix_target = program.Value.targets.fix_square;
+fix_hold_target = program.Value.targets.fix_hold_square;
 fix_acq_state = state.UserData.fixation_acquired_state;
 
-if ( fix_target.IsDurationMet )
+if ( fix_hold_target.IsDurationMet )
   % Looked for long enough, so proceed to the exit function.
   fix_acq_state.Acquired = true;
   escape( state );
   
-elseif ( fix_target.IsInBounds )
+elseif ( fix_hold_target.IsInBounds )
   % Mark that we entered the target.
   fix_acq_state.Entered = true;
   

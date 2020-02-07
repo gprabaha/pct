@@ -18,6 +18,7 @@ else
 end
 
 process_data( program );
+update_training_stages( program );
 
 end
 
@@ -133,5 +134,12 @@ fprintf( '\n%s \n', trial_no_str );
 fprintf( '%s \n', trial_correct_str );
 fprintf( '%s \n', last_state_str );
 fprintf( '%s \n', response_time_str );
+
+end
+
+function update_training_stages(program)
+
+manager = program.Value.training_stage_manager;
+apply( manager, program );
 
 end

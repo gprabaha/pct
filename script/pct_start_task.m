@@ -29,4 +29,6 @@ conf.DEBUG_SCREEN.rect = [ 1600, 0, 1600 + 1280, 1024 ];
 
 conf.REWARDS.training = 0.3;
 
-pct.task.fixation.start( conf );
+pct.task.fixation.start( conf ...
+  , 'training_stage_manager_config_func', @pct.training.configure.fixation_training ...
+);
