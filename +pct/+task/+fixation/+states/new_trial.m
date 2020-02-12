@@ -11,15 +11,9 @@ end
 
 function entry(state, program)
 
-if ( isempty(program.Value.data.Value) )
-    program.Value.data.Value = make_trial_data_scaffold( program );
-else
-    program.Value.data.Value(end+1) = make_trial_data_scaffold( program );
-end
-
-process_data( program );
-display_training_stage( program );
 update_training_stages( program );
+update_data_scaffold( program );
+process_data( program );
 
 end
 
@@ -31,6 +25,16 @@ function exit(state, program)
 
 states = program.Value.states;
 next( state, states('fixation') );
+
+end
+
+function update_data_scaffold(program)
+
+if ( isempty(program.Value.data.Value) )
+    program.Value.data.Value = make_trial_data_scaffold( program );
+else
+    program.Value.data.Value(end+1) = make_trial_data_scaffold( program );
+end
 
 end
 
@@ -59,6 +63,8 @@ data_scaffold.error_penalty.entry_time = nan;
 data_scaffold.error_penalty.exit_time = nan;
 data_scaffold.error_penalty.did_fixate = nan;
 
+data_scaffold.training_stage_name = program.Value.training_stage_name;
+
 end
 
 function num_patches = count_patches(program)
@@ -78,8 +84,9 @@ if( length(data) > 1 )
   online_data_rep.Value(trials_so_far).did_correctly = check_correct(data, trials_so_far);
   online_data_rep.Value(trials_so_far).last_state_reached = check_last_state(data, trials_so_far);
   online_data_rep.Value(trials_so_far).response_times = check_response_times(data, trials_so_far);
+  online_data_rep.Value(trials_so_far).training_stage_name = data(trials_so_far).training_stage_name;
 
-  display_data( online_data_rep );
+  display_data( online_data_rep, program);
 end
 
 end
@@ -107,42 +114,53 @@ response_times = data(trials_so_far).just_patches.patch_acquired_times - ...
 
 end
 
-function display_training_stage( program )
-
-fprintf( '\nThe current training stage is: %s\n ', program.Value.training_stage_name );
-
-end
-
-
-function display_data( online_data_rep )
+function display_data(online_data_rep, program)
 
 clc;
 
 if( length( online_data_rep.Value ) < 11 )
-  data_cell = cell( length( online_data_rep.Value ), 4 );
+  data_cell = cell( length( online_data_rep.Value ), 5 );
   for trial = 1:length( online_data_rep.Value )
     data_cell(trial,:) = {trial online_data_rep.Value(trial).did_correctly ...
       online_data_rep.Value(trial).last_state_reached ...
-      online_data_rep.Value(trial).response_times};
+      online_data_rep.Value(trial).response_times ...
+      online_data_rep.Value(trial).training_stage_name};
   end
   data_table = cell2table(data_cell,...
-    'VariableNames',{'Trial_no' 'Correct' 'Last_state' 'Resp_time'});
+    'VariableNames',{'Trial_no' 'Correct' 'Last_state' 'Resp_time' 'Training_stage'});
 else
-  data_cell = cell( 10, 4 );
-  for trial = (length( online_data_rep.Value ) - 9):length( online_data_rep.Value )
-    data_cell(trial - ( length( online_data_rep.Value ) - 10 ),:) = ...
+  data_cell = cell( 10, 5 );
+  for trial = (numel( online_data_rep.Value ) - 9):numel( online_data_rep.Value )
+    data_cell(trial - ( numel( online_data_rep.Value ) - 10 ),:) = ...
       {trial online_data_rep.Value(trial).did_correctly ...
       online_data_rep.Value(trial).last_state_reached ...
-      online_data_rep.Value(trial).response_times};
+      online_data_rep.Value(trial).response_times ...
+      online_data_rep.Value(trial).training_stage_name};
   end
   data_table = cell2table(data_cell,...
-    'VariableNames',{'Trial_no' 'Correct' 'Last_state' 'Resp_time'});
+    'VariableNames',{'Trial_no' 'Correct' 'Last_state' 'Resp_time' 'Training_stage'});
 end
 
 overall_accuracy = mean([online_data_rep.Value(1:end).did_correctly])*100;
 
 fprintf( 'The overall accuracy is: %0.2f percent\n', overall_accuracy );
 disp(data_table)
+
+display_training_stage( program );
+display_juice_received( online_data_rep, 0.3 );
+
+end
+
+function display_training_stage( program )
+
+fprintf( '\nThe current training stage is: %s\n ', program.Value.training_stage_name );
+
+end
+
+function display_juice_received( online_data_rep, juice_reward_time )
+
+total_reward = sum([online_data_rep.Value(1:end).did_correctly])*juice_reward_time;
+fprintf( '\nTotal reward received so far = %0.2f seconds worth\n ', total_reward );
 
 end
 

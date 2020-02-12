@@ -21,28 +21,49 @@ classdef TrainingStageManager < handle
         return
       end
       
-      update_current_stage_index( obj );
+      curr_stage = current_stage( obj );
       
-      curr_stage = obj.Stages{obj.CurrentStageIndex};
       apply( curr_stage, program );
+      direc = direction( curr_stage, program );
       
-      obj.CurrentStageIndex = obj.CurrentStageIndex + direction( curr_stage, program );
+      if ( direc ~= 0 )
+        new_index = maybe_wrap_index( obj, obj.CurrentStageIndex + direc );
+        new_stage = obj.Stages{new_index};
+        
+        transition( curr_stage, new_stage, program );
+      else
+        new_index = obj.CurrentStageIndex;
+      end
+      
+      obj.CurrentStageIndex = new_index;
+    end
+    
+    function transition(from, to, program)
+      %
     end
   end
   
   methods (Access = private)
-    function update_current_stage_index(obj)
+    function stage = current_stage(obj)
       if ( obj.CurrentStageIndex > numel(obj.Stages) )
+        stage = [];
+      else
+        stage = obj.Stages{obj.CurrentStageIndex};
+      end
+    end
+    
+    function index = maybe_wrap_index(obj, index)      
+      if ( index > numel(obj.Stages) )
         if ( obj.WrapAround )
-          obj.CurrentStageIndex = 1;
+          index = 1;
         else
-          obj.CurrentStageIndex = numel( obj.Stages );
+          index = numel( obj.Stages );
         end
-      elseif ( obj.CurrentStageIndex < 1 )
+      elseif ( index < 1 )
         if ( obj.WrapAround )
-          obj.CurrentStageIndex = numel( obj.Stages );
+          index = numel( obj.Stages );
         else
-          obj.CurrentStageIndex = 1;
+          index = 1;
         end
       end
     end
