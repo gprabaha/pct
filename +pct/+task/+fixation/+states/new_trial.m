@@ -86,7 +86,7 @@ if( length(data) > 1 )
   online_data_rep.Value(trials_so_far).response_times = check_response_times(data, trials_so_far);
   online_data_rep.Value(trials_so_far).training_stage_name = data(trials_so_far).training_stage_name;
 
-  display_data( online_data_rep, program);
+  display_data( online_data_rep, program );
 end
 
 end
@@ -143,22 +143,26 @@ end
 
 overall_accuracy = mean([online_data_rep.Value(1:end).did_correctly])*100;
 
-fprintf( 'The overall accuracy is: %0.2f percent\n', overall_accuracy );
+fprintf( 'The overall accuracy is: %0.2f percent\n\n', overall_accuracy );
 disp(data_table)
 
-display_training_stage( program );
-display_juice_received( online_data_rep, 0.3 );
+display_juice_received( online_data_rep, program );
+if ~strcmp( online_data_rep.Value(end).training_stage_name, ...
+    program.Value.training_stage_name )
+  display_training_stage( program );
+end
 
 end
 
 function display_training_stage( program )
 
-fprintf( '\nThe current training stage is: %s\n ', program.Value.training_stage_name );
+fprintf( '\n!!!Transitioning to training stage: %s!!!\n ', program.Value.training_stage_name );
 
 end
 
-function display_juice_received( online_data_rep, juice_reward_time )
+function display_juice_received( online_data_rep, program )
 
+juice_reward_time = program.Value.rewards.training;
 total_reward = sum([online_data_rep.Value(1:end).did_correctly])*juice_reward_time;
 fprintf( '\nTotal reward received so far = %0.2f seconds worth\n ', total_reward );
 
