@@ -210,7 +210,8 @@ SIGNAL.analog_channel_m1y = 'ai1';
 
 %   REWARDS
 REWARDS = struct();
-REWARDS.training = 300;
+REWARDS.training = .2;
+REWARDS.total_reward = 0;
 
 % EXPORT
 conf.PATHS = PATHS;

@@ -7,7 +7,7 @@ classdef FixationTrainingStage < pct.util.TrainingStage
     
     PercentCorrectThresholdAdvance = 85;
     PercentCorrectThresholdRevert = 20;
-    TrialHistorySize = 50;
+    TrialHistorySize = 5;
   end
   
   properties (Access = private)
@@ -76,8 +76,19 @@ classdef FixationTrainingStage < pct.util.TrainingStage
       end
     end
     
-    function transition(from, to, program)
+    function transition(from, to, direc, program)
       to.history_start_index = numel( program.Value.data.Value ) + 1; % current trial index.
+      if direc == 1
+        program.Value.rewards.training = program.Value.rewards.training + 0.02;
+        if program.Value.rewards.training > 0.3
+          program.Value.rewards.training = 0.3;
+        end
+      elseif direc == -1
+        program.Value.rewards.training = program.Value.rewards.training - 0.02;
+        if program.Value.rewards.training < 0.15
+          program.Value.rewards.training = 0.15;
+        end
+      end
     end
     
     function slice = get_history_slice(obj, program)

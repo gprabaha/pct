@@ -64,6 +64,7 @@ data_scaffold.error_penalty.exit_time = nan;
 data_scaffold.error_penalty.did_fixate = nan;
 
 data_scaffold.training_stage_name = program.Value.training_stage_name;
+data_scaffold.training_stage_reward = program.Value.rewards.training;
 
 end
 
@@ -85,6 +86,7 @@ if( length(data) > 1 )
   online_data_rep.Value(trials_so_far).last_state_reached = check_last_state(data, trials_so_far);
   online_data_rep.Value(trials_so_far).response_times = check_response_times(data, trials_so_far);
   online_data_rep.Value(trials_so_far).training_stage_name = data(trials_so_far).training_stage_name;
+  online_data_rep.Value(trials_so_far).training_stage_reward = data(trials_so_far).training_stage_reward;
 
   display_data( online_data_rep, program );
 end
@@ -169,7 +171,8 @@ fix_hold_time = program.Value.targets.fix_hold_square.Duration;
 patch_name = pct.util.nth_patch_stimulus_name( 1 );
 patch_time = program.Value.targets.(patch_name).Duration;
 
-fprintf( '\n## Parameters of the current training stage ##\n\n' );
+fprintf( '\n## Parameters of the current training stage ##\n' );
+fprintf( '----------------------------------------------\n' );
 fprintf( 'Fixation time: %0.2f seconds\n', fix_time );
 fprintf( 'Fixation and hold time: %0.2f seconds\n', fix_hold_time );
 fprintf( 'Patch collection time: %0.2f seconds', patch_time );
@@ -178,9 +181,14 @@ end
 
 function display_juice_received(online_data_rep, program)
 
-juice_reward_time = program.Value.rewards.training;
-total_reward = sum([online_data_rep.Value(1:end).did_correctly])*juice_reward_time;
-fprintf( '\nTotal reward received so far = %0.2f seconds worth\n ', total_reward );
+juice_reward_time = online_data_rep.Value(end).training_stage_reward;
+if online_data_rep.Value(end).did_correctly
+  program.Value.rewards.total_reward = ...
+    program.Value.rewards.total_reward + juice_reward_time;
+end
+total_reward = program.Value.rewards.total_reward;
+fprintf( '\nReward duration per correct trial = %0.2f seconds worth\n ', juice_reward_time );
+fprintf( 'Total reward received so far = %0.2f seconds worth\n ', total_reward );
 
 end
 

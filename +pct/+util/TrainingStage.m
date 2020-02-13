@@ -22,6 +22,6 @@ classdef TrainingStage < handle
     apply(obj, program)
     tf = advance(obj, program)
     tf = revert(obj, program)
-    transition(from, to, program)
+    transition(from, to, direc, program)
   end
 end

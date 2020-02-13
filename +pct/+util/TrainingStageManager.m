@@ -22,23 +22,22 @@ classdef TrainingStageManager < handle
       end
       
       curr_stage = current_stage( obj );
-      
-      apply( curr_stage, program );
       direc = direction( curr_stage, program );
       
       if ( direc ~= 0 )
         new_index = maybe_wrap_index( obj, obj.CurrentStageIndex + direc );
         new_stage = obj.Stages{new_index};
-        
-        transition( curr_stage, new_stage, program );
+        transition( curr_stage, new_stage, direc, program );
       else
         new_index = obj.CurrentStageIndex;
       end
       
       obj.CurrentStageIndex = new_index;
+      curr_stage = current_stage( obj );
+      apply( curr_stage, program );
     end
     
-    function transition(from, to, program)
+    function transition(from, to, direc, program)
       %
     end
   end
