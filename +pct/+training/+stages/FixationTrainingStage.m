@@ -78,7 +78,6 @@ classdef FixationTrainingStage < pct.util.TrainingStage
     
     function transition(from, to, program)
       to.history_start_index = numel( program.Value.data.Value ) + 1; % current trial index.
-      fprintf( '\n\n!!Transitioning to new Fixation Stage!!\n');
     end
     
     function slice = get_history_slice(obj, program)

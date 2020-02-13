@@ -152,15 +152,31 @@ if ~strcmp( online_data_rep.Value(end).training_stage_name, ...
   display_training_stage( program );
 end
 
-end
-
-function display_training_stage( program )
-
-fprintf( '\n!!!Transitioning to training stage: %s!!!\n ', program.Value.training_stage_name );
+display_training_stage_parameters( program );
 
 end
 
-function display_juice_received( online_data_rep, program )
+function display_training_stage(program)
+
+fprintf( '\n!!!Transitioning to training stage: %s!!!\n\n ', program.Value.training_stage_name );
+
+end
+
+function display_training_stage_parameters(program)
+
+fix_time = program.Value.targets.fix_square.Duration;
+fix_hold_time = program.Value.targets.fix_hold_square.Duration;
+patch_name = pct.util.nth_patch_stimulus_name( 1 );
+patch_time = program.Value.targets.(patch_name).Duration;
+
+fprintf( '\n## Parameters of the current training stage ##\n\n' );
+fprintf( 'Fixation time: %0.2f seconds\n', fix_time );
+fprintf( 'Fixation and hold time: %0.2f seconds\n', fix_hold_time );
+fprintf( 'Patch collection time: %0.2f seconds', patch_time );
+
+end
+
+function display_juice_received(online_data_rep, program)
 
 juice_reward_time = program.Value.rewards.training;
 total_reward = sum([online_data_rep.Value(1:end).did_correctly])*juice_reward_time;
