@@ -7,7 +7,7 @@ classdef FixationTrainingStage < pct.util.TrainingStage
     
     PercentCorrectThresholdAdvance = 85;
     PercentCorrectThresholdRevert = 20;
-    TrialHistorySize = 5;
+    TrialHistorySize = 50;
   end
   
   properties (Access = private)

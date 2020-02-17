@@ -202,7 +202,7 @@ function position_stimuli(state, program)
 
 num_patches = count_patches( program );
 stimuli = program.Value.stimuli;
-pos_vec = [.25, .75];
+pos_vec = [.35, .65];
 
 for i = 1:num_patches
   stim_name = pct.util.nth_patch_stimulus_name( i );

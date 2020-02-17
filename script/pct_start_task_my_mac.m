@@ -3,6 +3,8 @@ Screen( 'Preference', 'VisualDebuglevel', 0 );
 conf = pct.config.reconcile( pct.config.load() );
 
 conf.TIMINGS.time_in.fixation = 10;
+conf.TIMINGS.time_in.just_patches = 20;
+conf.TIMINGS.time_in.juice_reward = 1;
 
 conf.META.subject = 'human';
 
