@@ -30,6 +30,7 @@ make_states( program, conf );
 make_data( program, conf );
 make_online_data_rep( program, conf );
 make_training_stage_name( program, conf );
+make_percentage_correct_recorder( program, conf );
 
 training_stage_manager = make_training_stage_manager( program, conf );
 make_training_stages( program, conf, params, training_stage_manager );
@@ -121,6 +122,12 @@ function online_data_rep = make_online_data_rep(program, conf)
 
 online_data_rep = ptb.Reference();
 program.Value.online_data_rep = online_data_rep;
+
+end
+
+function make_percentage_correct_recorder( program, conf )
+
+program.Value.last_n_percent_correct = nan;
 
 end
 
