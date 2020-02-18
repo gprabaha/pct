@@ -51,6 +51,7 @@ classdef FixationTrainingStage < pct.util.TrainingStage
       
       online_performance = program.Value.online_data_rep.Value( slice(1):slice(2)-1 );
       last_n_perc_correct = check_last_n_percent_corr( obj, online_performance, program );
+      program.Value.last_n_percent_correct = last_n_perc_correct;
       if last_n_perc_correct >= obj.PercentCorrectThresholdAdvance
         tf = true;
       else
@@ -71,6 +72,7 @@ classdef FixationTrainingStage < pct.util.TrainingStage
       
       online_performance = program.Value.online_data_rep.Value( slice(1):slice(2)-1 );
       last_n_perc_correct = check_last_n_percent_corr( obj, online_performance, program );
+      program.Value.last_n_percent_correct = last_n_perc_correct;
       if last_n_perc_correct < obj.PercentCorrectThresholdRevert
         tf = true;
       else

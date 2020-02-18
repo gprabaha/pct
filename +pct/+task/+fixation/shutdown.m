@@ -70,7 +70,7 @@ if( program.Value.interface.save_data )
     data_filename = [datestr(datetime, 'yyyy-mm-dd_HH-MM-SS') '-pct-training-data'];
     save([path data_filename], 'program_data');
   catch err
-    warning( err.message )
+    warning( err.message );
   end
 end
 

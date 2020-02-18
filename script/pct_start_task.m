@@ -1,3 +1,4 @@
+clear;
 Screen( 'Preference', 'VisualDebuglevel', 0 );
 
 conf = pct.config.reconcile( pct.config.load() );
