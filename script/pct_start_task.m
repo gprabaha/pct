@@ -6,6 +6,7 @@ conf = pct.config.reconcile( pct.config.load() );
 conf.TIMINGS.time_in.fixation = 10;
 conf.TIMINGS.time_in.just_patches = 20;
 conf.TIMINGS.time_in.juice_reward = 1;
+conf.TIMINGS.time_in.pause = 60;
 
 conf.META.subject = 'hitch';
 
@@ -16,6 +17,8 @@ conf.INTERFACE.reward_output_type = 'ni';
 % conf.INTERFACE.reward_output_type = 'none'; 
 conf.INTERFACE.skip_sync_tests = true;
 conf.INTERFACE.save_data = true;
+
+conf.STRUCTURE.pause_state_criterion = @(program) pct.util.pause_after_num_trials(program, 300);
 
 % conf.SCREEN.rect = [0, 0, 1280, 1024];
 conf.SCREEN.rect = [];

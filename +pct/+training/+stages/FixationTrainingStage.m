@@ -5,7 +5,7 @@ classdef FixationTrainingStage < pct.util.TrainingStage
     FixHoldDur;
     PatchDur;
     
-    PercentCorrectThresholdAdvance = 85;
+    PercentCorrectThresholdAdvance = 80;
     PercentCorrectThresholdRevert = 20;
     TrialHistorySize = 50;
   end
