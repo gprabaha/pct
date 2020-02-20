@@ -289,6 +289,7 @@ function targets = make_targets(program, updater, window, sampler, stimuli, conf
 stim_setup = get_stimuli_setup( conf );
 stim_names = fieldnames( stim_setup );
 structure = get_structure( conf );
+patch_distribution_radius =  get_patch_distribution_radius( conf );
 
 targets = struct();
 patch_targets = {};
@@ -323,6 +324,7 @@ end
 
 program.Value.targets = targets;
 program.Value.patch_targets = patch_targets;
+program.Value.patch_distribution_radius = patch_distribution_radius;
 
 end
 
@@ -533,6 +535,10 @@ end
 
 function signal = get_signal(conf)
 signal = conf.SIGNAL;
+end
+
+function patch_distribution_radius = get_patch_distribution_radius( conf )
+patch_distribution_radius = conf.STIMULI.patch_distribution_radius;
 end
 
 function varargout = noop(varargin)

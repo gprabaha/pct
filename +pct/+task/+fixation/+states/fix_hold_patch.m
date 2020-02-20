@@ -202,11 +202,14 @@ function position_stimuli(state, program)
 
 num_patches = count_patches( program );
 stimuli = program.Value.stimuli;
-pos_vec = [.35, .65];
+radius = program.Value.patch_distribution_radius;
+screen_index = program.Value.window.Index;
+screen_resolution = Screen( 'Resolution', screen_index );
+coordinates = assign_patch_coordinates( num_patches, radius, screen_resolution );
 
-for i = 1:num_patches
-  stim_name = pct.util.nth_patch_stimulus_name( i );
-  new_pos = [pos_vec(randi(length(pos_vec))) pos_vec(randi(length(pos_vec)))];
+for patch_index = 1:num_patches
+  stim_name = pct.util.nth_patch_stimulus_name( patch_index );
+  new_pos = coordinates(:, patch_index);
   stimulus = stimuli.(stim_name);
   stimulus.Position.Value = new_pos;
 end
@@ -249,4 +252,51 @@ function did_fixate(state,program,fix_acq_state)
 
 program.Value.data.Value(end).(state.Name).did_fixate = fix_acq_state;
   
+end
+
+function coordinates = assign_patch_coordinates( num_patches, radius, screen_resolution )
+
+if num_patches > 4
+  error('Number of patches cannot be more than 4!');
+end
+
+% Adjusting for rectangular screen
+if screen_resolution.width > screen_resolution.height
+  adjustment_ratio = screen_resolution.height/screen_resolution.width;
+  adjustment_dim = 1;
+else
+  adjustment_ratio = screen_resolution.width/screen_resolution.height;
+  adjustment_dim = 2;
+end
+
+center = [0.5; 0.5];
+if num_patches ~= 1
+  theta = 360/num_patches;
+else
+  theta = 0;
+end
+rotation_matrix = [cosd(theta) -sind(theta); sind(theta) cosd(theta)];
+
+coordinates = nan( 2, num_patches );
+if adjustment_dim == 1
+  coordinates( :, 1 ) = [0; radius];
+else
+  coordinates( :, 1 ) = [radius; 0];
+end
+if num_patches > 1
+  for patch = 2:num_patches
+    coordinates( :, patch ) = rotation_matrix * coordinates( :, patch-1 );
+  end
+else
+end
+
+random_frame_rotation_angle = rand * 180;
+random_angle_frame_rotation_matrix = [cosd(random_frame_rotation_angle)...
+  -sind(random_frame_rotation_angle);...
+  sind(random_frame_rotation_angle)...
+  cosd(random_frame_rotation_angle)];
+coordinates = random_angle_frame_rotation_matrix * coordinates;
+coordinates(adjustment_dim, :) = coordinates(adjustment_dim, :) * adjustment_ratio;
+coordinates = coordinates + center;
+
 end

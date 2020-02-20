@@ -14,10 +14,12 @@ conf.INTERFACE.reward_output_type = 'none';
 conf.INTERFACE.skip_sync_tests = true;
 conf.INTERFACE.save_data = false;
 
+conf.STIMULI.patch_distribution_radius = 0.4;
+
 conf.STRUCTURE.pause_state_criterion = @(program) pct.util.pause_after_num_trials(program, 5);
 
 
-conf.SCREEN.rect = [0, 0, 500, 500];
+conf.SCREEN.rect = [0, 0, 840, 525];
 conf.SCREEN.index = 0;
 % conf.SCREEN.calibration_rect = [0, 0, 1280, 1024];
 

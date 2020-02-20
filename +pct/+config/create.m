@@ -92,6 +92,7 @@ TIMINGS.time_in = time_in;
 %	STIMULI
 STIMULI = struct();
 STIMULI.setup = struct();
+STIMULI.patch_distribution_radius = 0.15;
 
 non_editable_properties = {{ 'placement', 'has_target', 'image_matrix' }};
 
