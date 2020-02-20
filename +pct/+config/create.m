@@ -70,6 +70,8 @@ DEBUG_SCREEN.rect = [ 0, 0, 400, 400 ];
 % STRUCTURE
 STRUCTURE = struct();
 STRUCTURE.num_patches = 1;
+STRUCTURE.pause_state_criterion = ...
+  @(program) pct.util.pause_after_num_trials( program, 300 );
 
 %	TIMINGS
 TIMINGS = struct();
@@ -83,6 +85,7 @@ time_in.just_patches = Inf;
 time_in.error_penalty = 3;
 time_in.present_patches = Inf;
 time_in.juice_reward = 1;
+time_in.pause = 60;
 
 TIMINGS.time_in = time_in;
 

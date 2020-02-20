@@ -11,9 +11,18 @@ end
 
 function entry(state, program)
 
-update_training_stages( program );
-update_data_scaffold( program );
-process_data( program );
+states = program.Value.states;
+pause_flag = program.Value.pause_flag;
+
+if ( should_go_to_pause_state(program) &&  ~pause_flag )
+  next( state, states('pause') );
+else
+  update_training_stages( program );
+  update_data_scaffold( program );
+  process_data( program );
+  program.Value.pause_flag = false;
+  next( state, states('fixation') );
+end
 
 end
 
@@ -22,9 +31,6 @@ function loop(state, program)
 end
 
 function exit(state, program)
-
-states = program.Value.states;
-next( state, states('fixation') );
 
 end
 
@@ -62,6 +68,9 @@ data_scaffold.just_patches.did_fixate = nan;
 data_scaffold.error_penalty.entry_time = nan;
 data_scaffold.error_penalty.exit_time = nan;
 data_scaffold.error_penalty.did_fixate = nan;
+
+data_scaffold.pause.entry_time = nan;
+data_scaffold.pause.exit_time = nan;
 
 data_scaffold.training_stage_name = program.Value.training_stage_name;
 data_scaffold.training_stage_reward = program.Value.rewards.training;
@@ -202,5 +211,11 @@ function update_training_stages(program)
 
 manager = program.Value.training_stage_manager;
 apply( manager, program );
+
+end
+
+function tf = should_go_to_pause_state(program)
+
+tf = program.Value.structure.pause_state_criterion( program );
 
 end

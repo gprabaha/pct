@@ -32,6 +32,8 @@ make_online_data_rep( program, conf );
 make_training_stage_name( program, conf );
 make_percentage_correct_recorder( program, conf );
 
+make_pause_flag( program, conf );
+
 training_stage_manager = make_training_stage_manager( program, conf );
 make_training_stages( program, conf, params, training_stage_manager );
 
@@ -115,6 +117,12 @@ end
 function make_training_stage_name(program, conf)
 
 program.Value.training_stage_name = '';
+
+end
+
+function make_pause_flag( program, conf )
+
+program.Value.pause_flag = false;
 
 end
 
@@ -237,7 +245,7 @@ function states = make_states(program, conf)
 
 states = containers.Map();
 state_names = { 'new_trial', 'fixation', 'fix_hold_patch', ...
-    'just_patches', 'error_penalty', 'juice_reward' };
+    'just_patches', 'error_penalty', 'juice_reward', 'pause' };
 
 for i = 1:numel(state_names)
   state_func = sprintf( 'pct.task.fixation.states.%s', state_names{i} );
