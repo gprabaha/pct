@@ -102,13 +102,13 @@ classdef FixationTrainingStage < pct.util.TrainingStage
       to.history_start_index = numel( program.Value.data.Value ) + 1; % current trial index.
       if direc == 1
         program.Value.rewards.training = program.Value.rewards.training + 0.02;
-        if program.Value.rewards.training > 0.3
-          program.Value.rewards.training = 0.3;
+        if program.Value.rewards.training > 0.4
+          program.Value.rewards.training = 0.4;
         end
       elseif direc == -1
         program.Value.rewards.training = program.Value.rewards.training - 0.02;
-        if program.Value.rewards.training < 0.15
-          program.Value.rewards.training = 0.15;
+        if program.Value.rewards.training < 0.2
+          program.Value.rewards.training = 0.2;
         end
       end
     end
