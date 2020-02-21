@@ -275,7 +275,7 @@ if num_patches ~= 1
 else
   theta = 0;
 end
-rotation_matrix = [cosd(theta) -sind(theta); sind(theta) cosd(theta)];
+
 
 coordinates = nan( 2, num_patches );
 if adjustment_dim == 1
@@ -285,18 +285,22 @@ else
 end
 if num_patches > 1
   for patch = 2:num_patches
-    coordinates( :, patch ) = rotation_matrix * coordinates( :, patch-1 );
+    rotation_matrix = rotation_matrix_generator( theta*(patch-1) );
+    coordinates( :, patch ) = rotation_matrix * coordinates( :, 1 );
   end
 else
 end
 
-random_frame_rotation_angle = rand * 180;
-random_angle_frame_rotation_matrix = [cosd(random_frame_rotation_angle)...
-  -sind(random_frame_rotation_angle);...
-  sind(random_frame_rotation_angle)...
-  cosd(random_frame_rotation_angle)];
+random_frame_rotation_angle = rand * 360;
+random_angle_frame_rotation_matrix = rotation_matrix_generator( random_frame_rotation_angle );
 coordinates = random_angle_frame_rotation_matrix * coordinates;
 coordinates(adjustment_dim, :) = coordinates(adjustment_dim, :) * adjustment_ratio;
 coordinates = coordinates + center;
+
+end
+
+function rotation_matrix = rotation_matrix_generator(theta)
+
+rotation_matrix = [cosd(theta) -sind(theta); sind(theta) cosd(theta)];
 
 end

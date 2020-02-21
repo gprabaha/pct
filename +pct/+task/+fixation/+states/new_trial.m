@@ -14,15 +14,21 @@ function entry(state, program)
 states = program.Value.states;
 pause_flag = program.Value.pause_flag;
 
-if ( should_go_to_pause_state(program) &&  ~pause_flag )
-  next( state, states('pause') );
-else
-  update_training_stages( program );
-  update_data_scaffold( program );
-  process_data( program );
-  program.Value.pause_flag = false;
-  next( state, states('fixation') );
-end
+% if ( should_go_to_pause_state(program) &&  ~pause_flag )
+%   next( state, states('pause') );
+% else
+%   update_training_stages( program );
+%   update_data_scaffold( program );
+%   process_data( program );
+%   program.Value.pause_flag = false;
+%   next( state, states('fixation') );
+% end
+
+update_training_stages( program );
+update_data_scaffold( program );
+process_data( program );
+program.Value.pause_flag = false;
+next( state, states('fixation') );
 
 end
 
@@ -156,11 +162,7 @@ overall_accuracy = mean([online_data_rep.Value(1:end).did_correctly])*100;
 last_n_percent_correct = program.Value.last_n_percent_correct;
 
 fprintf( 'The overall accuracy is: %0.2f percent\n\n', overall_accuracy );
-if ~isnan(last_n_percent_correct)
-  fprintf( 'Accuracy over last n trials: %0.2f percent\n\n', last_n_percent_correct );
-else
-  fprintf( 'Accuracy over last n trials: NaN\n\n' );
-end
+fprintf( 'Accuracy over last n trials: %0.2f percent\n\n', last_n_percent_correct );
 disp(data_table)
 
 display_juice_received( online_data_rep, program );

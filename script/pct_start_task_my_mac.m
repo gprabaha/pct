@@ -3,7 +3,7 @@ Screen( 'Preference', 'VisualDebuglevel', 0 );
 conf = pct.config.reconcile( pct.config.load() );
 
 conf.TIMINGS.time_in.fixation = 10;
-conf.TIMINGS.time_in.just_patches = 20;
+conf.TIMINGS.time_in.just_patches = 10;
 conf.TIMINGS.time_in.juice_reward = 1;
 conf.TIMINGS.time_in.pause = 2;
 
@@ -14,12 +14,13 @@ conf.INTERFACE.reward_output_type = 'none';
 conf.INTERFACE.skip_sync_tests = true;
 conf.INTERFACE.save_data = false;
 
-conf.STIMULI.patch_distribution_radius = 0.4;
+conf.STIMULI.patch_distribution_radius = 0.35;
 
 conf.STRUCTURE.pause_state_criterion = @(program) pct.util.pause_after_num_trials(program, 5);
+conf.STRUCTURE.num_patches = 3;
 
 
-conf.SCREEN.rect = [0, 0, 840, 525];
+conf.SCREEN.rect = [0, 0, 560, 350];
 conf.SCREEN.index = 0;
 % conf.SCREEN.calibration_rect = [0, 0, 1280, 1024];
 

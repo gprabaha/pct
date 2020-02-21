@@ -40,18 +40,19 @@ classdef FixationTrainingStage < pct.util.TrainingStage
     
     function tf = advance(obj, program)
       slice = get_history_slice( obj, program );
-      update_history_start_index( obj, slice );
+      % update_history_start_index( obj, slice );
       slice_size = slice(2) - slice(1) + 1;
       
       if ( slice_size < obj.TrialHistorySize )
         tf = false;
+        disp('Local accuracy updating in advance');
         program.Value.last_n_percent_correct = nan;
         return
       end
       
       online_performance = program.Value.online_data_rep.Value( slice(1):slice(2)-1 );
       last_n_perc_correct = check_last_n_percent_corr( obj, online_performance, program );
-      program.Value.last_n_percent_correct = last_n_perc_correct;
+      
       if last_n_perc_correct >= obj.PercentCorrectThresholdAdvance
         tf = true;
       else
@@ -66,13 +67,14 @@ classdef FixationTrainingStage < pct.util.TrainingStage
       
       if ( slice_size < obj.TrialHistorySize )
         tf = false;
+        disp('Local accuracy updating in revert');
         program.Value.last_n_percent_correct = nan;
         return
       end
       
       online_performance = program.Value.online_data_rep.Value( slice(1):slice(2)-1 );
       last_n_perc_correct = check_last_n_percent_corr( obj, online_performance, program );
-      program.Value.last_n_percent_correct = last_n_perc_correct;
+      
       if last_n_perc_correct < obj.PercentCorrectThresholdRevert
         tf = true;
       else
@@ -104,15 +106,15 @@ classdef FixationTrainingStage < pct.util.TrainingStage
       slice = [start_index end_index];
     end
     
-    function update_history_start_index(obj, history_slice)
-      slice_size = history_slice(2) - history_slice(1) + 1;
+    function update_history_start_index(obj, slice)
+      slice_size = slice(2) - slice(1) + 1;
       if ( slice_size == obj.TrialHistorySize )
         obj.history_start_index = obj.history_start_index + 1;
       end
     end
     
     function last_n_perc_correct = check_last_n_percent_corr(obj, online_performance, program)
-      last_n_perc_correct = mean([online_performance(1:end).did_correctly])*100;
+      last_n_perc_correct = nanmean([online_performance(1:end).did_correctly])*100;
       program.Value.last_n_percent_correct = last_n_perc_correct;
     end
   end
