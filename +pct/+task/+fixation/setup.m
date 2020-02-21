@@ -32,10 +32,14 @@ make_online_data_rep( program, conf );
 make_training_stage_name( program, conf );
 make_percentage_correct_recorder( program, conf );
 
+keyboard_queue = make_keyboard_queue( program );
+make_key_listeners( program, keyboard_queue );
+
 make_pause_flag( program, conf );
 
 training_stage_manager = make_training_stage_manager( program, conf );
-make_training_stages( program, conf, params, training_stage_manager );
+
+make_training_data( program, conf, params, training_stage_manager );
 
 ni_session = make_ni_daq_session( program, conf );
 ni_scan_input = make_ni_scan_input( program, conf, ni_session );
@@ -108,9 +112,13 @@ program.Value.training_stage_manager = manager;
 
 end
 
-function make_training_stages(program, conf, params, manager)
+function make_training_data(program, conf, params, manager)
 
 params.training_stage_manager_config_func( manager );
+
+program.Value.training_data = struct();
+program.Value.training_data.should_advance = false;
+program.Value.training_data.should_revert = false;
 
 end
 
@@ -485,6 +493,21 @@ arduino_reward_manager = serial_comm.SerialManager( port, messages, channels );
 start( arduino_reward_manager );
 
 program.Value.arduino_reward_manager = arduino_reward_manager;
+
+end
+
+function queue = make_keyboard_queue(program)
+
+queue = ptb.keyboard.Queue();
+start( queue );
+program.Value.keyboard_queue = queue;
+
+end
+
+function make_key_listeners(program, keyboard_queue)
+
+add_listener( keyboard_queue ...
+  , @(key_state) pct.training.fixation_training_stage_key_listener(key_state, program) );
 
 end
 

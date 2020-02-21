@@ -39,6 +39,14 @@ classdef FixationTrainingStage < pct.util.TrainingStage
     end
     
     function tf = advance(obj, program)
+      training_data = program.Value.training_data;
+      
+      if ( training_data.should_advance )
+        program.Value.training_data.should_advance = false;
+        tf = true;
+        return;
+      end
+      
       slice = get_history_slice( obj, program );
       % update_history_start_index( obj, slice );
       slice_size = slice(2) - slice(1) + 1;
@@ -61,6 +69,14 @@ classdef FixationTrainingStage < pct.util.TrainingStage
     end
     
     function tf = revert(obj, program)
+      training_data = program.Value.training_data;
+      
+      if ( training_data.should_revert )
+        program.Value.training_data.should_revert = false;
+        tf = true;
+        return;
+      end
+      
       slice = get_history_slice( obj, program );
       update_history_start_index( obj, slice );
       slice_size = slice(2) - slice(1) + 1;
@@ -82,7 +98,7 @@ classdef FixationTrainingStage < pct.util.TrainingStage
       end
     end
     
-    function transition(from, to, direc, program)
+    function transition(from, to, direc, program)      
       to.history_start_index = numel( program.Value.data.Value ) + 1; % current trial index.
       if direc == 1
         program.Value.rewards.training = program.Value.rewards.training + 0.02;

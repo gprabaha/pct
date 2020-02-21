@@ -33,6 +33,7 @@ INTERFACE.is_debug = false;
 INTERFACE.tracker_sync_interval = 1;
 INTERFACE.skip_sync_tests = false;
 INTERFACE.save_data = true;
+INTERFACE.display_task_progress = true;
 
 %   META
 META = struct();
