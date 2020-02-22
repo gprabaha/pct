@@ -5,7 +5,7 @@ classdef FixHold5 < pct.training.stages.FixationTrainingStage
   methods
     function obj = FixHold5()
       fix_dur = 0.3;
-      fix_hold_dur = 0.4;
+      fix_hold_dur = 0.25;
       patch_dur = 0.1;
       
       obj@pct.training.stages.FixationTrainingStage( fix_dur, fix_hold_dur, patch_dur );

@@ -45,7 +45,6 @@ classdef FixationTrainingStage < pct.util.TrainingStage
       
       if ( slice_size < obj.TrialHistorySize )
         tf = false;
-        disp('Local accuracy updating in advance');
         program.Value.last_n_percent_correct = nan;
         return
       end
@@ -67,7 +66,6 @@ classdef FixationTrainingStage < pct.util.TrainingStage
       
       if ( slice_size < obj.TrialHistorySize )
         tf = false;
-        disp('Local accuracy updating in revert');
         program.Value.last_n_percent_correct = nan;
         return
       end
