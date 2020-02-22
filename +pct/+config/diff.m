@@ -1,5 +1,5 @@
 
-function missing = diff(saved_conf, display)
+function missing = diff(saved_conf, display, created_conf)
 
 %   DIFF -- Return missing fields in the saved config file.
 %
@@ -38,7 +38,9 @@ else
     , class(display) );
 end
 
-created_conf = pct.config.create( false ); % false to not save conf
+if ( nargin < 3 )
+  created_conf = pct.config.create( false ); % false to not save conf
+end
 
 missing = get_missing( created_conf, saved_conf, '', 0, {}, display );
 

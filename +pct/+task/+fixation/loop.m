@@ -12,6 +12,8 @@ if ( strcmp(program.Value.interface.gaze_source_type, 'digital_eyelink') )
   sync_digital_eyelink( task, program );
 end
 
+update( program.Value.keyboard_queue );
+
 end
 
 function handle_ni_daq_update(program)

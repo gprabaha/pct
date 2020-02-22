@@ -14,21 +14,15 @@ function entry(state, program)
 states = program.Value.states;
 pause_flag = program.Value.pause_flag;
 
-% if ( should_go_to_pause_state(program) &&  ~pause_flag )
-%   next( state, states('pause') );
-% else
-%   update_training_stages( program );
-%   update_data_scaffold( program );
-%   process_data( program );
-%   program.Value.pause_flag = false;
-%   next( state, states('fixation') );
-% end
-
-update_training_stages( program );
-update_data_scaffold( program );
-process_data( program );
-program.Value.pause_flag = false;
-next( state, states('fixation') );
+if ( should_go_to_pause_state(program) &&  ~pause_flag )
+  next( state, states('pause') );
+else
+  update_training_stages( program );
+  update_data_scaffold( program );
+  process_data( program );
+  program.Value.pause_flag = false;
+  next( state, states('fixation') );
+end
 
 end
 
@@ -92,6 +86,7 @@ end
 function process_data(program)
 
 data = program.Value.data.Value;
+interface = program.Value.interface;
 online_data_rep = program.Value.online_data_rep;
 
 if( length(data) > 1 )
@@ -103,7 +98,9 @@ if( length(data) > 1 )
   online_data_rep.Value(trials_so_far).training_stage_name = data(trials_so_far).training_stage_name;
   online_data_rep.Value(trials_so_far).training_stage_reward = data(trials_so_far).training_stage_reward;
 
-  display_data( online_data_rep, program );
+  if ( interface.display_task_progress )
+    display_data( online_data_rep, program );
+  end
 end
 
 end
