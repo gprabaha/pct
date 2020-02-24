@@ -49,10 +49,12 @@ end
 function exit(state, program)
 
 fix_acq_state = state.UserData.fixation_acquired_state;
+quantity = 0.05;
 
 if ( fix_acq_state.Acquired )
   timestamp_exit( state, program );
   did_fixate( state, program, fix_acq_state.Acquired );
+  pct.util.deliver_reward( program, 1, quantity );
   next( state, program.Value.states('just_patches') );
 else
   timestamp_exit( state, program );
