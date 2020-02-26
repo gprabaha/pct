@@ -2,18 +2,38 @@ classdef TrainingStageManager < handle
   properties (GetAccess = public, SetAccess = private)
     Stages = {};
     CurrentStageIndex;
+    InitialStageIndex = 1;
     WrapAround = false;
   end
   
   methods
     function obj = TrainingStageManager()
-      obj.CurrentStageIndex = 1;
+      %obj.CurrentStageIndex = 1;
     end
     
     function add_stage(obj, stage)
       validateattributes( stage, {'pct.util.TrainingStage'}, {'scalar'} ...
         , mfilename, 'stage' );
       obj.Stages{end+1} = stage;
+    end
+    
+    function initialize_stage(obj, stage_name)
+      if nargin < 2
+        stage_index = obj.InitialStageIndex;
+      else
+        found_stage = false;
+        for stage_id = 1:numel( obj.Stages )
+          if strcmp( obj.Stages{stage_id}.Name, stage_name )
+            stage_index = stage_id;
+            found_stage = true;
+            break
+          end
+        end
+        if ~found_stage
+          error('Entered stage name not found!')
+        end
+      end
+      obj.CurrentStageIndex = stage_index;
     end
     
     function apply(obj, program)
@@ -65,6 +85,11 @@ classdef TrainingStageManager < handle
           index = 1;
         end
       end
+    end
+    
+    function index = get_initial_stage(obj, program)
+      
+      index = obj.InitialStageIndex;
     end
   end
 end

@@ -17,7 +17,7 @@ conf.INTERFACE.save_data = false;
 conf.STIMULI.patch_distribution_radius = 0.35;
 
 conf.STRUCTURE.pause_state_criterion = @(program) pct.util.pause_after_num_trials(program, 5);
-conf.STRUCTURE.num_patches = 3;
+conf.STRUCTURE.num_patches = 2;
 
 
 conf.SCREEN.rect = [0, 0, 560, 350];
