@@ -17,7 +17,7 @@ conf.INTERFACE.reward_output_type = 'ni';
 conf.INTERFACE.skip_sync_tests = true;
 conf.INTERFACE.save_data = true;
 
-conf.STIMULI.patch_distribution_radius = 0.18;
+conf.STIMULI.patch_distribution_radius = 0.16;
 conf.STIMULI.setup.fix_square.target_padding = 20;
 conf.STIMULI.setup.fix_hold_square.target_padding = 20;
 
