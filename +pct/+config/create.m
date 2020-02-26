@@ -71,6 +71,7 @@ DEBUG_SCREEN.rect = [ 0, 0, 400, 400 ];
 % STRUCTURE
 STRUCTURE = struct();
 STRUCTURE.num_patches = 1;
+STRUCTURE.initial_stage_name = 'Fixation1';
 STRUCTURE.pause_state_criterion = ...
   @(program) pct.util.pause_after_num_trials( program, 300 );
 

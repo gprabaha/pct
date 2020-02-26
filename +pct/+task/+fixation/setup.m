@@ -114,11 +114,13 @@ end
 
 function make_training_data(program, conf, params, manager)
 
-params.training_stage_manager_config_func( manager );
-
+initial_stage_name = conf.STRUCTURE.initial_stage_name;
 program.Value.training_data = struct();
 program.Value.training_data.should_advance = false;
 program.Value.training_data.should_revert = false;
+program.Value.training_data.initial_stage_name = initial_stage_name;
+
+params.training_stage_manager_config_func( manager, program );
 
 end
 

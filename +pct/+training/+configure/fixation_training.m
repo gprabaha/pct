@@ -1,4 +1,6 @@
-function fixation_training(manager)
+function fixation_training(manager, program)
+
+stage_name = program.Value.training_data.initial_stage_name;
 
 add_stage( manager, pct.training.stages.Fixation1() );
 add_stage( manager, pct.training.stages.Fixation2() );
@@ -19,6 +21,6 @@ add_stage( manager, pct.training.stages.FixHold11() );
 add_stage( manager, pct.training.stages.FixHold12() );
 add_stage( manager, pct.training.stages.FixHold13() );
 
-initialize_stage(manager, 'FixHold1');
+initialize_stage(manager, stage_name);
 
 end

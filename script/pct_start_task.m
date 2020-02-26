@@ -24,6 +24,7 @@ conf.STIMULI.setup.fix_hold_square.target_padding = 20;
 
 conf.STRUCTURE.pause_state_criterion = @(program) pct.util.pause_after_num_trials(program, 300);
 conf.STRUCTURE.num_patches = 1;
+conf.STRUCTURE.initial_stage_name = 'FixHold1';
 
 % conf.SCREEN.rect = [0, 0, 1280, 1024];
 conf.SCREEN.rect = [];
