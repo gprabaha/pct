@@ -21,8 +21,6 @@ if (debug_window_is_present)
   flip( program.Value.debug_window );
 end
 
-give_juice_reward( program );
-
 end
 
 function loop(state, program)
@@ -33,6 +31,7 @@ function exit(state, program)
 
 states = program.Value.states;
 next( state, states('new_trial') );
+give_juice_reward( program );
 
 end
 
