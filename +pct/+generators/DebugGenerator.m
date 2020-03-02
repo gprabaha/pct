@@ -32,7 +32,6 @@ classdef DebugGenerator < handle
       [X_increment, Y_increment] = update_X_Y_pos( obj, delta_t, program );
       obj.source.SettableX = obj.source.SettableX + X_increment;
       obj.source.SettableY = obj.source.SettableY + Y_increment;
-      %obj.source.SettableX = obj.source.SettableX + 5 * delta_t;
       reset( obj.frame_timer );
     end
     
