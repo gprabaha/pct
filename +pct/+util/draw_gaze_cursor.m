@@ -1,7 +1,21 @@
 function draw_gaze_cursor(program, is_debug)
 
-gaze_cursor = program.Value.stimuli.gaze_cursor;
-sampler = program.Value.sampler;
+m1_gaze_cursor = program.Value.stimuli.gaze_cursor;
+m1_sampler = program.Value.sampler;
+
+m2_gaze_cursor = program.Value.stimuli.gaze_cursor_m2;
+m2_sampler = program.Value.sampler_m2;
+should_draw_m2 = program.Value.stimuli_setup.gaze_cursor_m2.visible;
+
+draw_one_cursor( program, m1_gaze_cursor, m1_sampler, is_debug );
+
+if ( should_draw_m2 )
+  draw_one_cursor( program, m2_gaze_cursor, m2_sampler, is_debug );
+end
+
+end
+
+function draw_one_cursor(program, gaze_cursor, sampler, is_debug)
 
 pixel_position = ptb.WindowDependent( [sampler.X, sampler.Y] );
 

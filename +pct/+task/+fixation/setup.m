@@ -56,14 +56,15 @@ else
   program.Value.debug_window_is_present = false;
 end
 
-tracker = make_eye_tracker( program, updater, ni_scan_input, conf );
+[tracker_m1, tracker_m2] = make_eye_trackers( program, updater, ni_scan_input, conf );
+[sampler_m1, sampler_m2] = make_gaze_samplers( program, updater, tracker_m1, tracker_m2 );
+
 make_eye_tracker_sync( program, conf );
-sampler = make_gaze_sampler( program, updater, tracker, conf );
 
 make_reward_manager( program, conf, ni_scan_output );
 
 stimuli = make_stimuli( program, conf );
-make_targets( program, updater, window, sampler, stimuli, conf );
+make_targets( program, updater, window, sampler_m1, stimuli, conf );
 
 make_structure( program, conf );
 make_interface( program, conf );
@@ -381,36 +382,76 @@ stim.FaceColor = set( ptb.Color(), description.color );
 
 end
 
-function tracker = make_eye_tracker(program, updater, ni_scan_input, conf)
+function [tracker_m1, tracker_m2] = make_eye_trackers(program, updater, ni_scan_input, conf)
 
 interface = get_interface( conf );
-source_type = interface.gaze_source_type;
+signal = get_signal( conf );
+
+m1_source_type = interface.gaze_source_type;
+m2_source_type = interface.gaze_source_type_m2;
+
+m1_channel_indices = signal.analog_gaze_input_channel_indices_m1;
+m2_channel_indices = signal.analog_gaze_input_channel_indices_m2;
+
+calibration_rect = conf.CALIB_SCREEN.rect;
+
+tracker_m1 = make_eye_tracker( updater, ni_scan_input ...
+  , m1_channel_indices, calibration_rect, m1_source_type );
+
+tracker_m2 = make_eye_tracker( updater, ni_scan_input ...
+  , m2_channel_indices, calibration_rect, m2_source_type );
+
+if ( interface.m2_is_computer )
+  generator_m2 = pct.generators.DebugGenerator( tracker_m2 );
+else
+  generator_m2 = [];
+end
+
+program.Value.tracker = tracker_m1;
+program.Value.tracker_m2 = tracker_m2;
+program.Value.generator_m2 = generator_m2;
+
+end
+
+function tracker = ...
+  make_eye_tracker(updater, ni_scan_input, input_channel_indices, calibration_rect, source_type)
 
 switch ( source_type )
   case 'mouse'
     tracker = ptb.sources.Mouse();
+    
   case 'digital_eyelink'
     tracker = ptb.sources.Eyelink();
     initialize( tracker );
     start_recording( tracker );
+    
   case 'analog_input'
-    tracker = make_analog_input_tracker( ni_scan_input, conf );
+    tracker = make_analog_input_tracker( ni_scan_input, input_channel_indices, calibration_rect );
+    
+  case 'DebugGenerator'
+    tracker = make_debug_generator_tracker();
+    
   otherwise
     error( 'Unrecognized source type "%s".', source_type );
 end
 
 updater.add_component( tracker );
-program.Value.tracker = tracker;
 
 end
 
-function tracker = make_analog_input_tracker(ni_scan_input, conf)
+function tracker = make_analog_input_tracker(ni_scan_input, channel_indices, calibration_rect)
 
 tracker = ptb.sources.XYAnalogInput( ni_scan_input );
-tracker.CalibrationRect = conf.SCREEN.calibration_rect;
+tracker.CalibrationRect = calibration_rect;
 tracker.OutputVoltageRange = [-5, 5];
 tracker.CalibrationRectPaddingFract = [0.2, 0.2];
-tracker.ChannelMapping = [1, 2];
+tracker.ChannelMapping = channel_indices;
+
+end
+
+function tracker = make_debug_generator_tracker()
+
+tracker = ptb.sources.Generator();
 
 end
 
@@ -426,14 +467,23 @@ program.Value.tracker_sync = sync_info;
 
 end
 
-function sampler = make_gaze_sampler(program, updater, tracker, conf)
+function [sampler_m1, sampler_m2] = ...
+  make_gaze_samplers(program, updater, tracker_m1, tracker_m2)
+
+sampler_m1 = make_gaze_sampler( updater, tracker_m1 );
+sampler_m2 = make_gaze_sampler( updater, tracker_m2 );
+
+program.Value.sampler = sampler_m1;
+program.Value.sampler_m2 = sampler_m2;
+
+end
+
+function sampler = make_gaze_sampler(updater, tracker)
 
 sampler = ptb.samplers.Pass();
 sampler.Source = tracker;
 
 updater.add_component( sampler );
-
-program.Value.sampler = sampler;
 
 end
 

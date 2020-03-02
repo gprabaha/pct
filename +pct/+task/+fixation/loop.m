@@ -2,6 +2,11 @@ function loop(task, program)
 
 handle_ni_daq_update( program );
 
+if ( ~isempty(program.Value.generator_m2) )
+  % Update computer-generated m2 gaze coordinates.
+  update( program.Value.generator_m2 );
+end
+
 update( program.Value.updater );
 
 if ( pct.util.is_debug(program) )

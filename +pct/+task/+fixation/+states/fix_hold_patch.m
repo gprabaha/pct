@@ -17,6 +17,15 @@ function entry(state, program)
 
 % Reset fix acquired state and target state.
 state.UserData.fixation_acquired_state = fixation_acquired_state();
+
+should_abort = false;
+fix_hold_square = program.Value.targets.fix_hold_square;
+fix_square = program.Value.targets.fix_square;
+
+if ( ~fix_hold_square.IsInBounds || ~fix_square.IsInBounds )
+  should_abort = true;
+end
+
 reset( program.Value.targets.fix_hold_square );
 
 reset_targets( program );
@@ -24,6 +33,11 @@ position_stimuli( state, program );
 
 timestamp_entry( state, program );
 update_last_state( state, program );
+
+if ( should_abort )
+  escape( state );
+  return;
+end
 
 end
 
@@ -186,8 +200,11 @@ if ( fix_hold_target.IsDurationMet )
   fix_acq_state.Acquired = true;
   escape( state );
   
-elseif ( fix_hold_target.IsInBounds )
+elseif ( fix_hold_target.IsInBounds )  
   % Mark that we entered the target.
+  if ( ~fix_acq_state.Entered )
+    fprintf( '\n\n=====Entered======\n\n' );
+  end
   fix_acq_state.Entered = true;
   
 elseif ( fix_acq_state.Entered )

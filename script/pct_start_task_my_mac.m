@@ -10,24 +10,29 @@ conf.TIMINGS.time_in.pause = 2;
 conf.META.subject = 'human';
 
 conf.INTERFACE.gaze_source_type = 'mouse';
+conf.INTERFACE.gaze_source_type_m2 = 'DebugGenerator';
+
 conf.INTERFACE.reward_output_type = 'none'; 
 conf.INTERFACE.skip_sync_tests = true;
 conf.INTERFACE.save_data = false;
+conf.INTERFACE.has_m2 = true;
 
 conf.STIMULI.patch_distribution_radius = 0.35;
+conf.STIMULI.setup.gaze_cursor_m2.visible = true;
 
 conf.STRUCTURE.pause_state_criterion = @(program) pct.util.pause_after_num_trials(program, 5);
 conf.STRUCTURE.num_patches = 2;
-conf.STRUCTURE.initial_stage_name = 'FixHold1';
+conf.STRUCTURE.initial_stage_name = 'FixHold11';
 
 
-conf.SCREEN.rect = [0, 0, 560, 350];
+conf.SCREEN.rect = [ 0, 0, 560, 350 ];
 conf.SCREEN.index = 0;
 % conf.SCREEN.calibration_rect = [0, 0, 1280, 1024];
 
-conf.STIMULI.setup.fix_square.size = [100, 100];
-conf.STIMULI.setup.fix_hold_square.size = [100, 100];
-conf.STIMULI.setup.patch.size = [100, 100];
+conf.STIMULI.setup.fix_square.size = [ 100, 100 ];
+conf.STIMULI.setup.fix_hold_square.size = [ 100, 100 ];
+conf.STIMULI.setup.patch.size = [ 100, 100 ];
+conf.STIMULI.setup.gaze_cursor_m2.color = [ 255, 0, 255 ];
 
 conf.DEBUG_SCREEN.is_present = false;
 conf.DEBUG_SCREEN.index = 0;

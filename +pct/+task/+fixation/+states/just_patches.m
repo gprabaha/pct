@@ -29,6 +29,8 @@ reset_targets( program );
 timestamp_entry( state, program );
 update_last_state( state, program );
 
+handle_computer_generated_m2( program );
+
 end
 
 function loop(state, program)
@@ -224,5 +226,17 @@ function patch_acquired_timestamp( state, program, patch_id )
 
 program.Value.data.Value(end).(state.Name).patch_acquired_times(patch_id) = ...
     elapsed( program.Value.task );
+
+end
+
+function handle_computer_generated_m2(program)
+
+interface = program.Value.interface;
+
+if ( ~interface.has_m2 || ~interface.m2_is_computer )
+  return
+end
+
+initialize( program.Value.generator_m2, program );
 
 end
