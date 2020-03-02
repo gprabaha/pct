@@ -5,6 +5,7 @@ classdef FixationTrainingStage < pct.util.TrainingStage
     FixHoldDur;
     PatchDur;
     
+    FixHoldStDev = 0.02;
     PercentCorrectThresholdAdvance = 80;
     PercentCorrectThresholdRevert = 20;
     TrialHistorySize = 50;
@@ -34,8 +35,13 @@ classdef FixationTrainingStage < pct.util.TrainingStage
         patch.Duration = obj.PatchDur;
       end
       
+      fix_hold_duration = normrnd(obj.FixDur, obj.FixHoldStDev);
+      if fix_hold_duration < 0.1
+        fix_hold_duration = 0.1;
+      end
+      
       fix_square.Duration = obj.FixDur;
-      fix_hold_square.Duration = obj.FixHoldDur;
+      fix_hold_square.Duration = fix_hold_duration;
     end
     
     function tf = advance(obj, program)
