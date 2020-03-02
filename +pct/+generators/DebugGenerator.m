@@ -25,11 +25,14 @@ classdef DebugGenerator < handle
       obj.source.SettableIsValidSample = true;
     end
     
-    function update(obj)
+    function update(obj, program)
    
       delta_t = elapsed( obj.frame_timer );
       
-      obj.source.SettableX = obj.source.SettableX + 5 * delta_t;
+      [X_increment, Y_increment] = update_X_Y_pos( obj, delta_t, program );
+      obj.source.SettableX = obj.source.SettableX + X_increment;
+      obj.source.SettableY = obj.source.SettableY + Y_increment;
+      %obj.source.SettableX = obj.source.SettableX + 5 * delta_t;
       reset( obj.frame_timer );
     end
     
@@ -37,6 +40,20 @@ classdef DebugGenerator < handle
       validateattributes( to, {'ptb.sources.Generator'} ...
         , {'scalar'}, mfilename, 'source' );
       obj.source = to;
+    end
+    
+    function [X_increment, Y_increment] = update_X_Y_pos( obj, delta_t, program )
+      saccade_attributes = program.Value.m2_saccade_attributes.Value;
+      start_pos = saccade_attributes.start_pos;
+      end_pos = saccade_attributes.end_pos;
+      total_time = saccade_attributes.total_time;
+      
+      total_X = end_pos(1) - start_pos(1);
+      total_Y = end_pos(2) - start_pos(2);
+      
+      time_frac = delta_t/total_time;
+      X_increment = total_X * time_frac;
+      Y_increment = total_Y * time_frac;
     end
   end
 end

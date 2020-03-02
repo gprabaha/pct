@@ -223,7 +223,12 @@ num_patches = count_patches( program );
 stimuli = program.Value.stimuli;
 radius = program.Value.patch_distribution_radius;
 screen_index = program.Value.window.Index;
-screen_resolution = Screen( 'Resolution', screen_index );
+rect = program.Value.window.Rect;
+screen_resolution = struct();
+%** This does not account for situations where rect does not start at 0,0 **%
+screen_resolution.width = rect.X2;
+screen_resolution.height = rect.Y2;
+%screen_resolution = Screen( 'Resolution', screen_index );
 coordinates = assign_patch_coordinates( num_patches, radius, screen_resolution );
 
 for patch_index = 1:num_patches
@@ -233,6 +238,17 @@ for patch_index = 1:num_patches
   stimulus.Position.Value = new_pos;
 end
 
+% Part to create m2 saccade source and targets
+stim_name = pct.util.nth_patch_stimulus_name( 1 );
+stimulus = stimuli.(stim_name);
+relative_target_position = stimulus.Position.Value;
+absolute_target_position = [relative_target_position(1)*screen_resolution.width, ...
+  relative_target_position(2)*screen_resolution.height];
+program.Value.m2_saccade_attributes.Value.end_pos = absolute_target_position;
+central_position = [0.5*screen_resolution.width, ...
+  0.5*screen_resolution.height];
+program.Value.m2_saccade_attributes.Value.start_pos = central_position;
+program.Value.m2_saccade_attributes.Value.total_time = 1;
 end
 
 function reset_targets(program)

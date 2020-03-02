@@ -56,6 +56,8 @@ else
   program.Value.debug_window_is_present = false;
 end
 
+make_m2_saccade_attributes( program, conf );
+
 [tracker_m1, tracker_m2] = make_eye_trackers( program, updater, ni_scan_input, conf );
 [sampler_m1, sampler_m2] = make_gaze_samplers( program, updater, tracker_m1, tracker_m2 );
 
@@ -381,6 +383,21 @@ stim.Scale.Units = 'px';
 stim.FaceColor = set( ptb.Color(), description.color );
 
 end
+
+function make_m2_saccade_attributes(program, conf)
+
+start_pos = [nan, nan];
+end_pos = [nan, nan];
+total_time = nan;
+
+program.Value.m2_saccade_attributes = ptb.Reference();
+m2_saccade_attributes = program.Value.m2_saccade_attributes;
+m2_saccade_attributes.Value.start_pos = start_pos;
+m2_saccade_attributes.Value.end_pos = end_pos;
+m2_saccade_attributes.Value.total_time = total_time;
+
+end
+
 
 function [tracker_m1, tracker_m2] = make_eye_trackers(program, updater, ni_scan_input, conf)
 

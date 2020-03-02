@@ -4,7 +4,7 @@ handle_ni_daq_update( program );
 
 if ( ~isempty(program.Value.generator_m2) )
   % Update computer-generated m2 gaze coordinates.
-  update( program.Value.generator_m2 );
+  update( program.Value.generator_m2, program );
 end
 
 update( program.Value.updater );
