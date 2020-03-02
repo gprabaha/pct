@@ -35,7 +35,7 @@ classdef FixationTrainingStage < pct.util.TrainingStage
         patch.Duration = obj.PatchDur;
       end
       
-      fix_hold_duration = normrnd(obj.FixDur, obj.FixHoldStDev);
+      fix_hold_duration = normrnd(obj.FixHoldDur, obj.FixHoldStDev);
       if fix_hold_duration < 0.1
         fix_hold_duration = 0.1;
       end
