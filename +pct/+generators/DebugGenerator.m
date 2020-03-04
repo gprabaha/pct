@@ -29,7 +29,7 @@ classdef DebugGenerator < handle
    
       delta_t = elapsed( obj.frame_timer );
       
-      [X_increment, Y_increment] = update_X_Y_pos( obj, delta_t, program );
+      [X_increment, Y_increment] = update_X_Y_pos_uniformly( obj, delta_t, program );
       obj.source.SettableX = obj.source.SettableX + X_increment;
       obj.source.SettableY = obj.source.SettableY + Y_increment;
       reset( obj.frame_timer );
@@ -41,7 +41,7 @@ classdef DebugGenerator < handle
       obj.source = to;
     end
     
-    function [X_increment, Y_increment] = update_X_Y_pos( obj, delta_t, program )
+    function [X_increment, Y_increment] = update_X_Y_pos_uniformly( obj, delta_t, program )
       saccade_attributes = program.Value.m2_saccade_attributes.Value;
       start_pos = saccade_attributes.start_pos;
       end_pos = saccade_attributes.end_pos;
