@@ -17,10 +17,14 @@ conf.INTERFACE.reward_output_type = 'ni';
 conf.INTERFACE.skip_sync_tests = true;
 conf.INTERFACE.save_data = true;
 
-conf.STIMULI.patch_distribution_radius = 0.16;
-conf.STIMULI.setup.fix_square.target_padding = 20;
-conf.STIMULI.setup.fix_hold_square.target_padding = 20;
+conf.STIMULI.patch_distribution_radius = 0.2;
+conf.STIMULI.setup.fix_square.target_padding = 50;
+conf.STIMULI.setup.fix_hold_square.target_padding = 50;
+conf.STIMULI.setup.patch.target_padding = 50;
 
+conf.STIMULI.setup.fix_square.size = [70, 70];
+conf.STIMULI.setup.fix_hold_square.size = [70, 70];
+conf.STIMULI.setup.patch.size = [70, 70];
 
 conf.STRUCTURE.pause_state_criterion = @(program) pct.util.pause_after_num_trials(program, 300);
 conf.STRUCTURE.num_patches = 1;
@@ -30,10 +34,6 @@ conf.STRUCTURE.initial_stage_name = 'FixHold1';
 conf.SCREEN.rect = [];
 conf.SCREEN.index = 4;
 conf.SCREEN.calibration_rect = [0, 0, 1280, 1024];
-
-conf.STIMULI.setup.fix_square.size = [80, 80];
-conf.STIMULI.setup.fix_hold_square.size = [80, 80];
-conf.STIMULI.setup.patch.size = [100, 100];
 
 conf.DEBUG_SCREEN.is_present = true;
 conf.DEBUG_SCREEN.index = 0;
