@@ -1,5 +1,13 @@
 function [X_pos, Y_pos] = update_X_Y_pos_gaussian_velocity(current_time, origin, destination, total_time)
 
+if isempty(origin)
+  origin = [nan; nan];
+  destination = [nan; nan];  
+elseif isempty(destination)
+  origin = [nan; nan];
+  destination = [nan; nan];
+end
+
 half_time = total_time/2;
 st_dev = half_time/3;
 total_dist = norm( destination - origin );
@@ -19,7 +27,7 @@ else
   dist_covered = mult_const * gaussian_cdf_area( current_time, half_time, st_dev );
 end
 X_pos = origin(1) + dist_covered * x_proj_coeff;
-Y_pos = origin(1) + dist_covered * y_proj_coeff;
+Y_pos = origin(2) + dist_covered * y_proj_coeff;
 
 end
 

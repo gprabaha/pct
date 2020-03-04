@@ -1,3 +1,4 @@
+
 function state = fix_hold_patch(program, conf)
 
 time_in = conf.TIMINGS.time_in;
@@ -234,9 +235,6 @@ for patch_index = 1:num_patches
   stimulus.Position.Value = new_pos;
 end
 
-% Setting up m2 cursor parameters
-set_m2_saccade_attributes(stimuli, rect_size, program);
-
 end
 
 function reset_targets(program)
@@ -327,20 +325,5 @@ end
 function rotation_matrix = rotation_matrix_generator(theta)
 
 rotation_matrix = [cosd(theta) -sind(theta); sind(theta) cosd(theta)];
-
-end
-
-function set_m2_saccade_attributes(stimuli, rect_size, program)
-
-stim_name = pct.util.nth_patch_stimulus_name( 1 );
-stimulus = stimuli.(stim_name);
-relative_target_position = stimulus.Position.Value;
-absolute_target_position = [relative_target_position(1) * rect_size(1), ...
-  relative_target_position(2) * rect_size(2)];
-program.Value.m2_saccade_attributes.Value.end_pos = absolute_target_position;
-central_position = [0.5 * rect_size(1), ...
-  0.5 * rect_size(2)];
-program.Value.m2_saccade_attributes.Value.start_pos = central_position;
-program.Value.m2_saccade_attributes.Value.total_time = 1;
 
 end
