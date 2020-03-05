@@ -20,6 +20,8 @@ debug_window_is_present = program.Value.debug_window_is_present;
 if (debug_window_is_present)
   flip( program.Value.debug_window );
 end
+WaitSecs(0.2)
+give_juice_reward( program );
 
 end
 
@@ -31,7 +33,7 @@ function exit(state, program)
 
 states = program.Value.states;
 next( state, states('new_trial') );
-give_juice_reward( program );
+
 
 end
 

@@ -14,6 +14,8 @@ screen_info.screen_index = 4; %conf.SCREEN.index;
 reward_channel_index = 1;
 reward_size = 0.1;
 
-run_calibration( screen_info, reward_channel_index, reward_size );
+n_cal_pts = 9;
+
+run_calibration( screen_info, reward_channel_index, reward_size, n_cal_pts );
 
 end
