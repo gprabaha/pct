@@ -18,6 +18,9 @@ function entry(state, program)
 % Reset fix acquired state and target state.
 state.UserData.fixation_acquired_state = fixation_acquired_state();
 reset( program.Value.targets.fix_square );
+
+handle_computer_generated_m2( program );
+
 timestamp_entry( state, program );
 update_last_state( state, program );
 
@@ -151,4 +154,16 @@ function did_fixate(state,program,fix_acq_state)
 
 program.Value.data.Value(end).(state.Name).did_fixate = fix_acq_state;
   
+end
+
+function handle_computer_generated_m2(program)
+
+interface = program.Value.interface;
+
+if ( ~interface.has_m2 || ~interface.m2_is_computer )
+  return
+end
+
+initialize_fixation( program.Value.generator_m2, program );
+
 end

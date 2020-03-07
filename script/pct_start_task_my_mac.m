@@ -19,6 +19,7 @@ conf.INTERFACE.has_m2 = true;
 
 conf.STIMULI.patch_distribution_radius = 0.35;
 conf.STIMULI.setup.gaze_cursor_m2.visible = true;
+conf.STIMULI.setup.gaze_cursor_m2.saccade_time = 0.3;
 
 conf.STRUCTURE.pause_state_criterion = @(program) pct.util.pause_after_num_trials(program, 5);
 conf.STRUCTURE.num_patches = 2;

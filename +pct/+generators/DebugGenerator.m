@@ -17,6 +17,19 @@ classdef DebugGenerator < handle
       source.SettableIsValidSample = true;
     end
     
+    function initialize_fixation(obj, program)
+      [start_pos_val, end_pos_val, total_time_val] = m2_saccade_attributes( obj, program );
+      obj.origin = start_pos_val;
+      obj.destination = start_pos_val;
+      obj.total_time = 0;
+      rect = program.Value.window.Rect;
+      rect_size = [ rect.X2-rect.X1, rect.Y2-rect.Y1 ];
+      obj.source.SettableX = rect_size(1)/2;
+      obj.source.SettableY = rect_size(2)/2;
+      obj.source.SettableIsValidSample = true;
+      reset( obj.frame_timer );
+    end
+    
     function initialize(obj, program)
       [start_pos_val, end_pos_val, total_time_val] = m2_saccade_attributes( obj, program );
       obj.origin = start_pos_val;
@@ -35,14 +48,18 @@ classdef DebugGenerator < handle
       origin_val = obj.origin;
       destination_val = obj.destination;
       total_time_val = obj.total_time;
-   
+      
+      total_dist = norm( destination_val - origin_val );
+      
       current_t = elapsed( obj.frame_timer );
       
       [X_pos, Y_pos] = pct.generators.update_X_Y_pos_gaussian_velocity(...
         current_t, origin_val, destination_val, total_time_val);
       
-      obj.source.SettableX = X_pos;
-      obj.source.SettableY = Y_pos;
+      deviation = total_dist/75;
+      
+      obj.source.SettableX = X_pos + normrnd( 0, deviation );
+      obj.source.SettableY = Y_pos + normrnd( 0, deviation );
     end
     
     function set.source(obj, to)
@@ -81,7 +98,7 @@ classdef DebugGenerator < handle
       
       start_pos_val = central_position;
       end_pos_val = absolute_target_position;
-      total_time_val = obj.total_time;
+      total_time_val = program.Value.generator_m2_saccade_time;
     end
   end
 end

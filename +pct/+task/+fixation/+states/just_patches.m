@@ -26,10 +26,10 @@ state.UserData.mark_exited = false( 1, count_patches( program ) );
 
 reset_targets( program );
 
+handle_computer_generated_m2( program );
+
 timestamp_entry( state, program );
 update_last_state( state, program );
-
-handle_computer_generated_m2( program );
 
 end
 

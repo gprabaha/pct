@@ -387,6 +387,8 @@ function [tracker_m1, tracker_m2] = make_eye_trackers(program, updater, ni_scan_
 interface = get_interface( conf );
 signal = get_signal( conf );
 
+saccade_time = conf.STIMULI.setup.gaze_cursor_m2.saccade_time;
+
 m1_source_type = interface.gaze_source_type;
 m2_source_type = interface.gaze_source_type_m2;
 
@@ -410,6 +412,7 @@ end
 program.Value.tracker = tracker_m1;
 program.Value.tracker_m2 = tracker_m2;
 program.Value.generator_m2 = generator_m2;
+program.Value.generator_m2_saccade_time = saccade_time;
 
 end
 
