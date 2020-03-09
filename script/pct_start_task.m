@@ -18,16 +18,16 @@ conf.INTERFACE.skip_sync_tests = true;
 conf.INTERFACE.save_data = true;
 
 conf.STIMULI.patch_distribution_radius = 0.23;
-conf.STIMULI.setup.fix_square.target_padding = 50;
-conf.STIMULI.setup.fix_hold_square.target_padding = 50;
-conf.STIMULI.setup.patch.target_padding = 50;
+conf.STIMULI.setup.fix_square.target_padding = 60;
+conf.STIMULI.setup.fix_hold_square.target_padding = 60;
+conf.STIMULI.setup.patch.target_padding = 60;
 
 conf.STIMULI.setup.fix_square.color = [255 255 255];
 conf.STIMULI.setup.fix_hold_square.color = [255 255 255];
 
-conf.STIMULI.setup.fix_square.size = [70, 70];
-conf.STIMULI.setup.fix_hold_square.size = [70, 70];
-conf.STIMULI.setup.patch.size = [70, 70];
+conf.STIMULI.setup.fix_square.size = [60, 60];
+conf.STIMULI.setup.fix_hold_square.size = [60, 60];
+conf.STIMULI.setup.patch.size = [60, 60];
 
 conf.STRUCTURE.pause_state_criterion = @(program) pct.util.pause_after_num_trials(program, 300);
 conf.STRUCTURE.num_patches = 1;
