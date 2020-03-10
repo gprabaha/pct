@@ -30,7 +30,7 @@ end
 reset( program.Value.targets.fix_hold_square );
 
 reset_targets( program );
-position_stimuli( state, program );
+configure_stimuli( state, program );
 
 timestamp_entry( state, program );
 update_last_state( state, program );
@@ -218,20 +218,26 @@ state.UserData.fixation_acquired_state = fix_acq_state;
 
 end
 
-function position_stimuli(state, program)
+function configure_stimuli(state, program)
 
 num_patches = count_patches( program );
+
+patch_ids = program.Value.current_patch_identities;
+patch_id_color_map = program.Value.stimuli_setup.patch.patch_identity_color_map;
+
 stimuli = program.Value.stimuli;
 radius = program.Value.patch_distribution_radius;
-screen_index = program.Value.window.Index;
 rect = program.Value.window.Rect;
-rect_size = [ rect.X2-rect.X1, rect.Y2-rect.Y1 ];
 coordinates = assign_patch_coordinates( num_patches, radius, rect );
 
 for patch_index = 1:num_patches
   stim_name = pct.util.nth_patch_stimulus_name( patch_index );
+  patch_id = patch_ids{patch_index};
+  patch_color = patch_id_color_map(patch_id);
+  
   new_pos = coordinates(:, patch_index);
   stimulus = stimuli.(stim_name);
+  stimulus.FaceColor = patch_color;
   stimulus.Position.Value = new_pos;
 end
 

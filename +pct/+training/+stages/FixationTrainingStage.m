@@ -42,6 +42,10 @@ classdef FixationTrainingStage < pct.util.TrainingStage
       
       fix_square.Duration = obj.FixDur;
       fix_hold_square.Duration = fix_hold_duration;
+      
+      % Establish patch identities
+      program.Value.current_patch_identities = ...
+        get_patch_identities( obj, program, num_patches );
     end
     
     function tf = advance(obj, program)
@@ -136,6 +140,10 @@ classdef FixationTrainingStage < pct.util.TrainingStage
     function last_n_perc_correct = check_last_n_percent_corr(obj, online_performance, program)
       last_n_perc_correct = nanmean([online_performance(1:end).did_correctly])*100;
       program.Value.last_n_percent_correct = last_n_perc_correct;
+    end
+    
+    function patch_ids = get_patch_identities(obj, program, num_stimuli)
+      patch_ids = repmat( {'m1'}, 1, num_stimuli );
     end
   end
 end

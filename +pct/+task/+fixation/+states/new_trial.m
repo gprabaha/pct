@@ -21,6 +21,7 @@ else
   update_data_scaffold( program );
   process_data( program );
   program.Value.pause_flag = false;
+  
   next( state, states('fixation') );
 end
 
@@ -74,6 +75,7 @@ data_scaffold.pause.exit_time = nan;
 
 data_scaffold.training_stage_name = program.Value.training_stage_name;
 data_scaffold.training_stage_reward = program.Value.rewards.training;
+data_scaffold.patch_identities = program.Value.current_patch_identities;
 
 end
 

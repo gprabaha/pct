@@ -15,8 +15,13 @@ total_dist = norm( destination - origin );
 path_vec = destination - origin;
 x_axis_unit_vec = [1; 0];
 y_axis_unit_vec = [0; 1];
-x_proj_coeff = dot( path_vec, x_axis_unit_vec ) / (norm( path_vec ) * norm( x_axis_unit_vec ));
-y_proj_coeff = dot( path_vec, y_axis_unit_vec ) / (norm( path_vec ) * norm( y_axis_unit_vec ));
+if norm( path_vec ) > 0.0000001
+  x_proj_coeff = dot( path_vec, x_axis_unit_vec ) / (norm( path_vec ) * norm( x_axis_unit_vec ));
+  y_proj_coeff = dot( path_vec, y_axis_unit_vec ) / (norm( path_vec ) * norm( y_axis_unit_vec ));
+else
+  x_proj_coeff = 0;
+  y_proj_coeff = 0;
+end
 
 area_under_curve = gaussian_cdf_area( total_time, half_time, st_dev );
 mult_const = total_dist/area_under_curve;

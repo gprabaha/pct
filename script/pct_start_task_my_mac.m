@@ -35,6 +35,9 @@ conf.STIMULI.setup.fix_hold_square.size = [ 100, 100 ];
 conf.STIMULI.setup.patch.size = [ 100, 100 ];
 conf.STIMULI.setup.gaze_cursor_m2.color = [ 255, 0, 255 ];
 
+conf.STIMULI.setup.patch.patch_identity_color_map('m1') = [255, 0, 0];
+conf.STIMULI.setup.patch.patch_identity_color_map('m2') = [0, 0, 255];
+
 conf.DEBUG_SCREEN.is_present = false;
 conf.DEBUG_SCREEN.index = 0;
 conf.DEBUG_SCREEN.background_color = [ 0 0 0 ];

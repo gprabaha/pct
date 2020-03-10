@@ -177,15 +177,6 @@ end
 function reset_targets(program)
 
 num_patches = count_patches( program );
-stimuli = program.Value.stimuli;
-default_color = default_patch_color( program );
-
-for i = 1:num_patches
-  stim_name = pct.util.nth_patch_stimulus_name( i );
-  stimulus = stimuli.(stim_name);
-  stimulus.FaceColor = default_color;
-end
-
 patch_targets = program.Value.patch_targets;
 
 for i = 1:numel(patch_targets)
@@ -197,12 +188,6 @@ end
 function num_patches = count_patches(program)
 
 num_patches = program.Value.structure.num_patches;
-
-end
-
-function color = default_patch_color(program)
-
-color = program.Value.stimuli_setup.patch.color;
 
 end
 

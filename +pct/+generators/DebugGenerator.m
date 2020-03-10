@@ -5,6 +5,7 @@ classdef DebugGenerator < handle
     origin = [0; 0];
     destination = [0; 0];
     total_time = 1;
+    noise = 2;
     
   end
   methods
@@ -20,8 +21,8 @@ classdef DebugGenerator < handle
     function initialize_fixation(obj, program)
       [start_pos_val, end_pos_val, total_time_val] = m2_saccade_attributes( obj, program );
       obj.origin = start_pos_val;
-      obj.destination = start_pos_val;
-      obj.total_time = 0;
+      obj.destination = start_pos_val+1;
+      obj.total_time = 1;
       rect = program.Value.window.Rect;
       rect_size = [ rect.X2-rect.X1, rect.Y2-rect.Y1 ];
       obj.source.SettableX = rect_size(1)/2;
@@ -48,18 +49,17 @@ classdef DebugGenerator < handle
       origin_val = obj.origin;
       destination_val = obj.destination;
       total_time_val = obj.total_time;
-      
-      total_dist = norm( destination_val - origin_val );
+      noise = obj.noise;
       
       current_t = elapsed( obj.frame_timer );
       
       [X_pos, Y_pos] = pct.generators.update_X_Y_pos_gaussian_velocity(...
         current_t, origin_val, destination_val, total_time_val);
       
-      deviation = total_dist/75;
+      assert(~isnan( X_pos));
       
-      obj.source.SettableX = X_pos + normrnd( 0, deviation );
-      obj.source.SettableY = Y_pos + normrnd( 0, deviation );
+      obj.source.SettableX = X_pos + normrnd( 0, noise );
+      obj.source.SettableY = Y_pos + normrnd( 0, noise );
     end
     
     function set.source(obj, to)
