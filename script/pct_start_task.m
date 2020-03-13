@@ -31,7 +31,7 @@ conf.STIMULI.setup.patch.size = [60, 60];
 
 conf.STRUCTURE.pause_state_criterion = @(program) pct.util.pause_after_num_trials(program, 300);
 conf.STRUCTURE.num_patches = 1;
-conf.STRUCTURE.initial_stage_name = 'FixHold7';
+conf.STRUCTURE.initial_stage_name = 'FixHold11';
 
 % conf.SCREEN.rect = [0, 0, 1280, 1024];
 conf.SCREEN.rect = [];
@@ -44,7 +44,7 @@ conf.DEBUG_SCREEN.background_color = [ 0 0 0 ];
 % conf.DEBUG_SCREEN.rect = [ 600, 600, 1000, 1000 ];
 conf.DEBUG_SCREEN.rect = [ 1600, 0, 1600 + 1280, 1024 ];
 
-conf.REWARDS.training = 0.4;
+conf.REWARDS.training = 0.5;
 
 pct.task.fixation.start( conf ...
   , 'training_stage_manager_config_func', @pct.training.configure.fixation_training ...
