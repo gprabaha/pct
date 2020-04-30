@@ -1,10 +1,22 @@
 function pit_strategies(m1_strategy, m2_strategy, m1_error_rate, ...
-  m2_error_rate, coop_reward, max_moves, n_reps, num_patches, ...
+  m2_error_rate, m1_win_prob, coop_reward, max_moves, n_reps, num_patches, ...
   save_data_flag, save_fig_flag)
 
 % Validation of input parameters
 if nargin<3
-  error('Too few arguments. Need the strategies of m1 and m2');
+  error('Too few arguments. Need at least the strategies of m1 and m2');
+end
+
+if isempty(m1_error_rated)
+  m1_error_rate = 0.1;
+end
+
+if isempty(m2_error_rate)
+  m2_error_rate = 0.1;
+end
+
+if isempty(m1_win_prob)
+  m1_win_prob = 0.5;
 end
 
 if isempty(coop_reward)
@@ -14,7 +26,6 @@ end
 if isempty(max_moves)
   max_moves = 2;
 end
-
 
 if isempty(n_reps)
   n_reps = 10;
@@ -49,8 +60,11 @@ for trial = 1:size(trial_sequence, 2)
       m1_error_rate, patches, acquired_patches);
     m2_patch_choice = pct.simulations.apply_strategy(m2_identity, m2_strategy, ...
       m2_error_rate, patches, acquired_patches);
-    [acquired_patches, reward] = pct.simulations.distribute_rewards(patches, ...
-      current_reward, m1_patch_choice, m2_patch_choice);
+    [patches_acquired, reward] = pct.simulations.distribute_rewards(patches, ...
+      current_reward, acquired_patches, m1_win_prob, coop_reward, ...
+      m1_patch_choice, m2_patch_choice);
+    
+    acquired_patches = patches_acquired;
     current_reward = reward;
     
     if all(acquired_patches == 1)
