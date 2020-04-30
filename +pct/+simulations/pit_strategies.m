@@ -59,4 +59,5 @@ for trial = 1:size(trial_sequence, 2)
   end
   reward_queue(:, trial, 1) = current_reward(:, 1);
   reward_queue(:, trial, 2) = current_reward(:, 2);
+  patch_acquired_state(:, trial) = acquired_patches;
 end
