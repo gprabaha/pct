@@ -18,8 +18,8 @@ max_moves = 2; % Maximum number of moves that can be made per trial (and thus ma
 save_data_flag = 1;
 save_fig_flag = 0;
 
-strategy_list = {'selfish', 'competitive', 'interactive', 'benevolent', ...
-  'wsls', 'random'};
+strategy_list = {'selfish', 'competitive', 'interactive-compete', ...
+  'interactive-cooperate', 'benevolent', 'random', 'wsls'};
 
 for m1_strategy = strategy_list
   for m2_strategy = strategy_list
