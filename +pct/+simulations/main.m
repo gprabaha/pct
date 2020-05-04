@@ -41,6 +41,7 @@ for m1_strategy_ind = 1:numel(strategy_list)
 end
 
 if save_data_flag
+  legend = 'result_mat: dim-1 = m1-strategy; dim-2 = m2strategy; dim-3 = session';
   data_filename = ['./+data/', num2str(num_patches) '-patches-run-' datestr(datetime, 'yyyy-mm-dd_HH-MM-SS')];
-  save(data_filename, 'result_mat');
+  save(data_filename, 'result_mat', 'legend', 'strategy_list');
 end

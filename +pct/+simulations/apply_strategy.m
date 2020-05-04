@@ -66,7 +66,11 @@ else
 end
 
 if patch_selected ~= 0
-  selected_patch_ind = find(patches==patch_selected, 1 );
+  selected_patch_ind = find(patches==patch_selected);
+  if numel(selected_patch_ind) > 1
+    prob_array = ones( 1, numel(selected_patch_ind) )/numel(selected_patch_ind);
+    selected_patch_ind = randsample(selected_patch_ind, 1, true, prob_array);
+  end
   choice(selected_patch_ind) = 1;
 end
 end
