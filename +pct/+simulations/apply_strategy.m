@@ -48,12 +48,16 @@ function choice = get_choice(preference_order, choice_prob_list, ...
     available_choices, patches, error_rate)
 
 choice = zeros( 1, numel(patches) );
-if any(ismember(available_choices, preference_order))
-  [~, choice_indices] = ismember(preference_order, available_choices);
-  choice_indices = choice_indices(choice_indices>0);
-  probabilities = choice_prob_list(choice_indices);
-  probabilities = probabilities/sum(probabilities);
-  patch_selected = randsample(preference_order(choice_indices), 1, true, probabilities);
+if any( ismember(available_choices, preference_order) )
+  [~, choice_indices] = ismember(available_choices, preference_order);
+  choice_indices = unique( choice_indices(choice_indices>0) );
+  if numel( choice_indices ) == 1
+    patch_selected = preference_order(choice_indices);
+  else
+    probabilities = choice_prob_list(choice_indices);
+    probabilities = probabilities/sum(probabilities);
+    patch_selected = randsample(preference_order(choice_indices), 1, true, probabilities);
+  end
   if rand < error_rate
     patch_selected = 0;
   end

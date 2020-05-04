@@ -1,13 +1,13 @@
-function pit_strategies(m1_strategy, m2_strategy, m1_error_rate, ...
+function sim_results = pit_strategies(m1_strategy, m2_strategy, m1_error_rate, ...
   m2_error_rate, choice_prob_list, m1_win_prob, coop_reward, max_moves, ...
-  n_reps, num_patches, save_data_flag, save_fig_flag)
+  n_reps, num_patches)
 
 % Validation of input parameters
 if nargin<3
   error('Too few arguments. Need at least the strategies of m1 and m2');
 end
 
-if isempty(m1_error_rated)
+if isempty(m1_error_rate)
   m1_error_rate = 0.1;
 end
 
@@ -35,15 +35,7 @@ if isempty(num_patches)
   num_patches = 2;
 end
 
-if isempty(save_data_flag)
-  save_data_flag = 1;
-end
-
-if isempty(save_fig_flag)
-  save_fig_flag = 0;
-end
-
-trial_sequence = pct.simuiations.make_trial_sequence( num_patches, n_reps );
+trial_sequence = pct.simulations.make_trial_sequence( num_patches, n_reps );
 patch_acquired_state = zeros( size( trial_sequence ) );
 reward_queue = nan( [size( trial_sequence ) 2] );
 
@@ -75,3 +67,34 @@ for trial = 1:size(trial_sequence, 2)
   reward_queue(:, trial, 2) = current_reward(:, 2);
   patch_acquired_state(:, trial) = acquired_patches;
 end
+
+sim_results = struct();
+sim_results.num_patches = num_patches;
+sim_results.m1_strategy = m1_strategy;
+sim_results.m2_strategy = m2_strategy;
+sim_results.trial_sequence = trial_sequence;
+sim_results.reward_queue = reward_queue;
+sim_results.patch_acquired_state = patch_acquired_state;
+sim_results.n_reps = n_reps;
+sim_results.m1_error_rate = m1_error_rate;
+sim_results.m2_error_rate = m2_error_rate;
+sim_results.m1_win_prob = m1_win_prob;
+sim_results.coop_reward = coop_reward;
+sim_results.max_moves = max_moves;
+
+legend = cell(12,1);
+n=0;
+n=n+1; legend{n} = 'num_patches           = number of patches per trial';
+n=n+1; legend{n} = 'm1_strategy           = strategy used by m1';
+n=n+1; legend{n} = 'm2_strategy           = strategy used by m2';
+n=n+1; legend{n} = 'trial_sequence        = specific trial order in the session';
+n=n+1; legend{n} = 'reward_queue          = reward received for each patch on each trial by both monkeys';
+n=n+1; legend{n} = 'patch_acquired_state  = whether each patch in each trial was acquired';
+n=n+1; legend{n} = 'n_reps                = number of repeats of each trial';
+n=n+1; legend{n} = 'm1_error_rate         = error probability per move for m1';
+n=n+1; legend{n} = 'm2_error_rate         = error probability per move for m2';
+n=n+1; legend{n} = 'm1_win_prob           = probability of m1 winning comp. patch';
+n=n+1; legend{n} = 'coop_reward           = amount of reward each monkey gets by acquiring a coop. patch';
+n=n+1; legend{n} = 'max_moves             = maximum number of moves allowed, per monkey, per trial';
+
+sim_results.legend = legend;
