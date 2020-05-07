@@ -29,7 +29,7 @@ for m1_strategy_ind = 1:numel(strategy_list)
   for m2_strategy_ind = 1:numel(strategy_list)
     m1_strategy = strategy_list{m1_strategy_ind};
     m2_strategy = strategy_list{m2_strategy_ind};
-    disp(['Starting M1 strategy: ', m1_strategy, '; M2 strategy: ', m2_strategy]);
+    disp(['Starting to run strategy pair; M1 strategy: ', m1_strategy, '; M2 strategy: ', m2_strategy]);
     for session = 1:n_sessions
       result_mat{m1_strategy_ind, m2_strategy_ind, session} = pct.simulations.pit_strategies( ...
         m1_strategy, m2_strategy, m1_error_rate, m2_error_rate, ...
