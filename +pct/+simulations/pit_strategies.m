@@ -64,7 +64,7 @@ n=n+1; legend{n} = 'max_moves             = maximum number of moves allowed, per
 
 for trial = 1:size(trial_sequence, 2)
   
-  sim_results(trial) = struct();
+  sim_results(trial) = make_trial_data_structure();
   
   patches = trial_sequence(:, trial);
   acquired_patches = patch_acquired_state(:, trial);
@@ -111,4 +111,29 @@ for trial = 1:size(trial_sequence, 2)
   sim_results(trial).coop_reward = coop_reward;
   sim_results(trial).max_moves = max_moves;
   sim_results(trial).legend = legend;
+end
+
+end
+
+function data_structure = make_trial_data_structure()
+
+data_structure = struct();
+
+data_structure.num_patches = nan;
+data_structure.m1_strategy = nan;
+data_structure.m2_strategy = nan;
+data_structure.session = nan;
+data_structure.trial_patches = nan;
+data_structure.reward = nan;
+data_structure.choice_sequence_m1 = nan;
+data_structure.choice_sequence_m2 = nan;
+data_structure.patch_acquired_state = nan;
+data_structure.n_reps = nan;
+data_structure.m1_error_rate = nan;
+data_structure.m2_error_rate = nan;
+data_structure.m1_win_prob = nan;
+data_structure.coop_reward = nan;
+data_structure.max_moves = nan;
+data_structure.legend = nan;
+  
 end

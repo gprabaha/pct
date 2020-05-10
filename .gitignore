@@ -3,3 +3,4 @@
 *.m~
 +pct/+config/config.mat
 +pct/+data/
++pct/+simulations/+data/
