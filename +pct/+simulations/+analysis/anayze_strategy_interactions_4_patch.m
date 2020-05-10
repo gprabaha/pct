@@ -2,7 +2,7 @@ function anayze_strategy_interactions_4_patch()
 
 files = dir('../+data/4-patches*');
 
-data = load(['../+data/' files(1).name]);
+data = load(['../+data/' files(end).name]);
 
 strategy_list = data.strategy_list;
 results = data.result_mat;
