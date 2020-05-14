@@ -17,7 +17,11 @@ filepath = [pct.util.get_project_folder '/+pct/+simulations/+data/', ...
   '2-patches-with-val-update-' folder_name];
 mkdir(filepath);
 
-%parpool(feature('numcores'));
+if isempty(gcp('nocreate'))
+  parpool( feature('NumCores') );
+else
+  % already created
+end
 
 for coop_reward = [0.5 1]
   for max_moves = 2:4 % Maximum number of moves that can be made per trial (and thus max number of patches collected)
