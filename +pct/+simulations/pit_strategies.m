@@ -114,9 +114,9 @@ for trial = 1:size(trial_sequence, 2)
     reward, patches, decay_rate);
   
   [current_value_unrewarded_m1, current_value_unrewarded_m2] = ...
-  update_value_unrewarded(current_value_unrewarded_m1, ...
-  current_value_unrewarded_m2, all_choices_m1, all_choices_m2, ...
-  reward, patches, decay_rate);
+    update_value_unrewarded(current_value_unrewarded_m1, ...
+    current_value_unrewarded_m2, all_choices_m1, all_choices_m2, ...
+    reward, patches, decay_rate);
   
   patch_acquired_state(:, trial) = acquired_patches;
   
@@ -204,7 +204,7 @@ function [updated_value_unrewarded_m1, updated_value_unrewarded_m2] = ...
 for patch_ind = 1:numel( all_choices_m1 )
   if all_choices_m1(patch_ind) == 1
     patch = patches(patch_ind);
-    if reward(patch_ind, 1) == 1
+    if reward(patch_ind, 1) > 0
       current_value_unrewarded_m1(patch) = current_value_unrewarded_m1(patch)*(1/decay_rate);
     else
       current_value_unrewarded_m1(patch) = current_value_unrewarded_m1(patch)*decay_rate;
@@ -215,7 +215,7 @@ end
 for patch_ind = 1:numel( all_choices_m2 )
   if all_choices_m2(patch_ind) == 1
     patch = patches(patch_ind);
-    if reward(patch_ind, 1) == 1
+    if reward(patch_ind, 1) > 0
       current_value_unrewarded_m2(patch) = current_value_unrewarded_m2(patch)*(1/decay_rate);
     else
       current_value_unrewarded_m2(patch) = current_value_unrewarded_m2(patch)*decay_rate;

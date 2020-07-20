@@ -40,6 +40,8 @@ end
 function give_juice_reward(program)
 
 quantity = program.Value.rewards.training;
-pct.util.deliver_reward( program, 1, quantity );
+% Check this with Nick
+collected = sum( ~isnan( program.Value.data.Value(end).just_patches.patch_acquired_times ) );
+pct.util.deliver_reward( program, 1, collected*quantity );
 
 end

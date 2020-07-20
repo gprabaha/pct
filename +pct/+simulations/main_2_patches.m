@@ -58,7 +58,7 @@ for coop_reward = [0.5 1]
             'm1err-' num2str(m1_error_rate*100) '-' ...
             'm2err-' num2str(m2_error_rate*100) ...
             '.mat'];
-          save( fullfile(filepath, filename), 'result_mat_across_strategies' );
+          save( fullfile(filepath, filename), 'result_mat_across_strategies', 'strategy_list' );
         end
       end
     end

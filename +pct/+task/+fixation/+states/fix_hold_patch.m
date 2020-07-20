@@ -194,6 +194,11 @@ elseif ( fix_acq_state.Entered )
   % Looked away from the target, so proceed to the exit function.
   fix_state.Broke = true;
   escape( state );
+  
+else
+  % Looked away from the target, so proceed to the exit function.
+  fix_acq_state.Broke = true;
+  escape( state );
 end
 
 state.UserData.fixation_acquired_state = fix_acq_state;
