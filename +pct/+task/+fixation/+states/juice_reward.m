@@ -41,6 +41,7 @@ if ( state.UserData.num_pulses < num_collected_patches )
     pct.util.deliver_reward( program, 1, quantity );
     state.UserData.reward_timer = tic();
     state.UserData.num_pulses = state.UserData.num_pulses + 1;
+    disp(['Juice pulse ' num2str(state.UserData.num_pulses) ' delivered.']);
   end
 end
 
