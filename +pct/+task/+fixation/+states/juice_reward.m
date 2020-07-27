@@ -30,7 +30,7 @@ end
 function loop(state, program)
 
 quantity = program.Value.rewards.training;
-inter_pulse_interval = 1e-2;  % 10ms;
+inter_pulse_interval = 5e-2;  % 50ms;
 num_collected_patches = sum( ~isnan( program.Value.data.Value(end).just_patches.patch_acquired_times ) );
 reward_timer = state.UserData.reward_timer;
 pulse_duration = quantity;
