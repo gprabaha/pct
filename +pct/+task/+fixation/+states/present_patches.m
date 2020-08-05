@@ -81,7 +81,7 @@ for i = 1:numel(patch_targets)
   stim_name = pct.util.nth_patch_stimulus_name( i );
   stimulus = stimuli.(stim_name);
     
-  if ( patch_targets{i}.IsDurationMet )
+  if ( any(patch_targets{i}.IsDurationMet) )
     stimulus.FaceColor = [0, 0, 0];
     
     if ( ~state.UserData.patch_elapsed_state(i) )

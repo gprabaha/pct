@@ -64,7 +64,7 @@ make_eye_tracker_sync( program, conf );
 make_reward_manager( program, conf, ni_scan_output );
 
 stimuli = make_stimuli( program, conf );
-make_targets( program, updater, window, sampler_m1, stimuli, conf );
+make_targets( program, updater, window, sampler_m1, sampler_m2, stimuli, conf );
 
 make_structure( program, conf );
 make_interface( program, conf );
@@ -295,7 +295,8 @@ program.Value.stimuli_setup = stim_setup;
 
 end
 
-function targets = make_targets(program, updater, window, sampler, stimuli, conf)
+function targets = make_targets(program, updater, window ...
+  , sampler_m1, sampler_m2, stimuli, conf)
 
 stim_setup = get_stimuli_setup( conf );
 stim_names = fieldnames( stim_setup );
@@ -318,7 +319,9 @@ for i = 1:numel(stim_names)
         stim_name = pct.util.nth_patch_stimulus_name( j );
         stimulus = stimuli.(stim_name);
         
-        target = make_target( stim_descr, stimulus, sampler, window );
+%         target = make_target( stim_descr, stimulus, sampler_m2, window );
+        target = make_multi_source_target( stim_descr, stimulus ...
+          , sampler_m1, sampler_m2, window );
         updater.add_component( target );
         
         targets.(stim_name) = target;
@@ -326,7 +329,7 @@ for i = 1:numel(stim_names)
       end
     else
       stimulus = stimuli.(stim_name);
-      target = make_target( stim_descr, stimulus, sampler, window );
+      target = make_target( stim_descr, stimulus, sampler_m1, window );
       updater.add_component( target );
       targets.(stim_name) = target;
     end
@@ -336,6 +339,29 @@ end
 program.Value.targets = targets;
 program.Value.patch_targets = patch_targets;
 program.Value.patch_distribution_radius = patch_distribution_radius;
+
+end
+
+function target = make_multi_source_target(stim_descr, stimulus ...
+  , sampler_m1, sampler_m2, window)
+
+target = ptb.XYMultiSourceTarget();
+add_sampler( target, sampler_m1 );
+add_sampler( target, sampler_m2 );
+
+switch ( stim_descr.class )
+  case {'Rect', 'Oval'}
+    bounds = ptb.bounds.Rect();
+    bounds.BaseRect = ptb.rects.MatchRectangle( stimulus );
+    bounds.BaseRect.Rectangle.Window = window;
+    bounds.Padding = stim_descr.target_padding;
+    
+  otherwise
+    error( 'Unrecognized stimulus class "%s".', stim_descr.class );
+end
+
+target.Bounds = bounds;
+target.Duration = stim_descr.target_duration;
 
 end
 

@@ -15,14 +15,20 @@ end
 
 function entry(state, program)
 
+num_patches = count_patches( program );
+
 % All patches remaining
-state.UserData.num_patches_remaining = count_patches( program );
+state.UserData.num_patches_remaining = num_patches;
 % No patches were acquired
-state.UserData.patch_elapsed_state = false( 1, count_patches(program) );
+state.UserData.patch_elapsed_state = false( 1, num_patches );
+% The IDs of the agent who acquired the patch.
+state.UserData.patch_acquired_by = zeros( 1, num_patches );
 % No patches were entered
-state.UserData.mark_entered = false( 1, count_patches( program ) );
+state.UserData.mark_entered = false( 1, num_patches );
+% IDs of the agent who entered the patch.
+state.UserData.entered_by = zeros( 1, num_patches );
 % No patches were exited
-state.UserData.mark_exited = false( 1, count_patches( program ) );
+state.UserData.mark_exited = false( 1, num_patches );
 
 reset_targets( program );
 
@@ -148,19 +154,23 @@ stimuli = program.Value.stimuli;
 for i = 1:numel(patch_targets)
   stim_name = pct.util.nth_patch_stimulus_name( i );
   stimulus = stimuli.(stim_name);
+  target = patch_targets{i};
   
-  if ( patch_targets{i}.IsInBounds && ~state.UserData.mark_entered(i) && ~patch_targets{i}.IsDurationMet )
+  if ( any(target.IsInBounds) && ...
+      ~state.UserData.mark_entered(i) && ~any(target.IsDurationMet) )
     % Entered one of the patches
     patch_entry_timestamp( state, program, i );
     state.UserData.mark_entered(i) = true;
+    state.UserData.entered_by(i) = find( target.IsInBounds );
   
-  elseif ( state.UserData.mark_entered(i) && ~patch_targets{i}.IsInBounds && ~patch_targets{i}.IsDurationMet )
+  elseif ( state.UserData.mark_entered(i) && ...
+      ~any(target.IsInBounds) && ~any(target.IsDurationMet) )
     % Exited one of the patches before duration was met
     patch_exit_timestamp( state, program, i );
     state.UserData.mark_entered(i) = false;
   end
     
-  if ( patch_targets{i}.IsDurationMet )
+  if ( any(target.IsDurationMet) )
     stimulus.FaceColor = [0, 0, 0];
     
     if ( ~state.UserData.patch_elapsed_state(i) )
@@ -168,6 +178,7 @@ for i = 1:numel(patch_targets)
       patch_acquired_timestamp( state, program, i );
       state.UserData.patch_elapsed_state(i) = true;
       state.UserData.num_patches_remaining = state.UserData.num_patches_remaining - 1;
+      state.UserData.patch_acquired_by(i) = find( target.IsDurationMet );
     end
   end
 end
@@ -176,7 +187,6 @@ end
 
 function reset_targets(program)
 
-num_patches = count_patches( program );
 patch_targets = program.Value.patch_targets;
 
 for i = 1:numel(patch_targets)
