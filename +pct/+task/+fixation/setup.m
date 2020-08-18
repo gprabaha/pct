@@ -29,6 +29,7 @@ make_task( program, conf );
 make_states( program, conf );
 make_data( program, conf );
 make_online_data_rep( program, conf );
+make_patch_generator( program, conf );
 make_training_stage_name( program, conf );
 make_percentage_correct_recorder( program, conf );
 
@@ -134,6 +135,13 @@ end
 function make_pause_flag( program, conf )
 
 program.Value.pause_flag = false;
+
+end
+
+function generator = make_patch_generator(program, conf)
+
+generator = conf.STRUCTURE.patch_generator( program );
+program.Value.patch_generator = generator;
 
 end
 

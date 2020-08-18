@@ -78,6 +78,10 @@ STRUCTURE.initial_stage_name = 'Fixation1';
 STRUCTURE.pause_state_criterion = ...
   @(program) pct.util.pause_after_num_trials( program, 300 );
 
+% Default to using a patch generator that makes info for M1 self patches
+% only.
+STRUCTURE.patch_generator = @(program) pct.util.PatchInfoM1Only();
+
 %	TIMINGS
 TIMINGS = struct();
 

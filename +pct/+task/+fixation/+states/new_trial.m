@@ -14,6 +14,9 @@ function entry(state, program)
 states = program.Value.states;
 pause_flag = program.Value.pause_flag;
 
+establish_patch_info( program );
+configure_patch_stimuli( program );
+
 if ( should_go_to_pause_state(program) &&  ~pause_flag )
   next( state, states('pause') );
 else
@@ -81,7 +84,7 @@ end
 
 function num_patches = count_patches(program)
 
-num_patches = program.Value.structure.num_patches;
+num_patches = numel( program.Value.current_patches );
 
 end
 
@@ -218,5 +221,40 @@ end
 function tf = should_go_to_pause_state(program)
 
 tf = program.Value.structure.pause_state_criterion( program );
+
+end
+
+function establish_patch_info(program)
+
+all_targets = program.Value.patch_targets;
+
+program.Value.current_patches = ...
+  generate( program.Value.patch_generator, all_targets, program );
+
+end
+
+function configure_patch_stimuli(program)
+
+num_patches = count_patches( program );
+
+stimuli = program.Value.stimuli;
+current_patches = program.Value.current_patches;
+current_stimuli = cell( 1, num_patches );
+
+for i = 1:num_patches
+  stim_name = pct.util.nth_patch_stimulus_name( i );
+  stimulus = stimuli.(stim_name);
+  
+  patch_info = current_patches(i);
+  patch_color = patch_info.Color;
+  patch_pos = patch_info.Position;
+  
+  stimulus.FaceColor = patch_color;
+  stimulus.Position.Value = patch_pos;
+  
+  current_stimuli{i} = stimulus;
+end
+
+program.Value.current_patch_stimuli = current_stimuli;
 
 end

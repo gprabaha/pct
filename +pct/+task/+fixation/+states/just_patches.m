@@ -41,15 +41,19 @@ end
 
 function loop(state, program)
 
-draw_targets( program );
+main_window = program.Value.window;
+
+draw_patches( program, main_window );
 draw_cursor( program );
-flip( program.Value.window );
+flip( main_window );
 
 debug_window_is_present = program.Value.debug_window_is_present;
 if (debug_window_is_present)
-  draw_debug_targets( program );
+  debug_window = program.Value.debug_window;
+  
+  draw_patches( program, debug_window );
   draw_debug_cursor( program );
-  flip( program.Value.debug_window );
+  flip( debug_window );
 end
 
 check_targets( state, program );
@@ -91,37 +95,14 @@ program.Value.data.Value(end).last_state = 'jp';
 
 end
 
-function draw_targets(program)
+function draw_patches(program, window)
 
-num_patches = count_patches( program );
-stimuli = program.Value.stimuli;
-window = program.Value.window;
-patch_targets = program.Value.patch_targets;
-
+stimuli = program.Value.current_patch_stimuli;
+patch_targets = { program.Value.current_patches.Target };
 is_debug = pct.util.is_debug( program );
 
-for i = 1:num_patches
-  stimulus = stimuli.(pct.util.nth_patch_stimulus_name(i));
-  draw( stimulus, window );
-  
-  if ( is_debug )
-    draw( patch_targets{i}.Bounds, window );
-  end
-end
-
-end
-
-function draw_debug_targets(program)
-
-num_patches = count_patches( program );
-stimuli = program.Value.stimuli;
-window = program.Value.debug_window;
-patch_targets = program.Value.patch_targets;
-
-is_debug = true;
-
-for i = 1:num_patches
-  stimulus = stimuli.(pct.util.nth_patch_stimulus_name(i));
+for i = 1:numel(stimuli)
+  stimulus = stimuli{i};
   draw( stimulus, window );
   
   if ( is_debug )
@@ -147,14 +128,12 @@ end
 
 function check_targets(state, program)
 
-patch_targets = program.Value.patch_targets;
-stimuli = program.Value.stimuli;
+patch_info = program.Value.current_patches;
+stimuli = program.Value.current_patch_stimuli;
 
-
-for i = 1:numel(patch_targets)
-  stim_name = pct.util.nth_patch_stimulus_name( i );
-  stimulus = stimuli.(stim_name);
-  target = patch_targets{i};
+for i = 1:numel(patch_info)
+  stimulus = stimuli{i};
+  target = patch_info(i).Target;
   
   if ( any(target.IsInBounds) && ...
       ~state.UserData.mark_entered(i) && ~any(target.IsDurationMet) )
@@ -197,7 +176,7 @@ end
 
 function num_patches = count_patches(program)
 
-num_patches = program.Value.structure.num_patches;
+num_patches = numel( program.Value.current_patches );
 
 end
 
@@ -232,6 +211,7 @@ if ( ~interface.has_m2 || ~interface.m2_is_computer )
   return
 end
 
-initialize( program.Value.generator_m2, program );
+patch_info = program.Value.current_patches;
+initialize( program.Value.generator_m2, patch_info, program );
 
 end

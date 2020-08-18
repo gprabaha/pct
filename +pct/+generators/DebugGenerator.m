@@ -31,8 +31,10 @@ classdef DebugGenerator < handle
       reset( obj.frame_timer );
     end
     
-    function initialize(obj, program)
-      [start_pos_val, end_pos_val, total_time_val] = m2_saccade_attributes( obj, program );
+    function initialize(obj, patch_info, program)
+%       [start_pos_val, end_pos_val, total_time_val] = m2_saccade_attributes( obj, program );
+      [start_pos_val, end_pos_val, total_time_val] = m2_saccade( patch_info, program );
+      
       obj.origin = start_pos_val;
       obj.destination = end_pos_val;
       obj.total_time = total_time_val;
@@ -101,4 +103,32 @@ classdef DebugGenerator < handle
       total_time_val = program.Value.generator_m2_saccade_time;
     end
   end
+end
+
+function [start_pos, end_pos, total_time] = m2_saccade(patch_info, program)
+
+rect = program.Value.window.Rect;
+rect_size = [ rect.X2-rect.X1, rect.Y2-rect.Y1 ];
+      
+start_pos = [0.5 * rect_size(1), 0.5 * rect_size(2)];
+end_pos = start_pos;
+total_time = program.Value.generator_m2_saccade_time;
+
+maybe_m2_patches = pct.util.PatchInfo.empty();
+
+for i = 1:numel(patch_info)
+  if ( acquireable_by_m2(patch_info(i)) )
+    maybe_m2_patches(end+1) = patch_info(i);
+  end
+end
+
+if ( isempty(maybe_m2_patches) )
+  % No patches acquireable by m2.
+  return
+end
+
+patch_ind = randi( numel(maybe_m2_patches), 1 );
+end_pos = maybe_m2_patches(patch_ind).Position(:)' .* rect_size(:)';
+% end_pos = maybe_m2_patches(patch_ind).Position(:)';
+
 end

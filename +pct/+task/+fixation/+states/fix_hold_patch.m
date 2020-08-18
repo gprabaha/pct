@@ -30,7 +30,6 @@ end
 reset( program.Value.targets.fix_hold_square );
 
 reset_targets( program );
-configure_stimuli( state, program );
 
 timestamp_entry( state, program );
 update_last_state( state, program );
@@ -44,17 +43,21 @@ end
 
 function loop(state, program)
 
+main_window = program.Value.window;
+
 draw_target( program );
-draw_patches( program );
+draw_patches( program, main_window );
 draw_cursor( program );
-flip( program.Value.window );
+flip( main_window );
 
 debug_window_is_present = program.Value.debug_window_is_present;
 if (debug_window_is_present)
+  debug_window = program.Value.debug_window;
+  
   draw_debug_target( program );
-  draw_debug_patches( program );
+  draw_patches( program, debug_window );
   draw_debug_cursor( program );
-  flip( program.Value.debug_window );
+  flip( debug_window );
 end
 
 check_target( state, program );
@@ -136,17 +139,14 @@ end
 
 end
 
-function draw_patches( program )
+function draw_patches(program, window)
 
-num_patches = count_patches( program );
-stimuli = program.Value.stimuli;
-window = program.Value.window;
-patch_targets = program.Value.patch_targets;
-
+stimuli = program.Value.current_patch_stimuli;
+patch_targets = { program.Value.current_patches.Target };
 is_debug = pct.util.is_debug( program );
 
-for i = 1:num_patches
-  stimulus = stimuli.(pct.util.nth_patch_stimulus_name(i));
+for i = 1:numel(stimuli)
+  stimulus = stimuli{i};
   draw( stimulus, window );
   
   if ( is_debug )
@@ -155,27 +155,6 @@ for i = 1:num_patches
 end
 
 end
-
-function draw_debug_patches(program)
-
-num_patches = count_patches( program );
-stimuli = program.Value.stimuli;
-window = program.Value.debug_window;
-patch_targets = program.Value.patch_targets;
-
-is_debug = true;
-
-for i = 1:num_patches
-  stimulus = stimuli.(pct.util.nth_patch_stimulus_name(i));
-  draw( stimulus, window );
-  
-  if ( is_debug )
-    draw( patch_targets{i}.Bounds, window );
-  end
-end
-
-end
-
 
 function draw_cursor(program)
 
@@ -218,42 +197,7 @@ state.UserData.fixation_acquired_state = fix_acq_state;
 
 end
 
-function configure_stimuli(state, program)
-
-num_patches = count_patches( program );
-
-patch_ids = program.Value.current_patch_identities;
-patch_id_color_map = program.Value.stimuli_setup.patch.patch_identity_color_map;
-
-stimuli = program.Value.stimuli;
-radius = program.Value.patch_distribution_radius;
-rect = program.Value.window.Rect;
-coordinates = assign_patch_coordinates( num_patches, radius, rect );
-
-for patch_index = 1:num_patches
-  stim_name = pct.util.nth_patch_stimulus_name( patch_index );
-  patch_id = patch_ids{patch_index};
-  patch_color = patch_id_color_map(patch_id);
-  
-  new_pos = coordinates(:, patch_index);
-  stimulus = stimuli.(stim_name);
-  stimulus.FaceColor = patch_color;
-  stimulus.Position.Value = new_pos;
-end
-
-end
-
 function reset_targets(program)
-
-num_patches = count_patches( program );
-stimuli = program.Value.stimuli;
-default_color = default_patch_color( program );
-
-for i = 1:num_patches
-  stim_name = pct.util.nth_patch_stimulus_name( i );
-  stimulus = stimuli.(stim_name);
-  stimulus.FaceColor = default_color;
-end
 
 patch_targets = program.Value.patch_targets;
 
@@ -263,73 +207,8 @@ end
 
 end
 
-function num_patches = count_patches(program)
-
-num_patches = program.Value.structure.num_patches;
-
-end
-
-function color = default_patch_color(program)
-
-color = program.Value.stimuli_setup.patch.color;
-
-end
-
 function did_fixate(state,program,fix_acq_state)
 
 program.Value.data.Value(end).(state.Name).did_fixate = fix_acq_state;
   
-end
-
-function coordinates = assign_patch_coordinates( num_patches, radius, rect )
-
-if num_patches > 4
-  error('Number of patches cannot be more than 4!');
-end
-
-rect_size = [ rect.X2-rect.X1, rect.Y2-rect.Y1 ];
-
-% Adjusting for rectangular screen
-if rect_size(1) > rect_size(2)
-  adjustment_ratio = rect_size(2)/rect_size(1);
-  adjustment_dim = 1;
-else
-  adjustment_ratio = rect_size(1)/rect_size(2);
-  adjustment_dim = 2;
-end
-
-center = [0.5; 0.5];
-if num_patches ~= 1
-  theta = 360/num_patches;
-else
-  theta = 0;
-end
-
-
-coordinates = nan( 2, num_patches );
-if adjustment_dim == 1
-  coordinates( :, 1 ) = [0; radius];
-else
-  coordinates( :, 1 ) = [radius; 0];
-end
-if num_patches > 1
-  for patch = 2:num_patches
-    rotation_matrix = rotation_matrix_generator( theta*(patch-1) );
-    coordinates( :, patch ) = rotation_matrix * coordinates( :, 1 );
-  end
-else
-end
-
-random_frame_rotation_angle = rand * 360;
-random_angle_frame_rotation_matrix = rotation_matrix_generator( random_frame_rotation_angle );
-coordinates = random_angle_frame_rotation_matrix * coordinates;
-coordinates(adjustment_dim, :) = coordinates(adjustment_dim, :) * adjustment_ratio;
-coordinates = coordinates + center;
-
-end
-
-function rotation_matrix = rotation_matrix_generator(theta)
-
-rotation_matrix = [cosd(theta) -sind(theta); sind(theta) cosd(theta)];
-
 end
