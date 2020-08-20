@@ -1,4 +1,8 @@
 classdef PatchInfo
+  properties (Constant = true)
+    Strategies = {'self', 'compete', 'cooperate'};
+  end
+  
   properties
     AcquirableBy = {};
     Strategy = 'self';
@@ -20,7 +24,7 @@ classdef PatchInfo
     end
     
     function obj = set.Strategy(obj, v)
-      obj.Strategy = validatestring( v, {'self'}, mfilename, 'strategy' );
+      obj.Strategy = validatestring( v, obj.Strategies, mfilename, 'strategy' );
     end
     
     function tf = acquireable_by_m2(obj)

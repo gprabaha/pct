@@ -16,19 +16,20 @@ end
 function entry(state, program)
 
 num_patches = count_patches( program );
+num_sources = 2;  % m1 and m2
 
 % All patches remaining
 state.UserData.num_patches_remaining = num_patches;
 % No patches were acquired
-state.UserData.patch_elapsed_state = false( 1, num_patches );
+state.UserData.patch_acquired = false( 1, num_patches );
 % The IDs of the agent who acquired the patch.
-state.UserData.patch_acquired_by = zeros( 1, num_patches );
+state.UserData.patch_acquired_by = zeros( num_sources, num_patches );
 % No patches were entered
-state.UserData.mark_entered = false( 1, num_patches );
-% IDs of the agent who entered the patch.
-state.UserData.entered_by = zeros( 1, num_patches );
+state.UserData.mark_entered = false( num_sources, num_patches );
 % No patches were exited
 state.UserData.mark_exited = false( 1, num_patches );
+% IDs of the agent who entered the patch.
+state.UserData.entered_by = zeros( 1, num_patches );
 
 reset_targets( program );
 
@@ -126,39 +127,95 @@ pct.util.draw_gaze_cursor( program, is_debug );
 
 end
 
+function tf = can_acquire_self(patch_info, source_index)
+
+acq_by = patch_info.AcquirableBy;
+
+assert( numel(acq_by) == 1 ...
+  , 'Expected self patch to be acquireable by a single source, only.' );
+
+if ( strcmp(acq_by, 'm1') )
+  tf = source_index == 1;
+  
+elseif ( strcmp(acq_by, 'm2') )
+  tf = source_index == 2;
+  
+else
+  error( 'Unknown acquireable by id "%s".', acq_by );
+end
+
+end
+
+function acquire_patch(state, program, patch_index, source_index)
+
+patch_acquired_timestamp( state, program, patch_index );
+state.UserData.patch_acquired(patch_index) = true;
+state.UserData.num_patches_remaining = ...
+  state.UserData.num_patches_remaining - 1;
+state.UserData.patch_acquired_by(patch_index) = source_index;
+
+end
+
 function check_targets(state, program)
 
 patch_info = program.Value.current_patches;
 stimuli = program.Value.current_patch_stimuli;
+patches_acquired = state.UserData.patch_acquired;
 
 for i = 1:numel(patch_info)
   stimulus = stimuli{i};
-  target = patch_info(i).Target;
   
-  if ( any(target.IsInBounds) && ...
-      ~state.UserData.mark_entered(i) && ~any(target.IsDurationMet) )
-    % Entered one of the patches
-    patch_entry_timestamp( state, program, i );
-    state.UserData.mark_entered(i) = true;
-    state.UserData.entered_by(i) = find( target.IsInBounds );
+  info = patch_info(i);
+  target = info.Target;
+  strategy = info.Strategy;
   
-  elseif ( state.UserData.mark_entered(i) && ...
-      ~any(target.IsInBounds) && ~any(target.IsDurationMet) )
-    % Exited one of the patches before duration was met
-    patch_exit_timestamp( state, program, i );
-    state.UserData.mark_entered(i) = false;
-  end
-    
-  if ( any(target.IsDurationMet) )
-    stimulus.FaceColor = [0, 0, 0];
-    
-    if ( ~state.UserData.patch_elapsed_state(i) )
-      % The patch has already been acquired
-      patch_acquired_timestamp( state, program, i );
-      state.UserData.patch_elapsed_state(i) = true;
-      state.UserData.num_patches_remaining = state.UserData.num_patches_remaining - 1;
-      state.UserData.patch_acquired_by(i) = find( target.IsDurationMet );
+  in_bounds = target.IsInBounds;
+  dur_met = target.IsDurationMet;
+  
+  for j = 1:numel(in_bounds)
+    if ( in_bounds(j) && ~state.UserData.mark_entered(j, i) && ~dur_met(j) )
+      % Subject (j) entered this patch (i)
+      patch_entry_timestamp( state, program, i );
+      state.UserData.mark_entered(j, i) = true;
+      state.UserData.entered_by(i) = j;
+      
+    elseif ( state.UserData.mark_entered(j, i) && ~in_bounds(j) && ~dur_met(j) )
+      % Subject (j) exited this patch (i)
+      patch_exit_timestamp( state, program, i );
+      state.UserData.mark_entered(j, i) = false;
     end
+  end
+  
+  if ( ~patches_acquired(i) )
+    switch ( strategy )
+      case 'self'
+        for j = 1:numel(dur_met)
+          if ( dur_met(j) && can_acquire_self(info, j) )
+            acquire_patch( state, program, i, j );
+            break;
+          end
+        end
+        
+      case 'compete'
+        for j = 1:numel(dur_met)
+          if ( dur_met(j) )
+            acquire_patch( state, program, i, j );
+            break;
+          end
+        end
+        
+      case 'cooperate'
+        if ( all(dur_met) )
+          acquire_patch( state, program, i, j );
+        end
+        
+      otherwise
+        error( 'Unhandled strategy "%s".', strategy );
+    end
+  end
+  
+  if ( patches_acquired(i) )
+    stimulus.FaceColor = [0, 0, 0];
   end
 end
 
