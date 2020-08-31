@@ -5,7 +5,7 @@ classdef DebugGenerator < handle
     origin = [0; 0];
     destination = [0; 0];
     total_time = 1;
-    noise = 2;
+    noise = 1.5;
     
   end
   methods
@@ -112,6 +112,8 @@ rect_size = [ rect.X2-rect.X1, rect.Y2-rect.Y1 ];
       
 start_pos = [0.5 * rect_size(1), 0.5 * rect_size(2)];
 end_pos = start_pos;
+
+% This is where the total saccade time gets assigned
 total_time = program.Value.generator_m2_saccade_time;
 
 maybe_m2_patches = pct.util.PatchInfo.empty();
