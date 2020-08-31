@@ -33,6 +33,7 @@ classdef DebugGenerator < handle
     
     function time = establish_saccade_time(obj, program)
       data = program.Value.data.Value;
+      training_data = program.Value.training_data;
       
       all_m1_rts = [];
       
@@ -56,6 +57,11 @@ classdef DebugGenerator < handle
           
           all_m1_rts = [ all_m1_rts; rts(~isnan(rts)) ];
         end
+      end
+      
+      if ( training_data.mean_m2_saccade_velocity_shift_direction ~= 0 )
+        % Right or left key was pressed, increase / decrease the mean
+        % saccade velocity.
       end
       
       if ( ~isempty(all_m1_rts) )

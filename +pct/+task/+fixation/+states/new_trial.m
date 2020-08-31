@@ -11,6 +11,8 @@ end
 
 function entry(state, program)
 
+update_training_data( program );
+
 states = program.Value.states;
 pause_flag = program.Value.pause_flag;
 
@@ -256,5 +258,11 @@ for i = 1:num_patches
 end
 
 program.Value.current_patch_stimuli = current_stimuli;
+
+end
+
+function update_training_data(program)
+
+program.Value.training_data.mean_m2_saccade_velocity_shift_direction = 0;
 
 end

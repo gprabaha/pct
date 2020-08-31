@@ -64,7 +64,7 @@ make_eye_tracker_sync( program, conf );
 
 make_reward_manager( program, conf, ni_scan_output );
 
-stimuli = make_stimuli( program, conf );
+stimuli = make_stimuli( program, window, conf );
 make_targets( program, updater, window, sampler_m1, sampler_m2, stimuli, conf );
 
 make_structure( program, conf );
@@ -275,7 +275,7 @@ program.Value.states = states;
 
 end
 
-function stimuli = make_stimuli(program, conf)
+function stimuli = make_stimuli(program, window, conf)
 
 structure = get_structure( conf );
 stim_setup = get_stimuli_setup( conf );
@@ -290,11 +290,11 @@ for i = 1:numel(stim_names)
     % Generate structure.num_patches patch stimuli.
     for j = 1:structure.num_patches
       use_name = pct.util.nth_patch_stimulus_name( j );
-      stimuli.(use_name) = make_stimulus( stim_setup.(stim_name) );
+      stimuli.(use_name) = make_stimulus( window, stim_setup.(stim_name) );
     end
   else
     % Otherwise, just generate a single stimulus.
-    stimuli.(stim_name) = make_stimulus( stim_setup.(stim_name) );
+    stimuli.(stim_name) = make_stimulus( window, stim_setup.(stim_name) );
   end
 end
 
@@ -394,7 +394,7 @@ target.Duration = stim_descr.target_duration;
 
 end
 
-function stim = make_stimulus(description)
+function stim = make_stimulus(window, description)
 
 switch ( description.class )
   case 'Rect'
@@ -412,7 +412,19 @@ end
 
 stim.Scale = ptb.WindowDependent( description.size );
 stim.Scale.Units = 'px';
-stim.FaceColor = set( ptb.Color(), description.color );
+
+if ( isfield(description, 'use_image') && description.use_image )
+  try
+    img = ptb.Image( window, imread(description.image_file) );
+    stim.FaceColor = img;
+    
+  catch err
+    warning( 'Failed to read image: %s.', err.message );
+    stim.FaceColor = set( ptb.Color(), description.color );
+  end
+else
+  stim.FaceColor = set( ptb.Color(), description.color );
+end
 
 end
 

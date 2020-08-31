@@ -38,6 +38,12 @@ conf.STIMULI.setup.fix_hold_square.size = [ 100, 100 ];
 conf.STIMULI.setup.patch.size = [ 100, 100 ];
 conf.STIMULI.setup.gaze_cursor_m2.color = [ 255, 0, 255 ];
 
+% Optionally use an image for the cursor
+conf.STIMULI.setup.gaze_cursor_m2.use_image = true;
+conf.STIMULI.setup.gaze_cursor_m2.image_file = '';
+conf.STIMULI.setup.gaze_cursor.use_image = true;
+conf.STIMULI.setup.gaze_cursor.image_file = '';
+
 % Optionally use a handle to a different function to change the appearance
 % properties of a patch.
 conf.STIMULI.setup.patch.patch_appearance_func = ...
