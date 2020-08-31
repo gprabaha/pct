@@ -19,7 +19,8 @@ classdef DebugPatchInfo < pct.util.EstablishPatchInfo
         elseif ( strat_condition < 0.75 )
           strategy = 'compete';
         else
-          strategy = 'cooperate';
+%           strategy = 'cooperate';
+          strategy = 'compete';
         end
         
         % For the self strategy, determine whether the patch is an m1 or m2
@@ -29,7 +30,8 @@ classdef DebugPatchInfo < pct.util.EstablishPatchInfo
           if ( rand() > 0.5 )
             acquirable_by = {'m1'};
           else
-            acquirable_by = {'m2'};
+            acquirable_by = {'m1'};
+%             acquirable_by = {'m2'};
           end
         else
           acquirable_by = {'m1', 'm2'};
