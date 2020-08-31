@@ -63,9 +63,9 @@ data_scaffold.fix_hold_patch.exit_time = nan;
 data_scaffold.fix_hold_patch.did_fixate = nan;
 
 data_scaffold.just_patches.entry_time = nan;
-data_scaffold.just_patches.patch_entry_times = cell( 1, count_patches( program ) );
-data_scaffold.just_patches.patch_exit_times = cell( 1, count_patches( program ) );
-data_scaffold.just_patches.patch_acquired_times = nan( 1, count_patches( program ) );
+data_scaffold.just_patches.patch_entry_times = cell( 2, count_patches( program ) );
+data_scaffold.just_patches.patch_exit_times = cell( 2, count_patches( program ) );
+data_scaffold.just_patches.patch_acquired_times = nan( 2, count_patches( program ) );
 data_scaffold.just_patches.exit_time = nan;
 data_scaffold.just_patches.did_fixate = nan;
 

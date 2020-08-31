@@ -148,7 +148,7 @@ end
 
 function acquire_patch(state, program, patch_index, source_index)
 
-patch_acquired_timestamp( state, program, patch_index );
+patch_acquired_timestamp( state, program, source_index, patch_index );
 state.UserData.patch_acquired(patch_index) = true;
 state.UserData.num_patches_remaining = ...
   state.UserData.num_patches_remaining - 1;
@@ -175,13 +175,13 @@ for i = 1:numel(patch_info)
   for j = 1:numel(in_bounds)
     if ( in_bounds(j) && ~state.UserData.mark_entered(j, i) && ~dur_met(j) )
       % Subject (j) entered this patch (i)
-      patch_entry_timestamp( state, program, i );
+      patch_entry_timestamp( state, program, j, i );
       state.UserData.mark_entered(j, i) = true;
       state.UserData.entered_by(i) = j;
       
     elseif ( state.UserData.mark_entered(j, i) && ~in_bounds(j) && ~dur_met(j) )
       % Subject (j) exited this patch (i)
-      patch_exit_timestamp( state, program, i );
+      patch_exit_timestamp( state, program, j, i );
       state.UserData.mark_entered(j, i) = false;
     end
   end
@@ -237,25 +237,25 @@ num_patches = numel( program.Value.current_patches );
 
 end
 
-function patch_entry_timestamp( state, program, patch_id )
+function patch_entry_timestamp( state, program, subject_id, patch_id )
 
-program.Value.data.Value(end).(state.Name).patch_entry_times{patch_id} = ...
-    [program.Value.data.Value(end).(state.Name).patch_entry_times{patch_id} ...
+program.Value.data.Value(end).(state.Name).patch_entry_times{subject_id, patch_id} = ...
+    [program.Value.data.Value(end).(state.Name).patch_entry_times{subject_id, patch_id} ...
     elapsed( program.Value.task )];
 
 end
 
-function patch_exit_timestamp( state, program, patch_id )
+function patch_exit_timestamp( state, program, subject_id, patch_id )
 
-program.Value.data.Value(end).(state.Name).patch_exit_times{patch_id} = ...
-    [program.Value.data.Value(end).(state.Name).patch_exit_times{patch_id} ...
+program.Value.data.Value(end).(state.Name).patch_exit_times{subject_id, patch_id} = ...
+    [program.Value.data.Value(end).(state.Name).patch_exit_times{subject_id, patch_id} ...
     elapsed( program.Value.task )];
 
 end
 
-function patch_acquired_timestamp( state, program, patch_id )
+function patch_acquired_timestamp( state, program, subject_id, patch_id )
 
-program.Value.data.Value(end).(state.Name).patch_acquired_times(patch_id) = ...
+program.Value.data.Value(end).(state.Name).patch_acquired_times(subject_id, patch_id) = ...
     elapsed( program.Value.task );
 
 end

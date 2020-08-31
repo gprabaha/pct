@@ -31,13 +31,46 @@ classdef DebugGenerator < handle
       reset( obj.frame_timer );
     end
     
+    function time = establish_saccade_time(obj, program)
+      data = program.Value.data.Value;
+      
+      all_m1_rts = [];
+      
+      for i = 1:numel(data)
+        patch_entry_times = data(i).just_patches.patch_entry_times;
+        state_start_time = data(i).just_patches.entry_time;
+        
+        if ( ~isnan(state_start_time) )
+          % Get the patch entry times for m1, separately for each patch.
+          % Get the maximum (?) entry time, and subtract it from the state
+          % entry time to get a reaction time / saccade time for m1.
+          m1_entry_times = patch_entry_times(1, :);
+          
+          rts = nan( numel(m1_entry_times), 1 );
+          for j = 1:numel(rts)
+            if ( ~isempty(m1_entry_times{j}) )
+              % Should this be max?
+              rts(j) = max( m1_entry_times{j} ) - state_start_time;
+            end
+          end
+          
+          all_m1_rts = [ all_m1_rts; rts(~isnan(rts)) ];
+        end
+      end
+      
+      if ( ~isempty(all_m1_rts) )
+        time = mean( all_m1_rts );
+      else
+        time = program.Value.generator_m2_saccade_time;
+      end
+    end
+    
     function initialize(obj, patch_info, program)
 %       [start_pos_val, end_pos_val, total_time_val] = m2_saccade_attributes( obj, program );
-      [start_pos_val, end_pos_val, total_time_val] = m2_saccade( patch_info, program );
-      
+      [start_pos_val, end_pos_val] = m2_saccade( patch_info, program );      
       obj.origin = start_pos_val;
       obj.destination = end_pos_val;
-      obj.total_time = total_time_val;
+      obj.total_time = establish_saccade_time( obj, program );
       rect = program.Value.window.Rect;
       rect_size = [ rect.X2-rect.X1, rect.Y2-rect.Y1 ];
       obj.source.SettableX = rect_size(1)/2;
@@ -105,7 +138,7 @@ classdef DebugGenerator < handle
   end
 end
 
-function [start_pos, end_pos, total_time] = m2_saccade(patch_info, program)
+function [start_pos, end_pos] = m2_saccade(patch_info, program)
 
 rect = program.Value.window.Rect;
 rect_size = [ rect.X2-rect.X1, rect.Y2-rect.Y1 ];
