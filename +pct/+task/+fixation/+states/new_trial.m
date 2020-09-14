@@ -198,6 +198,11 @@ fprintf( 'Fixation time: %0.2f seconds\n', fix_time );
 fprintf( 'Fixation and hold time: %0.2f seconds\n', fix_hold_time );
 fprintf( 'Patch collection time: %0.2f seconds', patch_time );
 
+if ( isfield(program.Value, 'generator_m2') )
+  fprintf( '\nCurrent m2 saccade time: %0.2f seconds' ...
+    , program.Value.generator_m2.get_current_saccade_time() );
+end
+
 end
 
 function display_juice_received(online_data_rep, program)

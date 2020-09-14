@@ -6,7 +6,10 @@ classdef DebugGenerator < handle
     destination = [0; 0];
     total_time = 1;
     noise = 1.5;
-    
+    use_subject_rt_based_saccade_time = false;
+    cursor_override_increment = 0.1;  % seconds;
+    cursor_override_amount = 0;
+    current_saccade_time = 0;
   end
   methods
     function obj = DebugGenerator(source)
@@ -29,6 +32,10 @@ classdef DebugGenerator < handle
       obj.source.SettableY = rect_size(2)/2;
       obj.source.SettableIsValidSample = true;
       reset( obj.frame_timer );
+    end
+    
+    function time = get_current_saccade_time(obj)
+      time = obj.current_saccade_time;
     end
     
     function time = establish_saccade_time(obj, program)
@@ -62,13 +69,22 @@ classdef DebugGenerator < handle
       if ( training_data.mean_m2_saccade_velocity_shift_direction ~= 0 )
         % Right or left key was pressed, increase / decrease the mean
         % saccade velocity.
+        dir = training_data.mean_m2_saccade_velocity_shift_direction;        
+        obj.cursor_override_amount = ...
+          obj.cursor_override_amount + obj.cursor_override_increment * dir;
+        
+        fprintf( '\n Applying override: %0.2f', obj.cursor_override_amount );
       end
       
-      if ( ~isempty(all_m1_rts) )
-        time = mean( all_m1_rts );
+      override_amt = obj.cursor_override_amount;
+      
+      if ( ~isempty(all_m1_rts) && obj.use_subject_rt_based_saccade_time )
+        time = mean( all_m1_rts ) + override_amt;
       else
-        time = program.Value.generator_m2_saccade_time;
+        time = program.Value.generator_m2_saccade_time + override_amt;
       end
+      
+      obj.current_saccade_time = time;
     end
     
     function initialize(obj, patch_info, program)

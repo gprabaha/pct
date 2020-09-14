@@ -21,13 +21,14 @@ conf.INTERFACE.has_m2 = true;
 
 conf.STIMULI.patch_distribution_radius = 0.35;
 conf.STIMULI.setup.gaze_cursor_m2.visible = true;
-conf.STIMULI.setup.gaze_cursor_m2.saccade_time = 0.3;
+conf.STIMULI.setup.gaze_cursor_m2.saccade_time = 0.6; % saccade time.
 
-conf.STRUCTURE.pause_state_criterion = @(program) pct.util.pause_after_num_trials(program, 5);
-conf.STRUCTURE.patch_generator = @(program) pct.util.DebugPatchInfo;
-conf.STRUCTURE.num_patches = 2;
+% Pause every 15 trials.
+conf.STRUCTURE.pause_state_criterion = ...
+  @(program) pct.util.pause_after_num_trials(program, 15);
+conf.STRUCTURE.patch_generator = @(program) pct.util.BlockedCompeteCooperate;
+conf.STRUCTURE.num_patches = 1;
 conf.STRUCTURE.initial_stage_name = 'FixHold11';
-
 
 conf.SCREEN.rect = [ 0, 0, 560, 350 ];
 conf.SCREEN.index = 0;
