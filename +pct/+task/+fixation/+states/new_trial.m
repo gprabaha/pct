@@ -82,6 +82,8 @@ data_scaffold.training_stage_name = program.Value.training_stage_name;
 data_scaffold.training_stage_reward = program.Value.rewards.training;
 data_scaffold.patch_identities = program.Value.current_patch_identities;
 
+data_scaffold.m2_saccade_time = nan;
+
 end
 
 function num_patches = count_patches(program)
@@ -200,7 +202,7 @@ fprintf( 'Patch collection time: %0.2f seconds', patch_time );
 
 if ( isfield(program.Value, 'generator_m2') )
   fprintf( '\nCurrent m2 saccade time: %0.2f seconds' ...
-    , program.Value.generator_m2.get_current_saccade_time() );
+    , maybe_get_m2_saccade_time(program) );
 end
 
 end
@@ -269,5 +271,15 @@ end
 function update_training_data(program)
 
 program.Value.training_data.mean_m2_saccade_velocity_shift_direction = 0;
+
+end
+
+function time = maybe_get_m2_saccade_time(program)
+
+if ( isfield(program.Value, 'generator_m2') )
+  time = program.Value.generator_m2.get_current_saccade_time();
+else
+  time = 0;
+end
 
 end

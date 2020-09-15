@@ -268,7 +268,12 @@ if ( ~interface.has_m2 || ~interface.m2_is_computer )
   return
 end
 
+generator_m2 = program.Value.generator_m2;
+
 patch_info = program.Value.current_patches;
-initialize( program.Value.generator_m2, patch_info, program );
+initialize( generator_m2, patch_info, program );
+
+program.Value.data.Value(end).m2_saccade_time = ...
+  generator_m2.get_current_saccade_time();
 
 end
