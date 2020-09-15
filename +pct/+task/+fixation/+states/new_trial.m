@@ -11,6 +11,8 @@ end
 
 function entry(state, program)
 
+update_training_data( program );
+
 states = program.Value.states;
 pause_flag = program.Value.pause_flag;
 
@@ -197,6 +199,11 @@ fprintf( 'Fixation time: %0.2f seconds\n', fix_time );
 fprintf( 'Fixation and hold time: %0.2f seconds\n', fix_hold_time );
 fprintf( 'Patch collection time: %0.2f seconds', patch_time );
 
+if ( isfield(program.Value, 'generator_m2') )
+  fprintf( '\nCurrent m2 saccade time: %0.2f seconds' ...
+    , program.Value.generator_m2.get_current_saccade_time() );
+end
+
 end
 
 function display_juice_received(online_data_rep, program)
@@ -257,5 +264,11 @@ for i = 1:num_patches
 end
 
 program.Value.current_patch_stimuli = current_stimuli;
+
+end
+
+function update_training_data(program)
+
+program.Value.training_data.mean_m2_saccade_velocity_shift_direction = 0;
 
 end
