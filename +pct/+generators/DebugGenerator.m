@@ -44,13 +44,15 @@ classdef DebugGenerator < handle
           % Get the patch entry times for m1, separately for each patch.
           % Get the maximum (?) entry time, and subtract it from the state
           % entry time to get a reaction time / saccade time for m1.
+          
+          % This command gets the m1 patch entry times for all patches
           m1_entry_times = patch_entry_times(1, :);
           
           rts = nan( numel(m1_entry_times), 1 );
           for j = 1:numel(rts)
             if ( ~isempty(m1_entry_times{j}) )
-              % Should this be max?
-              rts(j) = max( m1_entry_times{j} ) - state_start_time;
+              % I made this min to capture the first entry
+              rts(j) = min( m1_entry_times{j} ) - state_start_time;
             end
           end
           
@@ -59,7 +61,7 @@ classdef DebugGenerator < handle
       end
       
       if ( ~isempty(all_m1_rts) )
-        time = mean( all_m1_rts );
+        time = mean( all_m1_rts ); % can initiate a norand generator here
       else
         time = program.Value.generator_m2_saccade_time;
       end
