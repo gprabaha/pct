@@ -69,7 +69,7 @@ if( program.Value.interface.save_data )
     program_data = program.Value;
     data_filename = [datestr(datetime, 'yyyy-mm-dd_HH-MM-SS') '-pct-training-data'];
     save([path data_filename], 'program_data');
-    path_dropbox = 'C:\Users\changlab\Dropbox (ChangLab)\prabaha_changlab\pct-training-hitch\';
+    path_dropbox = 'C:\Users\changlab\Dropbox (ChangLab)\prabaha_changlab\pct-training-hitch\comp-coop\';
     save([path_dropbox data_filename], 'program_data');
   catch err
     warning( err.message );
