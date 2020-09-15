@@ -4,8 +4,9 @@ close_window( program );
 close_arduino( program );
 handle_cursor();
 handle_keyboard();
+
 path = save_path();
-save_data( program, path );
+save_task_data( program, path );
 
 end
 
@@ -62,7 +63,7 @@ which path
 
 end
 
-function save_data(program, path)
+function save_task_data(program, path)
 
 if( program.Value.interface.save_data )
   try

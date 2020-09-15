@@ -33,6 +33,8 @@ make_patch_generator( program, conf );
 make_training_stage_name( program, conf );
 make_percentage_correct_recorder( program, conf );
 
+data_directory = program.Value.data_directory;
+
 keyboard_queue = make_keyboard_queue( program );
 make_key_listeners( program, keyboard_queue );
 
@@ -57,7 +59,7 @@ else
   program.Value.debug_window_is_present = false;
 end
 
-[tracker_m1, tracker_m2] = make_eye_trackers( program, updater, ni_scan_input, conf );
+[tracker_m1, tracker_m2] = make_eye_trackers( program, updater, ni_scan_input, data_directory, conf );
 [sampler_m1, sampler_m2] = make_gaze_samplers( program, updater, tracker_m1, tracker_m2 );
 
 make_eye_tracker_sync( program, conf );
@@ -104,6 +106,7 @@ function data = make_data(program, conf)
 
 data = ptb.Reference();
 program.Value.data = data;
+program.Value.data_directory = session_data_directory( conf );
 
 end
 
@@ -428,7 +431,8 @@ end
 
 end
 
-function [tracker_m1, tracker_m2] = make_eye_trackers(program, updater, ni_scan_input, conf)
+function [tracker_m1, tracker_m2] = ...
+  make_eye_trackers(program, updater, ni_scan_input, data_directory, conf)
 
 interface = get_interface( conf );
 signal = get_signal( conf );
@@ -444,10 +448,10 @@ m2_channel_indices = signal.analog_gaze_input_channel_indices_m2;
 calibration_rect = conf.CALIB_SCREEN.rect;
 
 tracker_m1 = make_eye_tracker( updater, ni_scan_input ...
-  , m1_channel_indices, calibration_rect, m1_source_type );
+  , m1_channel_indices, calibration_rect, m1_source_type, data_directory, conf );
 
 tracker_m2 = make_eye_tracker( updater, ni_scan_input ...
-  , m2_channel_indices, calibration_rect, m2_source_type );
+  , m2_channel_indices, calibration_rect, m2_source_type, data_directory, conf );
 
 if ( interface.m2_is_computer )
   generator_m2 = pct.generators.DebugGenerator( tracker_m2 );
@@ -462,20 +466,39 @@ program.Value.generator_m2_saccade_time = saccade_time;
 
 end
 
-function tracker = ...
-  make_eye_tracker(updater, ni_scan_input, input_channel_indices, calibration_rect, source_type)
+function tracker = make_digital_eyelink(data_directory, conf)
+
+interface = get_interface( conf );
+
+tracker = ptb.sources.Eyelink();
+initialize( tracker );
+
+if ( interface.save_data )
+  filename = edf_filename( data_directory );  
+  start_recording( tracker, filename );
+  
+  tracker.Destruct = ...
+    @(tracker) tracker.conditional_receive_file(require_directory(data_directory));
+  
+else
+  start_recording( tracker );
+end
+
+end
+
+function tracker = make_eye_tracker(updater, ni_scan_input, input_channel_indices ...
+  , calibration_rect, source_type, data_directory, conf)
 
 switch ( source_type )
   case 'mouse'
     tracker = ptb.sources.Mouse();
     
   case 'digital_eyelink'
-    tracker = ptb.sources.Eyelink();
-    initialize( tracker );
-    start_recording( tracker );
+    tracker = make_digital_eyelink( data_directory, conf );
     
   case 'analog_input'
-    tracker = make_analog_input_tracker( ni_scan_input, input_channel_indices, calibration_rect );
+    tracker = ...
+      make_analog_input_tracker( ni_scan_input, input_channel_indices, calibration_rect );
     
   case 'DebugGenerator'
     tracker = make_debug_generator_tracker();
@@ -612,6 +635,18 @@ add_listener( keyboard_queue ...
 
 end
 
+function dir = session_data_directory(conf)
+
+dir = fullfile( conf.PATHS.data, datestr(now, 'mmddyy') );
+
+end
+
+function fname = edf_filename(session_dir)
+
+fname = shared_utils.io.get_next_numbered_filename( session_dir, '.edf' );
+
+end
+
 function tf = need_make_ni_session(conf)
 tf = strcmp( conf.INTERFACE.reward_output_type, 'ni' ) || ...
   is_analog_input_gaze_source( conf );
@@ -663,6 +698,10 @@ end
 
 function patch_distribution_radius = get_patch_distribution_radius( conf )
 patch_distribution_radius = conf.STIMULI.patch_distribution_radius;
+end
+
+function d = require_directory(d)
+shared_utils.io.require_dir( d );
 end
 
 function varargout = noop(varargin)
