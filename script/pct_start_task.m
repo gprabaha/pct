@@ -30,7 +30,7 @@ conf.STIMULI.setup.fix_hold_square.size = [60, 60];
 conf.STIMULI.setup.patch.size = [60, 60];
 
 conf.STRUCTURE.pause_state_criterion = @(program) pct.util.pause_after_num_trials(program, 300);
-conf.STRUCTURE.num_patches = 2;
+conf.STRUCTURE.num_patches = 3;
 conf.STRUCTURE.initial_stage_name = 'PatchFix4';
 
 % conf.SCREEN.rect = [0, 0, 1280, 1024];
