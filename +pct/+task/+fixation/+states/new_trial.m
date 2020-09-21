@@ -55,6 +55,8 @@ function data_scaffold = make_trial_data_scaffold(program)
 data_scaffold = struct();
 
 data_scaffold.last_state = nan;
+data_scaffold.last_patch_type = nan;
+data_scaffold.last_agent = nan;
 
 data_scaffold.fixation.entry_time = nan;
 data_scaffold.fixation.exit_time = nan;
@@ -79,7 +81,6 @@ data_scaffold.error_penalty.did_fixate = nan;
 data_scaffold.pause.entry_time = nan;
 data_scaffold.pause.exit_time = nan;
 
-data_scaffold.training_stage_name = program.Value.training_stage_name;
 data_scaffold.training_stage_reward = program.Value.rewards.training;
 data_scaffold.patch_identities = program.Value.current_patch_identities;
 
@@ -102,15 +103,29 @@ online_data_rep = program.Value.online_data_rep;
 if( length(data) > 1 )
   trials_so_far = length(data) - 1;
 
+  online_data_rep.Value(trials_so_far).did_initiate = check_initiation(data, trials_so_far);
   online_data_rep.Value(trials_so_far).did_correctly = check_correct(data, trials_so_far);
   online_data_rep.Value(trials_so_far).last_state_reached = check_last_state(data, trials_so_far);
+  online_data_rep.Value(trials_so_far).last_patch_type = check_last_patch_type(data, trials_so_far);
+  online_data_rep.Value(trials_so_far).last_patch_type_id = check_last_patch_type_id(data, trials_so_far);
+  online_data_rep.Value(trials_so_far).last_agent = check_last_agent(data, trials_so_far);
+  online_data_rep.Value(trials_so_far).last_agent_id = check_last_agent_id(data, trials_so_far);
   online_data_rep.Value(trials_so_far).response_times = check_response_times(data, trials_so_far);
-  online_data_rep.Value(trials_so_far).training_stage_name = data(trials_so_far).training_stage_name;
   online_data_rep.Value(trials_so_far).training_stage_reward = data(trials_so_far).training_stage_reward;
 
   if ( interface.display_task_progress )
     display_data( online_data_rep, program );
   end
+end
+
+end
+
+function did_initiate = check_initiation(data, trials_so_far)
+
+if( isnan( data(trials_so_far).fix_hold_patch.entry_time ) )
+  did_initiate = false;
+else
+  did_initiate = true;
 end
 
 end
@@ -131,6 +146,47 @@ last_state_reached = data(trials_so_far).last_state;
 
 end
 
+function last_patch_type = check_last_patch_type(data, trials_so_far)
+
+last_patch_type = data(trials_so_far).last_patch_type;
+
+end
+
+function last_patch_type_id = check_last_patch_type_id(data, trials_so_far)
+
+patch_type = data(trials_so_far).last_patch_type;
+if strcmp(patch_type, 'self')
+  last_patch_type_id = 1;
+elseif strcmp(patch_type, 'compete')
+  last_patch_type_id = 3;
+elseif strcmp(patch_type, 'cooperate')
+  last_patch_type_id = 4;
+else
+  last_patch_type_id = 0;
+end
+
+end
+
+function last_agent = check_last_agent(data, trials_so_far)
+
+last_agent = data(trials_so_far).last_agent;
+
+end
+
+function last_agent_id = check_last_agent_id(data, trials_so_far)
+
+last_agent = data(trials_so_far).last_agent;
+if strcmp(last_agent, 'hitch')
+  last_agent_id = 1;
+elseif strcmp(last_agent, 'm2_cursor')
+  last_agent_id = 2;
+else
+  last_agent_id = 0;
+end
+
+end
+
+
 function response_times = check_response_times(data, trials_so_far)
 
 response_times = data(trials_so_far).just_patches.patch_acquired_times - ...
@@ -146,47 +202,54 @@ if( length( online_data_rep.Value ) < 11 )
   data_cell = cell( length( online_data_rep.Value ), 5 );
   for trial = 1:length( online_data_rep.Value )
     data_cell(trial,:) = {trial online_data_rep.Value(trial).did_correctly ...
-      online_data_rep.Value(trial).last_state_reached ...
-      online_data_rep.Value(trial).response_times ...
-      online_data_rep.Value(trial).training_stage_name};
+      online_data_rep.Value(trial).last_patch_type ...
+      online_data_rep.Value(trial).last_agent ...
+      online_data_rep.Value(trial).response_times(1,1)};
   end
   data_table = cell2table(data_cell,...
-    'VariableNames',{'Trial_no' 'Correct' 'Last_state' 'Resp_time' 'Training_stage'});
+    'VariableNames',{'Trial_no' 'Correct' 'Patch_type' 'Acq_by' 'Resp_time'});
 else
   data_cell = cell( 10, 5 );
   for trial = (numel( online_data_rep.Value ) - 9):numel( online_data_rep.Value )
     data_cell(trial - ( numel( online_data_rep.Value ) - 10 ),:) = ...
       {trial online_data_rep.Value(trial).did_correctly ...
-      online_data_rep.Value(trial).last_state_reached ...
-      online_data_rep.Value(trial).response_times ...
-      online_data_rep.Value(trial).training_stage_name};
+      online_data_rep.Value(trial).last_patch_type ...
+      online_data_rep.Value(trial).last_agent ...
+      online_data_rep.Value(trial).response_times(1,1)};
   end
   data_table = cell2table(data_cell,...
-    'VariableNames',{'Trial_no' 'Correct' 'Last_state' 'Resp_time' 'Training_stage'});
+    'VariableNames',{'Trial_no' 'Correct' 'Patch_type' 'Acq_by' 'Resp_time'});
 end
 
-overall_accuracy = mean([online_data_rep.Value(1:end).did_correctly])*100;
-last_n_percent_correct = program.Value.last_n_percent_correct;
+%[ strcmp( online_data_rep.Value(1:end).last_state, 'fix' ) ];
+overall_accuracy = mean( [online_data_rep.Value(1:end).did_correctly] & ...
+  [online_data_rep.Value(1:end).did_initiate] )*100;
 
-fprintf( 'The overall accuracy is: %0.2f percent\n\n', overall_accuracy );
-fprintf( 'Accuracy over last n trials: %0.2f percent\n\n', last_n_percent_correct );
+comp_patch_ids = [online_data_rep.Value(1:end).last_patch_type_id] == 3;
+coop_patch_ids = [online_data_rep.Value(1:end).last_patch_type_id] == 4;
+
+accuracy_comp = [online_data_rep.Value(1:end).did_correctly] & ...
+  [online_data_rep.Value(1:end).did_initiate] & ...
+  ([online_data_rep.Value(1:end).last_agent_id] == 1);
+accuracy_comp = mean( accuracy_comp(comp_patch_ids) )*100;
+
+accuracy_coop = [online_data_rep.Value(1:end).did_correctly] & ...
+  [online_data_rep.Value(1:end).did_initiate] & ...
+  ([online_data_rep.Value(1:end).last_agent_id] == 1);
+accuracy_coop = mean( accuracy_coop(coop_patch_ids) )*100;
+
+fprintf( 'Overall accuracy of initiated trials: %0.2f percent\n\n', overall_accuracy );
+fprintf( 'Overall accuracy of compete trials: %0.2f percent\n\n', accuracy_comp );
+fprintf( 'Overall accuracy of cooperate trials: %0.2f percent\n\n', accuracy_coop );
+
 disp(data_table)
 
 display_juice_received( online_data_rep, program );
-if ~strcmp( online_data_rep.Value(end).training_stage_name, ...
-    program.Value.training_stage_name )
-  display_training_stage( program );
-end
 
 display_training_stage_parameters( program );
 
 end
 
-function display_training_stage(program)
-
-fprintf( '\n!!!Transitioning to training stage: %s!!!\n\n ', program.Value.training_stage_name );
-
-end
 
 function display_training_stage_parameters(program)
 
@@ -202,7 +265,7 @@ fprintf( 'Fixation and hold time: %0.2f seconds\n', fix_hold_time );
 fprintf( 'Patch collection time: %0.2f seconds', patch_time );
 
 if ( isfield(program.Value, 'generator_m2') )
-  fprintf( '\nCurrent m2 saccade time: %0.2f seconds' ...
+  fprintf( '\nCurrent mean m2 saccade time: %0.2f seconds' ...
     , maybe_get_m2_saccade_time(program) );
 end
 

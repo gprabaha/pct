@@ -192,6 +192,12 @@ for i = 1:numel(patch_info)
         for j = 1:numel(dur_met)
           if ( dur_met(j) && can_acquire_self(info, j) )
             acquire_patch( state, program, i, j );
+            program.Value.data.Value(end).last_patch_type = 'self';
+            if j==1
+              program.Value.data.Value(end).last_agent = 'hitch';
+            elseif j==2
+              program.Value.data.Value(end).last_agent = 'm2_cursor';
+            end
             break;
           end
         end
@@ -200,6 +206,12 @@ for i = 1:numel(patch_info)
         for j = 1:numel(dur_met)
           if ( dur_met(j) )
             acquire_patch( state, program, i, j );
+            program.Value.data.Value(end).last_patch_type = 'compete';
+            if j==1
+              program.Value.data.Value(end).last_agent = 'hitch';
+            elseif j==2
+              program.Value.data.Value(end).last_agent = 'm2_cursor';
+            end
             break;
           end
         end
@@ -207,6 +219,8 @@ for i = 1:numel(patch_info)
       case 'cooperate'
         if ( all(dur_met) )
           acquire_patch( state, program, i, j );
+          program.Value.data.Value(end).last_patch_type = 'cooperate';
+          program.Value.data.Value(end).last_agent = 'both';
         end
         
       otherwise
