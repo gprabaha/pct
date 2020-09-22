@@ -37,7 +37,10 @@ end
 
 function give_juice_reward(program)
 
+agent = program.Value.data.Value(end).last_agent;
 quantity = program.Value.rewards.training;
-pct.util.deliver_reward( program, 1, quantity );
+if strcmp(agent, 'hitch')
+  pct.util.deliver_reward( program, 1, quantity );
+end
 
 end
