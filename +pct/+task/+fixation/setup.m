@@ -51,10 +51,13 @@ ni_scan_output = make_ni_scan_output( program, conf, ni_session );
 updater = make_component_updater( program );
 window = make_window( program, conf );
 open( window );
+enable_blending( window );
+
 debug_window_is_present = conf.DEBUG_SCREEN.is_present;
 if (debug_window_is_present)
   debug_window = make_debug_window( program, conf );
   open( debug_window );
+  enable_blending( debug_window );
 else
   program.Value.debug_window_is_present = false;
 end
@@ -418,7 +421,13 @@ stim.Scale.Units = 'px';
 
 if ( isfield(description, 'use_image') && description.use_image )
   try
-    img = ptb.Image( window, imread(description.image_file) );
+    [im_mat, ~, im_alpha] = imread( description.image_file );
+    
+    if ( ~isempty(im_alpha) )
+      im_mat(:, :, end+1) = im_alpha;
+    end
+    
+    img = ptb.Image( window, im_mat );
     stim.FaceColor = img;
     
   catch err
