@@ -41,7 +41,7 @@ conf.STIMULI.setup.gaze_cursor_m2.color = [ 255, 0, 255 ];
 
 % Optionally use an image for the cursor
 conf.STIMULI.setup.gaze_cursor_m2.use_image = true;
-conf.STIMULI.setup.gaze_cursor_m2.image_file = '';
+conf.STIMULI.setup.gaze_cursor_m2.image_file = '/Users/prabaha/repositories/pct/bitmaps/cursors/gray-triangle.png';
 conf.STIMULI.setup.gaze_cursor.use_image = true;
 conf.STIMULI.setup.gaze_cursor.image_file = '';
 
