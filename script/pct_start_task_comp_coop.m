@@ -43,12 +43,13 @@ conf.STIMULI.setup.patch.size = [100, 100];
 conf.STIMULI.setup.gaze_cursor_m2.color = [ 255, 0, 255 ];
 
 % Optionally use an image for the cursor
+cursor_path = [repdir '/pct/bitmaps/cursors/'];
 conf.STIMULI.setup.gaze_cursor_m2.use_image = true;
-conf.STIMULI.setup.gaze_cursor_m2.image_file = '';
-conf.STIMULI.setup.gaze_cursor_m2.size = [20 20];
+conf.STIMULI.setup.gaze_cursor_m2.size = [25 25];
+conf.STIMULI.setup.gaze_cursor_m2.image_file = fullfile([cursor_path 'gray-star.png']);
 conf.STIMULI.setup.gaze_cursor.use_image = true;
-conf.STIMULI.setup.gaze_cursor.image_file = '';
-conf.STIMULI.setup.gaze_cursor.size = [20 20];
+conf.STIMULI.setup.gaze_cursor.size = [25 25];
+conf.STIMULI.setup.gaze_cursor.image_file = fullfile([cursor_path 'gray-triangle.png']);
 
 % Optionally use a handle to a different function to change the appearance
 % properties of a patch.
