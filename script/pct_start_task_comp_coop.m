@@ -24,11 +24,11 @@ conf.STIMULI.setup.fix_square.target_padding = 20;
 conf.STIMULI.setup.fix_hold_square.target_padding = 20;
 
 conf.STIMULI.setup.gaze_cursor_m2.visible = true;
-conf.STIMULI.setup.gaze_cursor_m2.saccade_time = 0.6; % saccade time.
+conf.STIMULI.setup.gaze_cursor_m2.saccade_time = 0.5; % saccade time.
 
 % Pause every 10 trials.
 conf.STRUCTURE.pause_state_criterion = ...
-  @(program) pct.util.pause_after_num_trials(program, 10);
+  @(program) pct.util.pause_after_num_trials(program, 100);
 conf.STRUCTURE.patch_generator = @(program) pct.util.BlockedCompeteCooperate;
 conf.STRUCTURE.num_patches = 1;
 conf.STRUCTURE.initial_stage_name = 'PatchFix4';

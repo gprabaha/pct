@@ -3,7 +3,7 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
     block_types = {'compete', 'cooperate'};
     block_type = 'compete';
     block_type_ind = 1;
-    trials_per_block = 10;
+    trials_per_block = 100;
     trial_ind = 0;
     next_block_strategy = 'sequential'; % 'random'
   end
