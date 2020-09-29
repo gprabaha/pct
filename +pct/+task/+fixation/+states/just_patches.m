@@ -219,6 +219,15 @@ for i = 1:numel(patch_info)
       case 'cooperate'
         if ( all(dur_met) )
           acquire_patch( state, program, i, j );
+          
+          % Add a patch acquired time stamp for each subject that is not
+          % subject `j`
+          remaining_subjects = setdiff( 1:numel(in_bounds), j );
+          
+          for k = 1:numel(remaining_subjects)
+            patch_acquired_timestamp( state, program, remaining_subjects(k), i );
+          end
+          
           program.Value.data.Value(end).last_patch_type = 'cooperate';
           program.Value.data.Value(end).last_agent = 'both';
         end

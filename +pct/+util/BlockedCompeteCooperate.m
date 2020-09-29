@@ -6,6 +6,7 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
     trials_per_block = 100;
     trial_ind = 0;
     next_block_strategy = 'sequential'; % 'random'
+    last_patch_info = pct.util.PatchInfo.empty();
   end
   
   methods
@@ -25,35 +26,61 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
       obj.block_type = obj.block_types{obj.block_type_ind};
     end
     
+    function tf = update_patch_info(obj, num_patches, program)
+      tf = true;
+      
+      if ( numel(obj.last_patch_info) ~= num_patches )
+        return
+      end
+      
+      trial_data = program.Value.data.Value;
+      
+      if ( isempty(trial_data) )
+        return
+      end
+      
+      % Reuse the last patch info if we didn't successfully initiate the
+      % last trial, in which case the patch wouldn't have been seen.
+      last_trial_data = trial_data(end);
+      did_initiate_last_trial = last_trial_data.fixation.did_fixate;
+      tf = did_initiate_last_trial;
+    end
+    
     function patch_info = generate(obj, patch_targets, program)
       appearance_func = program.Value.stimuli_setup.patch.patch_appearance_func;
       num_patches = numel( patch_targets );
+      
+      if ( obj.update_patch_info(num_patches, program) )
+        radius = program.Value.patch_distribution_radius;
+        rect = program.Value.window.Rect;
+        coordinates = pct.util.assign_patch_coordinates( num_patches, radius, rect );
 
-      radius = program.Value.patch_distribution_radius;
-      rect = program.Value.window.Rect;
-      coordinates = pct.util.assign_patch_coordinates( num_patches, radius, rect );
+        patch_info = pct.util.PatchInfo.empty();
 
-      patch_info = pct.util.PatchInfo.empty();
+        for i = 1:num_patches                
+          acquirable_by = {'m1', 'm2'};
+          strategy = obj.block_type;
 
-      for i = 1:num_patches                
-        acquirable_by = {'m1', 'm2'};
-        strategy = obj.block_type;
+          new_patch_info = pct.util.PatchInfo();
+          new_patch_info.AcquirableBy = acquirable_by;
+          new_patch_info.Strategy = strategy;
+          new_patch_info.Position = coordinates(:, i);
+          new_patch_info.Target = patch_targets{i};
+          % Configure color, and other appearence properties.
+          new_patch_info = appearance_func( new_patch_info );
+
+          patch_info(end+1) = new_patch_info;
+        end
+
+        obj.trial_ind = mod( obj.trial_ind + 1, obj.trials_per_block );
+
+        if ( obj.trial_ind == 0 )
+          obj.select_next_block_strategy();
+        end
         
-        new_patch_info = pct.util.PatchInfo();
-        new_patch_info.AcquirableBy = acquirable_by;
-        new_patch_info.Strategy = strategy;
-        new_patch_info.Position = coordinates(:, i);
-        new_patch_info.Target = patch_targets{i};
-        % Configure color, and other appearence properties.
-        new_patch_info = appearance_func( new_patch_info );
-
-        patch_info(end+1) = new_patch_info;
-      end
-      
-      obj.trial_ind = mod( obj.trial_ind + 1, obj.trials_per_block );
-      
-      if ( obj.trial_ind == 0 )
-        obj.select_next_block_strategy();
+        obj.last_patch_info = patch_info;
+      else
+        patch_info = obj.last_patch_info;
       end
     end
   end
