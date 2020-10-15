@@ -6,8 +6,8 @@ conf = pct.config.reconcile( pct.config.load() );
 
 conf.TIMINGS.time_in.fixation = 10;
 conf.TIMINGS.time_in.just_patches = 10;
-conf.TIMINGS.time_in.juice_reward = 1;
-conf.TIMINGS.time_in.pause = 5;
+conf.TIMINGS.time_in.juice_reward = 1.5;
+conf.TIMINGS.time_in.pause = 25;
 
 conf.META.subject = 'hitch';
 
@@ -24,11 +24,11 @@ conf.STIMULI.setup.fix_square.target_padding = 20;
 conf.STIMULI.setup.fix_hold_square.target_padding = 20;
 
 conf.STIMULI.setup.gaze_cursor_m2.visible = true;
-conf.STIMULI.setup.gaze_cursor_m2.saccade_time = 0.5; % saccade time.
+conf.STIMULI.setup.gaze_cursor_m2.saccade_time = 0.6; % saccade time.
 
 % Pause every 10 trials.
 conf.STRUCTURE.pause_state_criterion = ...
-  @(program) pct.util.pause_after_num_trials(program, 100);
+  @(program) pct.util.pause_after_num_trials(program, 50);
 conf.STRUCTURE.patch_generator = @(program) pct.util.BlockedCompeteCooperate;
 conf.STRUCTURE.num_patches = 1;
 conf.STRUCTURE.initial_stage_name = 'PatchFix4';
@@ -62,7 +62,7 @@ conf.DEBUG_SCREEN.background_color = [ 0 0 0 ];
 % conf.DEBUG_SCREEN.rect = [ 600, 600, 1000, 1000 ];
 conf.DEBUG_SCREEN.rect = [ 1600, 0, 1600 + 1280, 1024 ];
 
-conf.REWARDS.training = 0.4;
+conf.REWARDS.training = 0.7;
 
 pct.config.save( conf );
 
