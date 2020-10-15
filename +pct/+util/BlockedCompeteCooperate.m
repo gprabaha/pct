@@ -1,7 +1,7 @@
 classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
   properties
     block_types = {'compete', 'cooperate'};
-    block_type = 'compete';
+    block_type = 'cooperate'; %'compete';
     block_type_ind = 1;
     trials_per_block = 10;
     trial_ind = 0;

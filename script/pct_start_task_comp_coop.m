@@ -62,7 +62,7 @@ conf.DEBUG_SCREEN.background_color = [ 0 0 0 ];
 % conf.DEBUG_SCREEN.rect = [ 600, 600, 1000, 1000 ];
 conf.DEBUG_SCREEN.rect = [ 1600, 0, 1600 + 1280, 1024 ];
 
-conf.REWARDS.training = 0.7;
+conf.REWARDS.training = 0.8;
 
 pct.config.save( conf );
 
