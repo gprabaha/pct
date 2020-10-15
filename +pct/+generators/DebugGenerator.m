@@ -72,7 +72,9 @@ classdef DebugGenerator < handle
         time = mean( all_m1_rts ); % can initiate a norand generator here
       end
       
-      if ( training_data.mean_m2_saccade_velocity_shift_direction ~= 0 )
+      if ( isfield(training_data, 'mean_m2_saccade_velocity_shift_direction') && ...
+          training_data.mean_m2_saccade_velocity_shift_direction ~= 0 )
+        program.Value.training_data.mean_m2_saccade_velocity_shift_direction = 0;
         % Right or left key was pressed, increase / decrease the mean
         % saccade velocity.
         dir = training_data.mean_m2_saccade_velocity_shift_direction;        
