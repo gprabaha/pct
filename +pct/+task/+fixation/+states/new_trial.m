@@ -23,7 +23,7 @@ if ( should_go_to_pause_state(program) &&  ~pause_flag )
   next( state, states('pause') );
 else
   update_training_stages( program );
-  update_data_scaffold( program );
+  update_data_scaffold( program, program.Value.current_patches );
   process_data( program );
   program.Value.pause_flag = false;
   
@@ -40,17 +40,17 @@ function exit(state, program)
 
 end
 
-function update_data_scaffold(program)
+function update_data_scaffold(program, patch_info)
 
 if ( isempty(program.Value.data.Value) )
-    program.Value.data.Value = make_trial_data_scaffold( program );
+    program.Value.data.Value = make_trial_data_scaffold( program, patch_info );
 else
-    program.Value.data.Value(end+1) = make_trial_data_scaffold( program );
+    program.Value.data.Value(end+1) = make_trial_data_scaffold( program, patch_info );
 end
 
 end
 
-function data_scaffold = make_trial_data_scaffold(program)
+function data_scaffold = make_trial_data_scaffold(program, patch_info)
 
 data_scaffold = struct();
 
@@ -85,6 +85,7 @@ data_scaffold.training_stage_reward = program.Value.rewards.training;
 data_scaffold.patch_identities = program.Value.current_patch_identities;
 
 data_scaffold.m2_saccade_time = nan;
+data_scaffold.patch_info = patch_info;
 
 end
 

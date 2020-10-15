@@ -10,6 +10,20 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
   end
   
   methods
+    function obj = BlockedCompeteCooperate(varargin)
+      defaults = struct();
+      defaults.trials_per_block = 10;
+      defaults.next_block_strategy = 'sequential';
+      defaults.block_types = { 'compete', 'cooperate' };
+      defaults.start_block_type = 'cooperate';
+      params = shared_utils.general.parsestruct( defaults, varargin );
+      
+      obj.trials_per_block = params.trials_per_block;
+      obj.block_types = params.block_types;
+      obj.block_type = params.start_block_type;
+      obj.next_block_strategy = params.next_block_strategy;
+    end
+    
     function select_next_block_strategy(obj)
       if ( strcmp(obj.next_block_strategy, 'sequential') )
         % Select the next block type from `block_types`, wrapping back
