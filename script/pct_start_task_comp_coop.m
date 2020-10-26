@@ -9,7 +9,8 @@ conf.TIMINGS.time_in.just_patches = 10;
 conf.TIMINGS.time_in.juice_reward = 1.5;
 conf.TIMINGS.time_in.pause = 25;
 
-conf.META.subject = 'hitch';
+conf.META.m1_subject = 'hitch';
+conf.META.m2_subject = 'computer_naive';
 
 conf.INTERFACE.gaze_source_type = 'digital_eyelink';
 conf.INTERFACE.gaze_source_type_m2 = 'DebugGenerator';
@@ -26,10 +27,12 @@ conf.STIMULI.setup.fix_hold_square.target_padding = 20;
 conf.STIMULI.setup.gaze_cursor_m2.visible = true;
 conf.STIMULI.setup.gaze_cursor_m2.saccade_time = 0.6; % saccade time.
 
-% Pause every 10 trials.
+% Patch parameters
+conf.STRUCTURE.patch_params.trials_per_block = 20;
+conf.STRUCTURE.patch_generator = ...
+  @(program) pct.util.BlockedCompeteCooperate(conf.STRUCTURE.patch_params);
 conf.STRUCTURE.pause_state_criterion = ...
   @(program) pct.util.pause_after_num_trials(program, 50);
-conf.STRUCTURE.patch_generator = @(program) pct.util.BlockedCompeteCooperate;
 conf.STRUCTURE.num_patches = 1;
 conf.STRUCTURE.initial_stage_name = 'PatchFix4';
 

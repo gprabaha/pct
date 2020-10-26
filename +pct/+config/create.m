@@ -41,7 +41,8 @@ INTERFACE.m2_is_computer = true;
 
 %   META
 META = struct();
-META.subject = '';
+META.m1_subject = '';
+META.m2_subject = '';
 
 %	SCREEN
 SCREEN = struct();
