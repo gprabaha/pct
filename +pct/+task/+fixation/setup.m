@@ -485,13 +485,20 @@ initialize( tracker );
 if ( interface.save_data )
   filename = edf_filename( data_directory );  
   start_recording( tracker, filename );
-  
   tracker.Destruct = ...
-    @(tracker) tracker.conditional_receive_file(require_directory(data_directory));
+    @(tracker) digital_eyelink_destructor(tracker, data_directory);
   
 else
   start_recording( tracker );
 end
+
+end
+
+function digital_eyelink_destructor(tracker, data_directory)
+
+warning( 'off', 'all' );
+tracker.conditional_receive_file( require_directory(data_directory) );
+warning( 'on', 'all' );
 
 end
 
