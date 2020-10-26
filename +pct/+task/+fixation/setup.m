@@ -440,7 +440,7 @@ end
 
 end
 
-function [tracker_m1, tracker_m2] = ...
+function [tracker_m1, tracker_m2, edf_filename_m1, edf_filename_m2] = ...
   make_eye_trackers(program, updater, ni_scan_input, data_directory, conf)
 
 interface = get_interface( conf );
@@ -456,10 +456,10 @@ m2_channel_indices = signal.analog_gaze_input_channel_indices_m2;
 
 calibration_rect = conf.CALIB_SCREEN.rect;
 
-tracker_m1 = make_eye_tracker( updater, ni_scan_input ...
+[tracker_m1, edf_filename_m1] = make_eye_tracker( updater, ni_scan_input ...
   , m1_channel_indices, calibration_rect, m1_source_type, data_directory, conf );
 
-tracker_m2 = make_eye_tracker( updater, ni_scan_input ...
+[tracker_m2, edf_filename_m2] = make_eye_tracker( updater, ni_scan_input ...
   , m2_channel_indices, calibration_rect, m2_source_type, data_directory, conf );
 
 if ( interface.m2_is_computer )
@@ -472,15 +472,18 @@ program.Value.tracker = tracker_m1;
 program.Value.tracker_m2 = tracker_m2;
 program.Value.generator_m2 = generator_m2;
 program.Value.generator_m2_saccade_time = saccade_time;
+program.Value.edf_filename_m1 = edf_filename_m1;
+program.Value.edf_filename_m2 = edf_filename_m2;
 
 end
 
-function tracker = make_digital_eyelink(data_directory, conf)
+function [tracker, filename] = make_digital_eyelink(data_directory, conf)
 
 interface = get_interface( conf );
 
 tracker = ptb.sources.Eyelink();
 initialize( tracker );
+filename = '';
 
 if ( interface.save_data )
   filename = edf_filename( data_directory );  
@@ -502,15 +505,18 @@ warning( 'on', 'all' );
 
 end
 
-function tracker = make_eye_tracker(updater, ni_scan_input, input_channel_indices ...
+function [tracker, edf_filename] = ...
+  make_eye_tracker(updater, ni_scan_input, input_channel_indices ...
   , calibration_rect, source_type, data_directory, conf)
+
+edf_filename = '';
 
 switch ( source_type )
   case 'mouse'
     tracker = ptb.sources.Mouse();
     
   case 'digital_eyelink'
-    tracker = make_digital_eyelink( data_directory, conf );
+    [tracker, edf_filename] = make_digital_eyelink( data_directory, conf );
     
   case 'analog_input'
     tracker = ...
