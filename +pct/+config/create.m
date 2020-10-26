@@ -18,6 +18,7 @@ conf.(const.config_id) = true;
 PATHS = struct();
 PATHS.repositories = fileparts( pct.util.get_project_folder() );
 PATHS.data = fullfile( pct.util.get_project_folder(), 'data' );
+PATHS.remote = fullfile( pct.util.get_project_folder(), 'remote' );
 
 % DEPENDENCIES
 DEPENDS = struct();
