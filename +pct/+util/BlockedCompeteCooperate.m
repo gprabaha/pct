@@ -22,6 +22,13 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
       obj.block_types = params.block_types;
       obj.block_type = params.start_block_type;
       obj.next_block_strategy = params.next_block_strategy;
+      
+      [~, block_ind] = ismember( obj.block_type, obj.block_types );
+      if ( block_ind == 0 )
+        error( 'Unrecognized block type "%s".', obj.block_type );
+      end
+      
+      obj.block_type_ind = block_ind;
     end
     
     function select_next_block_strategy(obj)
