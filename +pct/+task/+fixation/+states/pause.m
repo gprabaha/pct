@@ -21,6 +21,9 @@ if (debug_window_is_present)
   flip( program.Value.debug_window );
 end
 
+state.UserData.reward_timer = nan;
+state.UserData.num_pulses = 0;
+
 timestamp_entry( state, program );
 
 program.Value.pause_flag = true;
@@ -28,6 +31,18 @@ program.Value.pause_flag = true;
 end
 
 function loop(state, program)
+
+quantity = program.Value.rewards.training/2;
+inter_pulse_interval = 10;
+reward_timer = state.UserData.reward_timer;
+pulse_duration = quantity;
+
+if ( isnan(reward_timer) || ...
+     toc(reward_timer) > pulse_duration + inter_pulse_interval )
+  pct.util.deliver_reward( program, 1, quantity );
+  state.UserData.reward_timer = tic();
+  state.UserData.num_pulses = state.UserData.num_pulses + 1;
+end
 
 end
 
