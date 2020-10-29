@@ -2,11 +2,34 @@ function shutdown(program)
 
 close_window( program );
 close_arduino( program );
+delete_trackers( program );
+
 handle_cursor();
 handle_keyboard();
 
 [local_path, remote_path] = save_paths( program );
 save_task_data( program, local_path, remote_path );
+
+end
+
+function delete_trackers(program)
+
+if ( isfield(program.Value, 'tracker') )
+  delete_tracker( program.Value.tracker );
+end
+if ( isfield(program.Value, 'tracker_m2') )
+  delete_tracker( program.Value.tracker_m2 );
+end
+
+end
+
+function delete_tracker(tracker)
+
+try
+  delete( tracker );
+catch err
+  warning( err.message );
+end
 
 end
 
@@ -68,13 +91,30 @@ else
     , ' but could not; using an alternative path: %s.'], local_path );
 end
 
-remote_path = program.Value.config.PATHS.remote;
+[~, session_dir] = fileparts( local_path );
+remote_path = fullfile( program.Value.config.PATHS.remote, session_dir );
 
 end
 
 function filename = make_filename()
 
 filename = [datestr(datetime, 'yyyy-mm-dd_HH-MM-SS') '-pct-training-data'];
+
+end
+
+function maybe_copy_edf_file(src_path, dest_path, filename)
+
+src_file = fullfile( src_path, filename );
+
+if ( shared_utils.io.fexists(src_file) )
+  dest_file = fullfile( dest_path, filename );
+  
+  try
+    copyfile( src_file, dest_file );
+  catch err
+    warning( err.message );
+  end
+end
 
 end
 
@@ -99,6 +139,13 @@ try
   if ( ~isempty(remote_path) )
     remote_filepath = fullfile( remote_path, data_filename );
     save( remote_filepath, 'program_data' );
+    
+    if ( ~isempty(program.Value.edf_filename_m1) )
+      maybe_copy_edf_file( local_path, remote_path, program.Value.edf_filename_m1 );
+    end
+    if ( ~isempty(program.Value.edf_filename_m2) )
+      maybe_copy_edf_file( local_path, remote_path, program.Value.edf_filename_m2 );
+    end
   end
   
 catch err
