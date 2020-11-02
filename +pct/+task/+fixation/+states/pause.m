@@ -32,7 +32,8 @@ end
 
 function loop(state, program)
 
-quantity = program.Value.rewards.training/2;
+%quantity = program.Value.rewards.pause;
+quantity = program.Value.rewards.training;
 inter_pulse_interval = 10;
 reward_timer = state.UserData.reward_timer;
 pulse_duration = quantity;
