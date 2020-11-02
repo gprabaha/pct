@@ -193,7 +193,8 @@ SIGNAL.analog_gaze_input_channel_indices_m2 = [3, 4];
 
 %   REWARDS
 REWARDS = struct();
-REWARDS.training = .2;
+REWARDS.training = .3;
+REWARDS.pause = .4;
 REWARDS.total_reward = 0;
 
 % EXPORT
