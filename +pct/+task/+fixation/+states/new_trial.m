@@ -80,7 +80,12 @@ data_scaffold.pause.entry_time = nan;
 data_scaffold.pause.exit_time = nan;
 
 data_scaffold.training_stage_reward = program.Value.rewards.training;
-data_scaffold.patch_identities = program.Value.current_patch_identities;
+
+if ( isfield(program.Value, 'current_patch_identitites') )
+  data_scaffold.patch_identities = program.Value.current_patch_identities;
+else
+  data_scaffold.patch_identities = {};
+end
 
 data_scaffold.m2_saccade_time = nan;
 data_scaffold.patch_info = patch_info;
