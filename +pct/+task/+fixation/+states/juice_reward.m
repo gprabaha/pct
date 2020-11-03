@@ -53,7 +53,18 @@ else
 end
 
 if ( num_m1_acquired_patches > 0 )
-  pct.util.deliver_reward( program, 1, quantity * num_m1_acquired_patches );  
+  pct.util.deliver_reward( program, 1, quantity * num_m1_acquired_patches );
+  
+  % Adding lines to deliver multiple pulses for patches collected instead
+  % of one big pulse
+  
+%   patches_to_reward = num_m1_acquired_patches;
+%   for pulse_ind = 1:patches_to_reward
+%     if pulse_ind > 1
+%       pause(0.2);
+%     end
+%     pct.util.deliver_reward( program, 1, quantity );
+%   end
 end
 
 end

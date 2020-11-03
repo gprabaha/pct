@@ -1,13 +1,16 @@
+KbName( 'UnifyKeyNames' );
+
 Screen( 'Preference', 'VisualDebuglevel', 0 );
 
 conf = pct.config.reconcile( pct.config.load() );
 
 conf.TIMINGS.time_in.fixation = 10;
 conf.TIMINGS.time_in.just_patches = 10;
-conf.TIMINGS.time_in.juice_reward = 1;
-conf.TIMINGS.time_in.pause = 2;
+conf.TIMINGS.time_in.juice_reward = 1.5;
+conf.TIMINGS.time_in.pause = 25;
 
-conf.META.subject = 'human';
+conf.META.m1_subject = 'human';
+conf.META.m2_subject = 'computer_naive';
 
 conf.INTERFACE.gaze_source_type = 'mouse';
 conf.INTERFACE.gaze_source_type_m2 = 'DebugGenerator';
@@ -17,13 +20,24 @@ conf.INTERFACE.skip_sync_tests = true;
 conf.INTERFACE.save_data = false;
 conf.INTERFACE.has_m2 = true;
 
-conf.STIMULI.patch_distribution_radius = 0.35;
-conf.STIMULI.setup.gaze_cursor_m2.visible = true;
-conf.STIMULI.setup.gaze_cursor_m2.saccade_time = 0.3;
+% Patch display parameters
+conf.STIMULI.patch_distribution_radius = 0.16;
+conf.STIMULI.setup.fix_square.target_padding = 20;
+conf.STIMULI.setup.fix_hold_square.target_padding = 20;
 
-conf.STRUCTURE.pause_state_criterion = @(program) pct.util.pause_after_num_trials(program, 5);
-conf.STRUCTURE.num_patches = 2;
-conf.STRUCTURE.initial_stage_name = 'FixHold11';
+% M2 cursor parameters
+conf.STIMULI.setup.gaze_cursor_m2.visible = true;
+conf.STIMULI.setup.gaze_cursor_m2.saccade_time = 0.6;
+
+% Trial structure parameters
+conf.STRUCTURE.patch_params.trials_per_block = 10;
+conf.STRUCTURE.patch_generator = ...
+  @(program) pct.util.BlockedCompeteCooperate(conf.STRUCTURE.patch_params);
+conf.STRUCTURE.pause_state_criterion = ...
+  @(program) pct.util.pause_after_num_trials(program, 50);
+conf.STRUCTURE.num_patches = 1;
+conf.STRUCTURE.initial_stage_name = 'PatchFix4';
+
 % Trials per block.
 conf.STRUCTURE.patch_params.trials_per_block = 20;
 
@@ -55,5 +69,5 @@ conf.REWARDS.training = 0.2;
 pct.config.save( conf );
 
 pct.task.fixation.start( conf ...
-  , 'training_stage_manager_config_func', @pct.training.configure.fixation_training ...
+  , 'training_stage_manager_config_func', @pct.training.configure.noop ...
 );
