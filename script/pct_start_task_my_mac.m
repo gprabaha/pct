@@ -30,19 +30,12 @@ conf.STIMULI.setup.gaze_cursor_m2.visible = true;
 conf.STIMULI.setup.gaze_cursor_m2.saccade_time = 0.6;
 
 % Trial structure parameters
-conf.STRUCTURE.patch_params.trials_per_block = 10;
+conf.STRUCTURE.patch_params.trials_per_block = 3;
 conf.STRUCTURE.patch_generator = ...
   @(program) pct.util.BlockedCompeteCooperate(conf.STRUCTURE.patch_params);
 conf.STRUCTURE.pause_state_criterion = ...
   @(program) pct.util.pause_after_num_trials(program, 50);
 conf.STRUCTURE.num_patches = 1;
-conf.STRUCTURE.initial_stage_name = 'PatchFix4';
-
-% Trials per block.
-conf.STRUCTURE.patch_params.trials_per_block = 20;
-
-conf.STRUCTURE.patch_generator = ...
-  @(program) pct.util.BlockedCompeteCooperate(conf.STRUCTURE.patch_params);
 
 conf.SCREEN.rect = [ 0, 0, 560, 350 ];
 conf.SCREEN.index = 0;
