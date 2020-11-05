@@ -41,7 +41,6 @@ conf.INTERFACE.gaze_source_type = 'digital_eyelink';
 conf.INTERFACE.gaze_source_type_m2 = 'DebugGenerator';
 conf.INTERFACE.reward_output_type = 'arduino'; %'none'; 'ni';
 conf.INTERFACE.skip_sync_tests = true;
-conf.INTERFACE.save_data = false; % true;
 conf.INTERFACE.has_m2 = true;
 
 %%%%%%%%%%%%%%%%%%
@@ -108,3 +107,9 @@ pct.config.save( conf );
 pct.task.fixation.start( conf ...
   , 'training_stage_manager_config_func', @pct.training.configure.noop ...
 );
+
+%%%%%%%%%%%%%%%
+% Saving data %
+%%%%%%%%%%%%%%%
+conf.INTERFACE.save_data = true;
+conf.PATHS.remote = 'C:\Users\Clockwork\Dropbox (ChangLab)\prabaha-changlab\pct-training-hitch\comp-coop\new';
