@@ -11,9 +11,23 @@ screen_info.full_rect = [];
 screen_info.calibration_rect = conf.CALIB_SCREEN.rect;
 screen_info.screen_index = 4; %conf.SCREEN.index;
 
-reward_channel_index = 1;
-reward_size = 0.1;
+reward_info = struct();
+reward_info.channel_index = 1;
+reward_info.size = 0.1;
+reward_info.manager_type = reward_manager_type_from_config( conf );
+reward_info.serial_port = conf.SERIAL.port;
 
-run_calibration( screen_info, reward_channel_index, reward_size, 9 );
+run_calibration( screen_info, reward_info, 9 );
+
+end
+
+function type = reward_manager_type_from_config(conf)
+
+type = 'none';
+
+if ( isfield(conf, 'INTERFACE') && isfield(conf.INTERFACE, 'reward_output_type') )
+  type = validatestring( conf.INTERFACE.reward_output_type ...
+    , {'ni', 'arduino', 'none'}, mfilename, 'reward_output_type' );
+end
 
 end
