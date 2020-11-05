@@ -7,7 +7,7 @@ if ( ~isempty(ni_reward_manager) )
   trigger( ni_reward_manager, for_time );
   
 elseif ( ~isempty(arduino_reward_manager) )
-  reward( arduino_reward_manager, channel, for_time );
+  reward( arduino_reward_manager, channel, for_time * 1e3 ); % to ms
 end
 
 end

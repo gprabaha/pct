@@ -39,23 +39,23 @@ conf.META.m2_subject = 'computer_naive';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 conf.INTERFACE.gaze_source_type = 'digital_eyelink';
 conf.INTERFACE.gaze_source_type_m2 = 'DebugGenerator';
-conf.INTERFACE.reward_output_type = 'ni';
+conf.INTERFACE.reward_output_type = 'arduino'; %'none'; 'ni';
 conf.INTERFACE.skip_sync_tests = true;
-conf.INTERFACE.save_data = true;
+conf.INTERFACE.save_data = false; % true;
 conf.INTERFACE.has_m2 = true;
 
 %%%%%%%%%%%%%%%%%%
 % Screen details %
 %%%%%%%%%%%%%%%%%%
 conf.SCREEN.rect = [];
-conf.SCREEN.index = 4;
-conf.SCREEN.calibration_rect = [0, 0, 1280, 1024];
+conf.SCREEN.index = 1;
+conf.SCREEN.calibration_rect = [0, 0, 1600, 900];
 % Debug screen
 conf.DEBUG_SCREEN.is_present = true;
-conf.DEBUG_SCREEN.index = 0;
+conf.DEBUG_SCREEN.index = 2;
 conf.DEBUG_SCREEN.background_color = [ 0 0 0 ];
 % Debug screen rect accounts for resolution of monkey monitor
-conf.DEBUG_SCREEN.rect = [ 1600, 0, 1600 + 1280, 1024 ];
+conf.DEBUG_SCREEN.rect = [ 0, 0, 1600, 900 ];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Fixation square properties %
@@ -91,6 +91,11 @@ conf.STIMULI.setup.gaze_cursor.use_image = true;
 conf.STIMULI.setup.gaze_cursor.image_file = fullfile([cursor_path 'gray-triangle.png']);
 conf.STIMULI.setup.gaze_cursor_m2.use_image = true;
 conf.STIMULI.setup.gaze_cursor_m2.image_file = fullfile([cursor_path 'gray-star.png']);
+
+%%%%%%%%%%%%%%%%%%%
+% Port for reward %
+%%%%%%%%%%%%%%%%%%%
+conf.SERIAL.port = 'COM5';
 
 %%%%%%%%%%%%%%%%%%%
 % Save new config %
