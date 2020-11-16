@@ -9,7 +9,9 @@ end
 screen_info = struct();
 screen_info.full_rect = [];
 screen_info.calibration_rect = conf.CALIB_SCREEN.rect;
-screen_info.screen_index = 4; %conf.SCREEN.index;
+screen_info.screen_index = conf.CALIB_SCREEN.index;
+screen_info.debug_screen_index = conf.CALIB_SCREEN.debug_screen_index;
+screen_info.debug_screen_rect = conf.CALIB_SCREEN.debug_screen_rect;
 
 reward_info = struct();
 reward_info.channel_index = 1;

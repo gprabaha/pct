@@ -59,6 +59,8 @@ CALIB_SCREEN = struct();
 CALIB_SCREEN.full_size = get( 0, 'screensize' );
 CALIB_SCREEN.index = 3;
 CALIB_SCREEN.rect = [0, 0, 1280, 1024];
+CALIB_SCREEN.debug_screen_index = 0;
+CALIB_SCREEN.debug_screen_rect = [0, 0, 400, 400];
 
 % DEBUG_SCREEN
 DEBUG_SCREEN = struct();
