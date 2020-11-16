@@ -1,7 +1,7 @@
 function pct_calibrate(conf)
 
 if ( nargin < 1 )
-  conf = pct.config.load();
+  conf = pct.config.reconcile( pct.config.load() );
 else
   pct.util.assertions.assert__is_config( conf );
 end
