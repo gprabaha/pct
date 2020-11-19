@@ -110,23 +110,29 @@ classdef DebugGeneratorManyPatch < handle
       obj.source.SettableX = rect_size(1)/2;
       obj.source.SettableY = rect_size(2)/2;
       obj.source.SettableIsValidSample = true;
+      obj.current_saccade_index = 1;
       reset( obj.frame_timer );
     end
     
     function update(obj, program)
       saccade_list = generate_saccade_list(obj, patch_info, program);
-      for saccade_index = 1:numel(saccade_list)
-        origin_val = saccade_list{saccade_index}.origin;
-        destination_val = saccade_list{saccade_index}.destination;
-        total_time_val = saccade_list{saccade_index}.total_time;
-        average_velocity = 1/total_time_val;
-        noise = obj.noise;
-        current_t = elapsed( obj.frame_timer );
-        [X_pos, Y_pos] = pct.generators.update_X_Y_pos_gaussian_velocity(...
-          current_t, origin_val, destination_val, average_velocity);
-        assert(~isnan( X_pos));
-        obj.source.SettableX = X_pos + normrnd( 0, noise );
-        obj.source.SettableY = Y_pos + normrnd( 0, noise );
+      current_t = elapsed( obj.frame_timer );
+      saccade_index = obj.current_saccade_index;
+      origin_val = saccade_list{saccade_index}.origin;
+      destination_val = saccade_list{saccade_index}.destination;
+      total_time_val = saccade_list{saccade_index}.total_time;
+      average_velocity = 1/total_time_val;
+      noise = obj.noise;
+      [X_pos, Y_pos] = pct.generators.update_X_Y_pos_gaussian_velocity(...
+        current_t, origin_val, destination_val, average_velocity);
+      assert(~isnan( X_pos));
+      obj.source.SettableX = X_pos + normrnd( 0, noise );
+      obj.source.SettableY = Y_pos + normrnd( 0, noise );
+      next_saccade_index = obj.current_saccade_index + 1;
+      % This resets timer for the next saccade once one saccade is done
+      if current_t > total_time_val && next_saccade_index <= numel(saccade_list)
+        reset( obj.frame_timer );
+        obj.current_saccade_index = next_saccade_index;
       end
     end
     
