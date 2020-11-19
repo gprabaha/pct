@@ -21,13 +21,13 @@ conf.INTERFACE.save_data = false;
 conf.INTERFACE.has_m2 = true;
 
 % Patch display parameters
-conf.STIMULI.patch_distribution_radius = 0.16;
+conf.STIMULI.patch_distribution_radius = 0.3;
 conf.STIMULI.setup.fix_square.target_padding = 20;
 conf.STIMULI.setup.fix_hold_square.target_padding = 20;
 
 % M2 cursor parameters
 conf.STIMULI.setup.gaze_cursor_m2.visible = true;
-conf.STIMULI.setup.gaze_cursor_m2.saccade_time = 0.6;
+conf.STIMULI.setup.gaze_cursor_m2.saccade_speed = 1/0.3;
 
 % Trial structure parameters
 conf.STRUCTURE.patch_params.trials_per_block = 3;
@@ -51,11 +51,11 @@ conf.STIMULI.setup.gaze_cursor_m2.color = [ 255, 0, 255 ];
 conf.STIMULI.setup.patch.patch_appearance_func = ...
   @pct.util.default_patch_appearance;
 
-conf.DEBUG_SCREEN.is_present = false;
+conf.DEBUG_SCREEN.is_present = true;
 conf.DEBUG_SCREEN.index = 0;
 conf.DEBUG_SCREEN.background_color = [ 0 0 0 ];
-% conf.DEBUG_SCREEN.rect = [ 600, 600, 1000, 1000 ];
-conf.DEBUG_SCREEN.rect = [ 1600, 0, 1600 + 1280, 1024 ];
+conf.DEBUG_SCREEN.rect = [ 0, 0, 560, 350 ] + 500;
+% conf.DEBUG_SCREEN.rect = [ 1600, 0, 1600 + 1280, 1024 ];
 
 conf.REWARDS.training = 0.2;
 

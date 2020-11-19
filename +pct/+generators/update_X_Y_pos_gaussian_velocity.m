@@ -1,4 +1,4 @@
-function [X_pos, Y_pos] = update_X_Y_pos_gaussian_velocity(current_time, origin, destination, total_time)
+function [X_pos, Y_pos] = update_X_Y_pos_gaussian_velocity(current_time, origin, destination, average_velocity)
 
 if isempty(origin)
   origin = [nan; nan];
@@ -8,6 +8,7 @@ elseif isempty(destination)
   destination = [nan; nan];
 end
 
+total_time = 1/average_velocity;
 half_time = total_time/2;
 st_dev = half_time/3;
 total_dist = norm( destination - origin );
