@@ -13,7 +13,7 @@ conf.META.m1_subject = 'human';
 conf.META.m2_subject = 'computer_naive';
 
 conf.INTERFACE.gaze_source_type = 'mouse';
-conf.INTERFACE.gaze_source_type_m2 = 'DebugGenerator';
+conf.INTERFACE.gaze_source_type_m2 = 'generator';
 
 conf.INTERFACE.reward_output_type = 'none'; 
 conf.INTERFACE.skip_sync_tests = true;
@@ -35,6 +35,7 @@ conf.STRUCTURE.patch_generator = ...
   @(program) pct.util.BlockedCompeteCooperate(conf.STRUCTURE.patch_params);
 conf.STRUCTURE.pause_state_criterion = ...
   @(program) pct.util.pause_after_num_trials(program, 50);
+conf.STRUCTURE.generator_m2 = @(program, tracker) pct.generators.DebugGenerator(tracker);
 conf.STRUCTURE.num_patches = 1;
 
 conf.SCREEN.rect = [ 0, 0, 560, 350 ];

@@ -525,8 +525,8 @@ switch ( source_type )
     tracker = ...
       make_analog_input_tracker( ni_scan_input, input_channel_indices, calibration_rect );
     
-  case 'DebugGenerator'
-    tracker = make_debug_generator_tracker();
+  case 'generator'
+    tracker = make_generator_tracker();
     
   otherwise
     error( 'Unrecognized source type "%s".', source_type );
@@ -546,7 +546,7 @@ tracker.ChannelMapping = channel_indices;
 
 end
 
-function tracker = make_debug_generator_tracker()
+function tracker = make_generator_tracker()
 
 tracker = ptb.sources.Generator();
 
