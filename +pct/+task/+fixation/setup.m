@@ -445,6 +445,7 @@ function [tracker_m1, tracker_m2, edf_filename_m1, edf_filename_m2] = ...
 
 interface = get_interface( conf );
 signal = get_signal( conf );
+structure = get_structure( conf );
 
 saccade_speed = conf.STIMULI.setup.gaze_cursor_m2.saccade_speed;
 wait_time = conf.STIMULI.setup.gaze_cursor_m2.wait_time;
@@ -464,7 +465,7 @@ calibration_rect = conf.CALIB_SCREEN.rect;
   , m2_channel_indices, calibration_rect, m2_source_type, data_directory, conf );
 
 if ( interface.m2_is_computer )
-  generator_m2 = pct.generators.DebugGenerator( tracker_m2 );
+  generator_m2 = structure.generator_m2( program, tracker_m2 );
 else
   generator_m2 = [];
 end
