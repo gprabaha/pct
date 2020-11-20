@@ -1,4 +1,4 @@
-classdef DebugGeneratorManyPatch < handle
+classdef DebugGeneratorManyPatches < handle
   properties (Access = private)
     source;
     frame_timer;
@@ -14,7 +14,7 @@ classdef DebugGeneratorManyPatch < handle
     current_saccade_index;
   end
   methods
-    function obj = DebugGeneratorManyPatch(source)
+    function obj = DebugGeneratorManyPatches(source)
       obj.source = source;
       obj.frame_timer = ptb.Clock();
       
@@ -110,12 +110,12 @@ classdef DebugGeneratorManyPatch < handle
       obj.source.SettableX = rect_size(1)/2;
       obj.source.SettableY = rect_size(2)/2;
       obj.source.SettableIsValidSample = true;
+      obj.saccade_list = generate_saccade_list(obj, patch_info, program);
       obj.current_saccade_index = 1;
       reset( obj.frame_timer );
     end
     
     function update(obj, program)
-      saccade_list = generate_saccade_list(obj, patch_info, program);
       current_t = elapsed( obj.frame_timer );
       saccade_index = obj.current_saccade_index;
       origin_val = saccade_list{saccade_index}.origin;
