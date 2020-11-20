@@ -52,6 +52,8 @@ SCREEN.full_size = get( 0, 'screensize' );
 SCREEN.index = 3;
 SCREEN.background_color = [ 0 0 0 ];
 SCREEN.rect = [0, 0, 1280, 1024];
+SCREEN.subject_distance_cm = 50;
+SCREEN.physical_height_cm = 16;
 
 % CALIBRATION SCREEN
 CALIB_SCREEN = struct();
