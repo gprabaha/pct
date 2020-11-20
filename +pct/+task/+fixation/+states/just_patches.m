@@ -68,7 +68,8 @@ end
 
 function exit(state, program)
 
-if ( state.UserData.num_patches_remaining == 0 )
+% Check with Nick of this is the right way of exiting.
+if ( state.UserData.num_patches_remaining < count_patches(program) )
   timestamp_exit( state, program );
   next( state, program.Value.states('juice_reward') );
 else

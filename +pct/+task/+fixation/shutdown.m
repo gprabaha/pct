@@ -111,6 +111,11 @@ if ( shared_utils.io.fexists(src_file) )
   
   try
     copyfile( src_file, dest_file );
+    program_data = program.Value;
+    data_filename = [datestr(datetime, 'yyyy-mm-dd_HH-MM-SS') '-pct-training-data'];
+    save([path data_filename], 'program_data');
+    path_dropbox = 'C:\Users\changlab\Dropbox (ChangLab)\prabaha_changlab\pct-training-hitch\comp-coop\';
+    save([path_dropbox data_filename], 'program_data');
   catch err
     warning( err.message );
   end

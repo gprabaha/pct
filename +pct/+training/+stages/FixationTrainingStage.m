@@ -5,7 +5,6 @@ classdef FixationTrainingStage < pct.util.TrainingStage
     FixHoldDur;
     PatchDur;
     FixHoldStDev = 0.02;
-    
     PercentCorrectThresholdAdvance = 80;
     PercentCorrectThresholdRevert = 20;
     TrialHistorySize = 50;
@@ -35,7 +34,8 @@ classdef FixationTrainingStage < pct.util.TrainingStage
         patch.Duration = obj.PatchDur;
       end
       
-      fix_hold_duration = normrnd(obj.FixDur, obj.FixHoldStDev);
+
+      fix_hold_duration = normrnd(obj.FixHoldDur, obj.FixHoldStDev);
       if fix_hold_duration < 0.1
         fix_hold_duration = 0.1;
       end
@@ -109,14 +109,14 @@ classdef FixationTrainingStage < pct.util.TrainingStage
     function transition(from, to, direc, program)      
       to.history_start_index = numel( program.Value.data.Value ) + 1; % current trial index.
       if direc == 1
-        program.Value.rewards.training = program.Value.rewards.training + 0.02;
-        if program.Value.rewards.training > 0.4
-          program.Value.rewards.training = 0.4;
+        program.Value.rewards.training = program.Value.rewards.training + 0.05;
+        if program.Value.rewards.training > 0.7
+          program.Value.rewards.training = 0.7;
         end
       elseif direc == -1
-        program.Value.rewards.training = program.Value.rewards.training - 0.02;
-        if program.Value.rewards.training < 0.2
-          program.Value.rewards.training = 0.2;
+        program.Value.rewards.training = program.Value.rewards.training - 0.05;
+        if program.Value.rewards.training < 0.3
+          program.Value.rewards.training = 0.3;
         end
       end
     end

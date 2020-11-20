@@ -28,6 +28,8 @@ conf.STIMULI.setup.fix_hold_square.target_padding = 20;
 % M2 cursor parameters
 conf.STIMULI.setup.gaze_cursor_m2.visible = true;
 conf.STIMULI.setup.gaze_cursor_m2.saccade_speed = 1/0.3;
+conf.STRUCTURE.pause_state_criterion = @(program) pct.util.pause_after_num_trials(program, 5);
+conf.STRUCTURE.num_patches = 2;
 
 % Trial structure parameters
 conf.STRUCTURE.patch_params.trials_per_block = 3;
