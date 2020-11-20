@@ -5,13 +5,12 @@ classdef DebugGeneratorManyPatches < handle
     saccades = {};
     origin = [0; 0];
     destination = [0; 0];
-    total_time = 1;
     noise = 1;
     use_subject_rt_based_saccade_time = false;
     cursor_override_increment = 0.05;  % seconds;
     cursor_override_amount = 0;
     current_saccade_time = 0;
-    current_saccade_index;
+    current_saccade_index = 1;
   end
   methods
     function obj = DebugGeneratorManyPatches(source)
@@ -24,20 +23,16 @@ classdef DebugGeneratorManyPatches < handle
     end
     
     function initialize_fixation(obj, program)
-      [start_pos_val, end_pos_val, total_time_val] = m2_saccade_attributes( obj, program );
-      obj.origin = start_pos_val;
-      obj.destination = start_pos_val+1;
-      obj.total_time = 1;
       rect = program.Value.window.Rect;
       rect_size = [ rect.X2-rect.X1, rect.Y2-rect.Y1 ];
       obj.source.SettableX = rect_size(1)/2;
       obj.source.SettableY = rect_size(2)/2;
       obj.source.SettableIsValidSample = true;
       reset( obj.frame_timer );
-    end
-    
-    function time = get_current_saccade_time(obj)
-      time = obj.current_saccade_time;
+      
+      total_time = program.Value.config.TIMINGS.time_in.fixation;
+      
+      obj.saccades = generate_fixation_saccade_list( rect_size, total_time );
     end
     
     function time = establish_saccade_time(obj, program)
@@ -100,22 +95,18 @@ classdef DebugGeneratorManyPatches < handle
     end
     
     function initialize(obj, patch_info, program)
-%       [start_pos_val, end_pos_val, total_time_val] = m2_saccade_attributes( obj, program );
-      [start_pos_val, end_pos_val] = m2_saccade( patch_info, program );      
-      obj.origin = start_pos_val;
-      obj.destination = end_pos_val;
-      obj.total_time = establish_saccade_time( obj, program );
-      rect = program.Value.window.Rect;
-      rect_size = [ rect.X2-rect.X1, rect.Y2-rect.Y1 ];
-      obj.source.SettableX = rect_size(1)/2;
-      obj.source.SettableY = rect_size(2)/2;
-      obj.source.SettableIsValidSample = true;
-      obj.saccade_list = generate_saccade_list(obj, patch_info, program);
       obj.current_saccade_index = 1;
       reset( obj.frame_timer );
+      obj.saccades = generate_saccade_list( patch_info, program );
     end
     
     function update(obj, program)
+
+      saccade_list = obj.saccades;
+      
+      if ( obj.current_saccade_index > numel(obj.saccades) )
+        return;
+      end
       current_t = elapsed( obj.frame_timer );
       saccade_index = obj.current_saccade_index;
       origin_val = saccade_list{saccade_index}.origin;
@@ -141,20 +132,6 @@ classdef DebugGeneratorManyPatches < handle
         , {'scalar'}, mfilename, 'source' );
       obj.source = to;
     end
-    
-%     function [X_increment, Y_increment] = update_X_Y_pos_uniformly( obj, delta_t, program )
-%       saccade_attributes = program.Value.m2_saccade_attributes.Value;
-%       start_pos = saccade_attributes.start_pos;
-%       end_pos = saccade_attributes.end_pos;
-%       total_time = saccade_attributes.total_time;
-%       
-%       total_X = end_pos(1) - start_pos(1);
-%       total_Y = end_pos(2) - start_pos(2);
-%       
-%       time_frac = delta_t/total_time;
-%       X_increment = total_X * time_frac;
-%       Y_increment = total_Y * time_frac;
-%     end
     
     function [start_pos_vals, end_pos_vals, total_time_val] = m2_saccade_attributes( obj, program )
       stimuli = program.Value.stimuli;
@@ -189,7 +166,20 @@ saccade_struct = struct(...
 
 end
 
-function saccade_list = generate_saccade_list(obj, patch_info, program)
+function fix_list = generate_fixation_saccade_list(rect_size, total_time)
+
+origin = rect_size * 0.5;
+destination = origin;
+
+fix_list = {...
+  make_saccade( origin, destination, nan, total_time ) ...
+};
+
+end
+
+function saccade_list = generate_saccade_list(patch_info, program)
+
+saccade_list = {};
 
 rect = program.Value.window.Rect;
 rect_size = [ rect.X2-rect.X1, rect.Y2-rect.Y1 ];
@@ -244,43 +234,12 @@ for patch_ind = 1:numel(maybe_m2_patches)
   saccade_interval_struct = make_saccade(origin, origin, nan, wait_time);
   temp_saccade_struct = make_saccade(origin, destination, nan, total_time);
   if patch_ind > 1
-    obj.saccades{end+1} = saccade_interval_struct;
-    obj.saccades{end+1} = temp_saccade_struct;
+    saccade_list{end+1} = saccade_interval_struct;
+    saccade_list{end+1} = temp_saccade_struct;
   else
-    obj.saccades{end+1} = temp_saccade_struct;
+    saccade_list{end+1} = temp_saccade_struct;
   end
   current_patch_ind = target_patch_ind;
 end
 
 end
-
-
-% function [start_pos, end_pos] = m2_saccade(patch_info, program)
-% 
-% rect = program.Value.window.Rect;
-% rect_size = [ rect.X2-rect.X1, rect.Y2-rect.Y1 ];
-%       
-% start_pos = [0.5 * rect_size(1), 0.5 * rect_size(2)];
-% end_pos = start_pos;
-% 
-% % This is where the total saccade time gets assigned
-% total_time = program.Value.generator_m2_saccade_time;
-% 
-% maybe_m2_patches = pct.util.PatchInfo.empty();
-% 
-% for i = 1:numel(patch_info)
-%   if ( acquireable_by_m2(patch_info(i)) )
-%     maybe_m2_patches(end+1) = patch_info(i);
-%   end
-% end
-% 
-% if ( isempty(maybe_m2_patches) )
-%   % No patches acquireable by m2.
-%   return
-% end
-% 
-% patch_ind = randi( numel(maybe_m2_patches), 1 );
-% end_pos = maybe_m2_patches(patch_ind).Position(:)' .* rect_size(:)';
-% % end_pos = maybe_m2_patches(patch_ind).Position(:)';
-% 
-% end
