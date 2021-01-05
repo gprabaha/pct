@@ -35,69 +35,14 @@ classdef DebugGeneratorManyPatches < handle
       obj.saccades = generate_fixation_saccade_list( rect_size, total_time );
     end
     
-    function time = establish_saccade_time(obj, program)
-      data = program.Value.data.Value;
-      training_data = program.Value.training_data;
-      
-      all_m1_rts = [];
-      
-      for i = 1:numel(data)
-        patch_entry_times = data(i).just_patches.patch_entry_times;
-        state_start_time = data(i).just_patches.entry_time;
-        
-        if ( ~isnan(state_start_time) )
-          % Get the patch entry times for m1, separately for each patch.
-          % Get the maximum (?) entry time, and subtract it from the state
-          % entry time to get a reaction time / saccade time for m1.
-          
-          % This command gets the m1 patch entry times for all patches
-          m1_entry_times = patch_entry_times(1, :);
-          
-          rts = nan( numel(m1_entry_times), 1 );
-          for j = 1:numel(rts)
-            if ( ~isempty(m1_entry_times{j}) )
-              % I made this min to capture the first entry
-              rts(j) = min( m1_entry_times{j} ) - state_start_time;
-            end
-          end
-          
-          all_m1_rts = [ all_m1_rts; rts(~isnan(rts)) ];
-        end
-      end
-      
-      if ( ~isempty(all_m1_rts) )
-        time = mean( all_m1_rts ); % can initiate a norand generator here
-      end
-      
-      if ( isfield(training_data, 'mean_m2_saccade_velocity_shift_direction') && ...
-          training_data.mean_m2_saccade_velocity_shift_direction ~= 0 )
-        program.Value.training_data.mean_m2_saccade_velocity_shift_direction = 0;
-        % Right or left key was pressed, increase / decrease the mean
-        % saccade velocity.
-        dir = training_data.mean_m2_saccade_velocity_shift_direction;        
-        obj.cursor_override_amount = ...
-          obj.cursor_override_amount + obj.cursor_override_increment * dir;
-        
-        fprintf( '\n Applying override: %0.2f', obj.cursor_override_amount );
-      end
-      
-      override_amt = obj.cursor_override_amount;
-      
-      if ( ~isempty(all_m1_rts) && obj.use_subject_rt_based_saccade_time )
-        time = mean( all_m1_rts ) + override_amt;
-      else
-        % Made the shift speed based instead of time
-        average_speed = program.Value.generator_m2_saccade_speed;
-        average_speed = average_speed + override_amt;
-        time = 1/average_speed;
-      end
-      obj.current_saccade_time = time;
-    end
-    
     function initialize(obj, patch_info, program)
       obj.current_saccade_index = 1;
       reset( obj.frame_timer );
       obj.saccades = generate_saccade_list( patch_info, program );
+    end
+    
+    function time = get_current_saccade_time(obj)
+      time = obj.current_saccade_time;
     end
     
     function update(obj, program)
