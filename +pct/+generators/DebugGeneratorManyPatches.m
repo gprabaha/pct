@@ -10,7 +10,10 @@ classdef DebugGeneratorManyPatches < handle
     cursor_override_increment = 0.05;  % seconds;
     cursor_override_amount = 0;
     current_saccade_time = 0;
-    current_saccade_index = 1;
+    current_saccade = [];
+    
+    current_x = 0;
+    current_y = 0;
   end
   methods
     function obj = DebugGeneratorManyPatches(source)
@@ -35,40 +38,70 @@ classdef DebugGeneratorManyPatches < handle
       obj.saccades = generate_fixation_saccade_list( rect_size, total_time );
     end
     
-    function initialize(obj, patch_info, program)
-      obj.current_saccade_index = 1;
+    function initialize_saccades(obj, patch_info, program, is_patch_acquired)
       reset( obj.frame_timer );
-      obj.saccades = generate_saccade_list( patch_info, program );
+      
+%       m2_acquireable_patch_info = ...
+%         get_m2_acquireable_patch_info( patch_info, is_patch_acquired );
+%       
+%       obj.saccades = generate_saccade_list( m2_acquireable_patch_info, program );
+      obj.saccades = {};
     end
     
     function time = get_current_saccade_time(obj)
       time = obj.current_saccade_time;
     end
     
+    function patch_update(obj, program, patch_info, is_patch_acquired)
+      if ( isempty(obj.saccades) )
+        m2_acquireable_patch_info = ...
+          get_m2_acquireable_patch_info( patch_info, is_patch_acquired );
+        
+        if ( isempty(m2_acquireable_patch_info) )
+          return;
+        end
+        
+        m2_patch_ind = randi( numel(m2_acquireable_patch_info), 1 );
+        m2_target_patch = m2_acquireable_patch_info(m2_patch_ind);
+        ori = [obj.current_x, obj.current_y];
+        
+        obj.saccades = generate_saccade_to_patch( ori, m2_target_patch, program );
+        reset( obj.frame_timer );
+      end
+    end
+    
     function update(obj, program)
-
       saccade_list = obj.saccades;
       
-      if ( obj.current_saccade_index > numel(obj.saccades) )
+      if ( isempty(obj.saccades) )
         return;
       end
+      
       current_t = elapsed( obj.frame_timer );
-      saccade_index = obj.current_saccade_index;
+      
+      saccade_index = 1;
       origin_val = saccade_list{saccade_index}.origin;
       destination_val = saccade_list{saccade_index}.destination;
       total_time_val = saccade_list{saccade_index}.total_time;
       average_velocity = 1/total_time_val;
-      noise = obj.noise;
+      
       [X_pos, Y_pos] = pct.generators.update_X_Y_pos_gaussian_velocity(...
         current_t, origin_val, destination_val, average_velocity);
       assert(~isnan( X_pos));
-      obj.source.SettableX = X_pos + normrnd( 0, noise );
-      obj.source.SettableY = Y_pos + normrnd( 0, noise );
-      next_saccade_index = obj.current_saccade_index + 1;
+      
+      curr_x = X_pos + normrnd( 0, obj.noise );
+      curr_y = Y_pos + normrnd( 0, obj.noise );
+      
+      obj.current_x = curr_x;
+      obj.current_y = curr_y;
+      
+      obj.source.SettableX = curr_x;
+      obj.source.SettableY = curr_y;
+      
       % This resets timer for the next saccade once one saccade is done
-      if current_t > total_time_val && next_saccade_index <= numel(saccade_list)
+      if current_t > total_time_val
+        obj.saccades(1) = [];
         reset( obj.frame_timer );
-        obj.current_saccade_index = next_saccade_index;
       end
     end
     
@@ -122,7 +155,38 @@ fix_list = {...
 
 end
 
-function saccade_list = generate_saccade_list(patch_info, program)
+function maybe_m2_patches = get_m2_acquireable_patch_info(patch_info, is_patch_acquired)
+
+maybe_m2_patches = pct.util.PatchInfo.empty();
+non_acquired_patch_info = patch_info(~is_patch_acquired);
+
+for i = 1:numel(non_acquired_patch_info)
+  if ( acquireable_by_m2(non_acquired_patch_info(i)) )
+    maybe_m2_patches(end+1) = non_acquired_patch_info(i);
+  end
+end
+
+end
+
+function saccades = generate_saccade_to_patch(origin, patch, program)
+
+saccades = {};
+
+average_speed = program.Value.generator_m2_saccade_speed;
+total_time = 1/average_speed;
+wait_time = program.Value.generator_m2_wait_time;
+
+rect = program.Value.window.Rect;
+rect_size = [ rect.X2-rect.X1, rect.Y2-rect.Y1 ];
+
+destination = patch.Position(:)' .* rect_size(:)';
+
+saccades{end+1} = make_saccade( origin, destination, nan, total_time );
+saccades{end+1} = make_saccade( destination, destination, nan, wait_time );
+
+end
+
+function saccade_list = generate_saccade_list(maybe_m2_patches, program)
 
 saccade_list = {};
 
@@ -135,19 +199,6 @@ total_time = 1/average_speed;
 wait_time = program.Value.generator_m2_wait_time;
 
 start_pos = [0.5 * rect_size(1), 0.5 * rect_size(2)];
-
-maybe_m2_patches = pct.util.PatchInfo.empty();
-
-for i = 1:numel(patch_info)
-  if ( acquireable_by_m2(patch_info(i)) )
-    maybe_m2_patches(end+1) = patch_info(i);
-  end
-end
-
-if ( isempty(maybe_m2_patches) )
-  % No patches acquireable by m2.
-  return
-end
 
 current_patch_ind = nan;
 for patch_ind = 1:numel(maybe_m2_patches)

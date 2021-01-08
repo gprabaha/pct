@@ -7,7 +7,7 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
     trial_ind = 0;
     next_block_strategy = 'sequential'; % 'random'
     last_patch_info = pct.util.PatchInfo.empty();
-    persist_patch_info_until_exhausted = true;
+    persist_patch_info_until_exhausted = false;
     next_set_id = 1;
     next_patch_id = 1;
   end
@@ -19,12 +19,14 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
       defaults.next_block_strategy = 'sequential';
       defaults.block_types = { 'compete', 'cooperate' };
       defaults.start_block_type = 'cooperate';
+      defaults.persist_patch_info_until_exhausted = false;
       params = shared_utils.general.parsestruct( defaults, varargin );
       
       obj.trials_per_block = params.trials_per_block;
       obj.block_types = params.block_types;
       obj.block_type = params.start_block_type;
       obj.next_block_strategy = params.next_block_strategy;
+      obj.persist_patch_info_until_exhausted = params.persist_patch_info_until_exhausted;
       
       [~, block_ind] = ismember( obj.block_type, obj.block_types );
       if ( block_ind == 0 )
@@ -51,6 +53,7 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
     end
     
     function tf = update_patch_info_persist_patches(obj, ~, latest_acquired_patches, ~)
+      % Generate new patches only if there are no remaining non-acquired patches.
       remaining_non_acquired = filter_non_acquired_patches( obj.last_patch_info, latest_acquired_patches );
       tf = isempty( remaining_non_acquired );
     end

@@ -35,7 +35,7 @@ state.UserData.acquired_patch_info = cell( 1, num_patches );
 
 reset_targets( program );
 
-handle_computer_generated_m2( program );
+handle_computer_generated_m2( program, state );
 
 timestamp_entry( state, program );
 update_last_state( state, program );
@@ -43,6 +43,8 @@ update_last_state( state, program );
 end
 
 function loop(state, program)
+
+maybe_update_computer_generated_m2( program, state );
 
 main_window = program.Value.window;
 
@@ -303,18 +305,27 @@ data.Value(end).just_patches.acquired_patches = state.UserData.acquired_patch_in
 
 end
 
-function handle_computer_generated_m2(program)
+function maybe_update_computer_generated_m2(program, state)
 
-interface = program.Value.interface;
-
-if ( ~interface.has_m2 || ~interface.m2_is_computer )
+generator_m2 = pct.util.maybe_get_computer_generated_m2( program );
+if ( isempty(generator_m2) )
   return
 end
 
-generator_m2 = program.Value.generator_m2;
+patch_info = program.Value.current_patches;
+patch_update( generator_m2, program, patch_info, state.UserData.patch_acquired );
+
+end
+
+function handle_computer_generated_m2(program, state)
+
+generator_m2 = pct.util.maybe_get_computer_generated_m2( program );
+if ( isempty(generator_m2) )
+  return
+end
 
 patch_info = program.Value.current_patches;
-initialize( generator_m2, patch_info, program );
+initialize_saccades( generator_m2, patch_info, program, state.UserData.patch_acquired );
 
 program.Value.data.Value(end).m2_saccade_time = ...
   generator_m2.get_current_saccade_time();

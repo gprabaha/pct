@@ -39,7 +39,7 @@ conf.STRUCTURE.patch_generator = ...
 conf.STRUCTURE.pause_state_criterion = ...
   @(program) pct.util.pause_after_num_trials(program, 50);
 conf.STRUCTURE.generator_m2 = @(program, tracker) pct.generators.DebugGeneratorManyPatches(tracker);
-conf.STRUCTURE.num_patches = 2;
+conf.STRUCTURE.num_patches = 4;
 
 conf.SCREEN.rect = [ 0, 0, 560, 350 ];
 conf.SCREEN.index = 0;
@@ -68,8 +68,9 @@ begin debug parameters for new task structure
 %}
 
 conf.STRUCTURE.error_if_not_all_patches_acquired = false;
-conf.STRUCTURE.num_patches = 4;
-conf.TIMINGS.time_in.just_patches = 0.5;
+conf.STRUCTURE.num_patches = 2;
+conf.STRUCTURE.patch_params.persist_patch_info_until_exhausted = true;
+conf.TIMINGS.time_in.just_patches = 2;
 
 %{
 end debug parameters
