@@ -7,6 +7,9 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
     trial_ind = 0;
     next_block_strategy = 'sequential'; % 'random'
     last_patch_info = pct.util.PatchInfo.empty();
+    persist_patch_info_until_exhausted = true;
+    next_set_id = 1;
+    next_patch_id = 1;
   end
   
   methods
@@ -47,7 +50,12 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
       obj.block_type = obj.block_types{obj.block_type_ind};
     end
     
-    function tf = update_patch_info(obj, num_patches, program)
+    function tf = update_patch_info_persist_patches(obj, ~, latest_acquired_patches, ~)
+      remaining_non_acquired = filter_non_acquired_patches( obj.last_patch_info, latest_acquired_patches );
+      tf = isempty( remaining_non_acquired );
+    end
+    
+    function tf = update_patch_info_dont_persist_patches(obj, num_patches, ~, program)
       tf = true;
       
       if ( numel(obj.last_patch_info) ~= num_patches )
@@ -67,11 +75,21 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
       tf = did_initiate_last_trial;
     end
     
+    function tf = generate_new_patch_info(obj, num_patches, latest_acquired_patches, program)
+      if ( obj.persist_patch_info_until_exhausted )
+        tf = obj.update_patch_info_persist_patches( num_patches, latest_acquired_patches, program );
+      else
+        tf = obj.update_patch_info_dont_persist_patches( num_patches, latest_acquired_patches, program );
+      end
+    end
+    
     function patch_info = generate(obj, patch_targets, program)
+      latest_acquired_patches = get_latest_acquired_patches( program );
+      
       appearance_func = program.Value.stimuli_setup.patch.patch_appearance_func;
       num_patches = numel( patch_targets );
       
-      if ( obj.update_patch_info(num_patches, program) )
+      if ( obj.generate_new_patch_info(num_patches, latest_acquired_patches, program) )
         radius = program.Value.patch_distribution_radius;
         rect = program.Value.window.Rect;
         coordinates = pct.util.assign_patch_coordinates( num_patches, radius, rect );
@@ -87,10 +105,15 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
           new_patch_info.Strategy = strategy;
           new_patch_info.Position = coordinates(:, i);
           new_patch_info.Target = patch_targets{i};
+          new_patch_info.Index = i;
+          new_patch_info.ID = obj.next_patch_id;
+          new_patch_info.SetID = obj.next_set_id;
           % Configure color, and other appearence properties.
           new_patch_info = appearance_func( new_patch_info );
 
           patch_info(end+1) = new_patch_info;
+          
+          obj.next_patch_id = obj.next_patch_id + 1;
         end
 
         obj.trial_ind = mod( obj.trial_ind + 1, obj.trials_per_block );
@@ -100,9 +123,43 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
         end
         
         obj.last_patch_info = patch_info;
+        obj.next_set_id = obj.next_set_id + 1;
       else
-        patch_info = obj.last_patch_info;
+        if ( obj.persist_patch_info_until_exhausted )
+          % Select patches that were not acquired on the last trial.
+          last_info = obj.last_patch_info;
+          patch_info = filter_non_acquired_patches( last_info, latest_acquired_patches );
+          obj.last_patch_info = patch_info;
+          
+        else
+          patch_info = obj.last_patch_info;
+        end
       end
     end
   end
+end
+
+function acquired = get_latest_acquired_patches(program)
+
+trial_data = program.Value.data.Value;
+
+if ( isempty(trial_data) )
+  acquired = {};
+else
+  acquired = trial_data(end).just_patches.acquired_patches;
+end
+
+end
+
+function remaining_patches = filter_non_acquired_patches(possible_patches, maybe_acquired_patches)
+
+acquired_patches = maybe_acquired_patches(cellfun(@(x) ~isempty(x), maybe_acquired_patches));
+acquired_patches = vertcat( pct.util.PatchInfo.empty(), acquired_patches{:} );
+
+possible_ids = [possible_patches.ID];
+acquired_ids = [acquired_patches.ID];
+
+was_acquired = ismember( possible_ids, acquired_ids );
+remaining_patches = possible_patches(~was_acquired);
+
 end

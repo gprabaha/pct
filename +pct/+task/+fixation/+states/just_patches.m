@@ -30,6 +30,8 @@ state.UserData.mark_entered = false( num_sources, num_patches );
 state.UserData.mark_exited = false( 1, num_patches );
 % IDs of the agent who entered the patch.
 state.UserData.entered_by = zeros( 1, num_patches );
+% PatchInfo of successfully acquired patches.
+state.UserData.acquired_patch_info = cell( 1, num_patches );
 
 reset_targets( program );
 
@@ -68,14 +70,23 @@ end
 
 function exit(state, program)
 
-% Check with Nick of this is the right way of exiting.
-if ( state.UserData.num_patches_remaining < count_patches(program) )
-  timestamp_exit( state, program );
-  next( state, program.Value.states('juice_reward') );
-else
-  timestamp_exit( state, program );
-  next( state, program.Value.states('error_penalty') );
+register_acquired_patches( state, program.Value.data );
+
+num_remaining = state.UserData.num_patches_remaining;
+
+error_if_not_all_acquired = ...
+  program.Value.config.STRUCTURE.error_if_not_all_patches_acquired;
+
+% Default to reward. 
+next_state = 'juice_reward';
+
+if ( num_remaining > 0 && error_if_not_all_acquired )
+  % Some patches left, and we require all patches to be acquired -> error.
+  next_state = 'error_penalty';
 end
+
+timestamp_exit( state, program );
+next( state, program.Value.states(next_state) );
 
 end
 
@@ -147,13 +158,15 @@ end
 
 end
 
-function acquire_patch(state, program, patch_index, source_index)
+function acquire_patch(patch_info, state, program, patch_index, source_index)
 
 patch_acquired_timestamp( state, program, source_index, patch_index );
+
 state.UserData.patch_acquired(patch_index) = true;
 state.UserData.num_patches_remaining = ...
   state.UserData.num_patches_remaining - 1;
 state.UserData.patch_acquired_by(patch_index) = source_index;
+state.UserData.acquired_patch_info{patch_index} = patch_info;
 
 end
 
@@ -192,7 +205,7 @@ for i = 1:numel(patch_info)
       case 'self'
         for j = 1:numel(dur_met)
           if ( dur_met(j) && can_acquire_self(info, j) )
-            acquire_patch( state, program, i, j );
+            acquire_patch( info, state, program, i, j );
             program.Value.data.Value(end).last_patch_type = 'self';
             if j==1
               program.Value.data.Value(end).last_agent = 'hitch';
@@ -206,7 +219,7 @@ for i = 1:numel(patch_info)
       case 'compete'
         for j = 1:numel(dur_met)
           if ( dur_met(j) )
-            acquire_patch( state, program, i, j );
+            acquire_patch( info, state, program, i, j );
             program.Value.data.Value(end).last_patch_type = 'compete';
             if j==1
               program.Value.data.Value(end).last_agent = 'hitch';
@@ -219,7 +232,7 @@ for i = 1:numel(patch_info)
         
       case 'cooperate'
         if ( all(dur_met) )
-          acquire_patch( state, program, i, j );
+          acquire_patch( info, state, program, i, j );
           
           % Add a patch acquired time stamp for each subject that is not
           % subject `j`
@@ -281,6 +294,12 @@ function patch_acquired_timestamp( state, program, subject_id, patch_id )
 
 program.Value.data.Value(end).(state.Name).patch_acquired_times(subject_id, patch_id) = ...
     elapsed( program.Value.task );
+
+end
+
+function register_acquired_patches(state, data)
+
+data.Value(end).just_patches.acquired_patches = state.UserData.acquired_patch_info;
 
 end
 

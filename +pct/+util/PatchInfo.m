@@ -11,6 +11,10 @@ classdef PatchInfo
     Position = zeros( 1, 3 );
     
     Target = ptb.Null();
+    
+    Index = 1;
+    ID = 1;
+    SetID = 1;
   end
   
   methods
@@ -30,6 +34,24 @@ classdef PatchInfo
     function tf = acquireable_by_m2(obj)
       % True if m2 can, potentially, acquire this patch.
       tf = ismember( 'm2', obj.AcquirableBy );
+    end
+    
+    function obj = set.SetID(obj, v)
+      validateattributes( v, {'double'}, {'scalar', 'integer'} ...
+        , mfilename, 'SetIndex' );
+      obj.SetID = v;
+    end
+    
+    function obj = set.ID(obj, v)
+      validateattributes( v, {'double'}, {'scalar', 'integer'} ...
+        , mfilename, 'SetIndex' );
+      obj.ID = v;
+    end
+    
+    function obj = set.Index(obj, v)
+      validateattributes( v, {'double'}, {'scalar', 'integer'} ...
+        , mfilename, 'Index' );
+      obj.Index = v;
     end
   end
 end

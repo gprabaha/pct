@@ -71,6 +71,7 @@ data_scaffold.just_patches.patch_exit_times = cell( 2, count_patches( program ) 
 data_scaffold.just_patches.patch_acquired_times = nan( 2, count_patches( program ) );
 data_scaffold.just_patches.exit_time = nan;
 data_scaffold.just_patches.did_fixate = nan;
+data_scaffold.just_patches.acquired_patches = cell( 1, count_patches(program) );
 
 data_scaffold.error_penalty.entry_time = nan;
 data_scaffold.error_penalty.exit_time = nan;
