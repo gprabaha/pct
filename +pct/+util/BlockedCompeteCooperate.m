@@ -86,6 +86,7 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
       end
     end
     
+    % This is the fucntion to modify to change patch trial
     function patch_info = generate(obj, patch_targets, program)
       latest_acquired_patches = get_latest_acquired_patches( program );
       
