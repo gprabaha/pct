@@ -12,6 +12,7 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
     num_trials_persisted_patch_info = 0;    
     next_set_id = 1;
     next_patch_id = 1;
+    trial_set = [];
   end
   
   methods
@@ -23,6 +24,7 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
       defaults.start_block_type = 'cooperate';
       defaults.persist_patch_info_until_exhausted = false;
       defaults.max_num_trials_persist_patch_info = 2;
+      defaults.trial_set = [];
       params = shared_utils.general.parsestruct( defaults, varargin );
       
       obj.trials_per_block = params.trials_per_block;
@@ -31,6 +33,7 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
       obj.next_block_strategy = params.next_block_strategy;
       obj.persist_patch_info_until_exhausted = params.persist_patch_info_until_exhausted;
       obj.max_num_trials_persist_patch_info = params.max_num_trials_persist_patch_info;
+      obj.trial_set = params.trial_set;
       
       [~, block_ind] = ismember( obj.block_type, obj.block_types );
       if ( block_ind == 0 )
@@ -98,6 +101,8 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
     
     % This is the fucntion to modify to change patch trial
     function patch_info = generate(obj, patch_targets, program)
+      
+      % 
       latest_acquired_patches = get_latest_acquired_patches( program );
       
       appearance_func = program.Value.stimuli_setup.patch.patch_appearance_func;
@@ -111,14 +116,19 @@ classdef BlockedCompeteCooperate < pct.util.EstablishPatchInfo
         coordinates = pct.util.assign_patch_coordinates( num_patches, radius, rect );
 
         patch_info = pct.util.PatchInfo.empty();
-
-        for i = 1:num_patches                
+        
+        % patch_list = obj.trial_set.sample(); % this is a function within
+        % trial_set
+        
+        % Work here in trying to assign the appearance of various patches.
+        % Chesk the functions in Util.
+        for i = 1:num_patches
           acquirable_by = {'m1', 'm2'};
           strategy = obj.block_type;
 
           new_patch_info = pct.util.PatchInfo();
-          new_patch_info.AcquirableBy = acquirable_by;
-          new_patch_info.Strategy = strategy;
+          new_patch_info.AcquirableBy = acquirable_by; % This needs to be changed to patch_list(i).Acq...
+          new_patch_info.Strategy = strategy; % This too
           new_patch_info.Position = coordinates(:, i);
           new_patch_info.Target = patch_targets{i};
           new_patch_info.Index = i;

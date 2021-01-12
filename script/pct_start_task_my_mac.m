@@ -44,6 +44,7 @@ conf.STRUCTURE.pause_state_criterion = ...
   @(program) pct.util.pause_after_num_trials(program, 50);
 conf.STRUCTURE.generator_m2 = @(program, tracker) pct.generators.DebugGeneratorManyPatches(tracker);
 conf.STRUCTURE.num_patches = 4;
+STRUCTURE.prevent_next_patch_repeat = true;
 
 conf.SCREEN.rect = [ 0, 0, 560, 350 ];
 conf.SCREEN.index = 0;
@@ -69,6 +70,15 @@ conf.REWARDS.training = 0.2;
 
 %{
 begin debug parameters for new task structure
+%}
+
+%{
+
+trial_set = pct.util.FourPatchTrialSet();
+conf.STRUCTURE.patch_params.trial_set = trial_set;
+conf.STIMULI.setup.patch.patch_appearance_func = ...
+  @(patch_info) trial_set.patch_appearance(patch_info);
+
 %}
 
 conf.STRUCTURE.error_if_not_all_patches_acquired = false;

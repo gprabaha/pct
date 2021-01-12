@@ -7,7 +7,7 @@ classdef DebugGeneratorManyPatches < handle
     destination = [0; 0];
     noise = 1;
     use_subject_rt_based_saccade_time = false;
-    last_patch_info = [];
+    visited_patch_list = [];
     cursor_override_increment = 0.05;  % seconds;
     cursor_override_amount = 0;
     current_saccade_time = 0;
@@ -29,7 +29,7 @@ classdef DebugGeneratorManyPatches < handle
     function initialize_fixation(obj, program)
       rect = program.Value.window.Rect;
       rect_size = [ rect.X2-rect.X1, rect.Y2-rect.Y1 ];
-      obj.last_patch_info = [];
+      obj.visited_patch_list = [];
       obj.source.SettableX = rect_size(1)/2;
       obj.source.SettableY = rect_size(2)/2;
       obj.source.SettableIsValidSample = true;
@@ -54,34 +54,37 @@ classdef DebugGeneratorManyPatches < handle
       time = obj.current_saccade_time;
     end
     
-    %% Figure out the paramtere details. The scaffold is ready.
     function patch_update(obj, program, patch_info, is_patch_acquired)
       
-      new_patch_rand_param = false;
-      % new_patch_rand_param = program.Value.new_patch_rand_param;
+      prevent_next_patch_repeat = ...
+        program.Value.structure.prevent_next_patch_repeat;
+      
       if ( isempty(obj.saccades) )
         m2_acquireable_patch_info = ...
           get_m2_acquireable_patch_info( patch_info, is_patch_acquired );
-        
-        % Change the last-patch_info to have data of all patches collected
-        % Use it to eliminate targets
-        if new_patch_rand_param
-          for patch_ind = 1:numel(m2_acquireable_patch_info)
-            patch = m2_acquireable_patch_info(patch_ind);
-            % What parameter has the position stored?
-            patch_poz = patch;
-            if norm (patch_poz - [obj.current_x, obj.current_y]) < 0.1
-              m2_acquireable_patch_info(patch_ind) = [];
-            end
-          end
-        end
         
         if ( isempty(m2_acquireable_patch_info) )
           return;
         end
         
-        m2_patch_ind = randi( numel(m2_acquireable_patch_info), 1 );
+        % Prevents present patch to be target patch
+        if prevent_next_patch_repeat
+          if ~isempty(obj.visited_patch_list)
+            last_patch = obj.visited_patch_list(end); % check the last target patch
+            if numel(m2_acquireable_patch_info) > 1 % check if this is the only patch
+              for patch_ind = 1:numel(m2_acquireable_patch_info)
+                if m2_acquireable_patch_info(patch_ind).ID == last_patch.ID
+                  m2_acquireable_patch_info(patch_ind) = [];
+                  break;
+                end
+              end
+            end
+          end
+        end
+        
+        m2_patch_ind = randi(numel(m2_acquireable_patch_info), 1);
         m2_target_patch = m2_acquireable_patch_info(m2_patch_ind);
+        obj.visited_patch_list = [obj.visited_patch_list m2_target_patch];
         ori = [obj.current_x, obj.current_y];
         
         obj.saccades = generate_saccade_to_patch( ori, m2_target_patch, program );
@@ -233,13 +236,6 @@ for patch_ind = 1:numel(maybe_m2_patches)
   if isnan(current_patch_ind)
     target_patch_ind = randi( numel(maybe_m2_patches), 1 );
   % Else select randomly from remaining patches
-  
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % We have to account for the fact that some of the remaining patches
-  % could already have been collected by M1 and thus have to be removed
-  % from the available pool
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
   else
     available_patches = 1:numel(maybe_m2_patches);
     available_patches(available_patches==current_patch_ind) = [];
