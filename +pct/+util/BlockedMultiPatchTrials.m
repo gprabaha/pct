@@ -3,8 +3,8 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
     patch_types                         = { 'self', 'compete', 'cooperate' };
     default_patch_type                  = 'compete';
     block_counter                       = 0;
-    trials_per_block                    = 100;
-    trial_reps                          = 50;
+    trials_per_block                    = 10;
+    trial_reps                          = 10;
     trial_ind                           = 0;
     trial_types                         = [];
     trial_bag                           = [];
@@ -26,9 +26,10 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
     function obj = BlockedMultiPatchTrials(varargin)
       % New defaults
       defaults = struct();
-      
-      defaults.trial_reps                         = 50;
-      defaults.trials_per_block                   = 100;
+      % Need to check with the 'pause' state for the 'trials_per_block'
+      % parameter
+      defaults.trial_reps                         = 10; % repeats of each trial
+      defaults.trials_per_block                   = 50; % gets a break after 50 trials
       defaults.patch_types                        = { 'self', 'compete', 'cooperate' };
       defaults.repeat_wrong_trials_later          = true;
       defaults.prevent_consecutive_trial_repeat   = true;
@@ -45,35 +46,6 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       obj.max_num_trials_persist_patch_info   = params.max_num_trials_persist_patch_info;
       obj.trial_set_generator                 = params.trial_set_generator;
       
-      %{
-      % Old Defaults
-      
-      defaults.trials_per_block = 10;
-      defaults.next_block_strategy = 'sequential';
-      defaults.block_types = { 'compete', 'cooperate' };
-      defaults.start_block_type = 'cooperate';
-      defaults.persist_patch_info_until_exhausted = false;
-      defaults.max_num_trials_persist_patch_info = 2;
-      defaults.trial_set = [];
-      params = shared_utils.general.parsestruct( defaults, varargin );
-      
-      
-      
-      obj.trials_per_block = params.trials_per_block;
-      obj.block_types = params.block_types;
-      obj.block_type = params.start_block_type;
-      obj.next_block_strategy = params.next_block_strategy;
-      obj.persist_patch_info_until_exhausted = params.persist_patch_info_until_exhausted;
-      obj.max_num_trials_persist_patch_info = params.max_num_trials_persist_patch_info;
-      obj.trial_set = params.trial_set;
-      
-      %}
-      
-      % Checks if any of the patch types is unrecognized
-%       [~, block_ind] = ismember( obj.patch_type, obj.patch_types );
-%       if ( block_ind == 0 )
-%         error( 'Unrecognized patch type "%s".', obj.patch_type );
-%       end
     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -183,10 +155,13 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
               counter = counter+1;
             end
             % This part is there in case we run out of choices when trying
-            % to generate trials without repeats.
+            % to generate trials without repeats. If after trying a few
+            % times, a sample different from the previous trial fails to
+            % generate then it tries it all over again.
             if counter == num_trial_types
               obj.generate_trial_order_again = true;
-              trial_order = generate_trial_order();
+              disp('Trying to generate trial-order without repeats again!');
+              trial_order = obj.generate_trial_order();
               break;
             end
             trial_order(trial_order_idx) = randsample( trial_stack{rep_ind}, 1 );
