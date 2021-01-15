@@ -4,9 +4,9 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
     default_patch_type                  = 'compete';
     block_counter                       = 0;
     trials_per_block                    = 10;
-    trial_reps                          = 10;
+    trial_reps                          = 2;
     trial_ind                           = 0;
-    trial_types                         = [];
+    trial_set                           = [];
     trial_bag                           = [];
     trial_set_generator                 = [];
     generate_new_trial_patches          = true; % for trial part 1
@@ -20,6 +20,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
     next_patch_id                       = 1;
     repeat_wrong_trials_later           = true;
     prevent_consecutive_trial_repeat    = true;
+    generate_trial_order_again          = false;
   end
   
   methods
@@ -28,7 +29,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       defaults = struct();
       % Need to check with the 'pause' state for the 'trials_per_block'
       % parameter
-      defaults.trial_reps                         = 10; % repeats of each trial
+      defaults.trial_reps                         = 2; % repeats of each trial
       defaults.trials_per_block                   = 50; % gets a break after 50 trials
       defaults.patch_types                        = { 'self', 'compete', 'cooperate' };
       defaults.repeat_wrong_trials_later          = true;
@@ -130,44 +131,60 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
     % trial from the bag.
     
     function trial_order = generate_trial_order(obj)
-      obj.generate_trial_order_again = false;
-      trial_order = [];
-      obj.trial_set = obj.trial_set_generator.generate_trial_set();
-      num_trial_types = numel(obj.trial_set);
-      n_reps = obj.trial_reps;
-      for rep_ind = 1:n_reps
-        trial_stack{rep_ind} = 1:num_trial_types;
-      end
-      for trial_set_ind = 1:num_trial_types
-        for rep_ind = 1:n_reps
-          trial_order_idx = n_reps*(trial_set_ind-1) + rep_ind;
-          if trial_order_idx == 1
-            trial_order(trial_order_idx) = randsample( trial_stack{rep_ind}, 1 );
-            trial_stack{rep_ind}(trial_stack{rep_ind} == trial_order(trial_order_idx)) = [];
+      
+      % Initial assignments %
+      
+      obj.generate_trial_order_again    = false;
+      obj.trial_set                     = obj.trial_set_generator.generate_trial_set();
+      num_trial_types                   = numel(obj.trial_set);
+      n_reps                            = obj.trial_reps;
+      trial_order                       = nan(n_reps*num_trial_types,1);
+      
+      % Operations %
+      
+      % Generate list of all trials
+      trial_stack = repmat( (1:num_trial_types)', [1 n_reps] );
+      trial_stack = trial_stack(:);
+      % Keep sampling from trial_stack until it is empty
+      trial_order_idx = 1;
+      while ~isempty(trial_stack)
+        trial_sample = randsample( trial_stack, 1 );
+        % Store the first trial irrespectively
+        if trial_order_idx == 1
+          trial_order(trial_order_idx) = trial_sample;
+          trial_stack( find( trial_stack == trial_sample, 1 ) ) = [];
+        % Check for repeats from next trial onwards
+        else
+          if trial_sample ~= trial_order(trial_order_idx-1)
+            trial_order(trial_order_idx) = trial_sample;
+            trial_stack( find( trial_stack == trial_sample, 1 ) ) = [];
+          % If this sample matches the previous one, sample again for a few
+          % times. Here I am sampling as many times as the number of
+          % elements in the trial_stack.
           else
-            potential_trial = randsample( trial_stack{rep_ind}, 1 );
-            counter = 0;
-            % Check if this trial is same as the previoius one, and if it
-            % is then keep sampling a few times.
-            while ( potential_trial == trial_order(trial_order_idx-1) ) && ...
-                counter < num_trial_types
-              potential_trial = randsample( trial_stack{rep_ind}, 1 );
-              counter = counter+1;
+            num_remaining_trials = numel(trial_stack);
+            if num_remaining_trials > 1
+              counter = 0;
+              while ( trial_sample == trial_order(trial_order_idx-1) && ...
+                  counter < num_remaining_trials )
+                trial_sample = randsample( trial_stack, 1 );
+                counter = counter+1;
+              end
+            else
+              trial_sample = trial_stack(1);
             end
-            % This part is there in case we run out of choices when trying
-            % to generate trials without repeats. If after trying a few
-            % times, a sample different from the previous trial fails to
-            % generate then it tries it all over again.
-            if counter == num_trial_types
-              obj.generate_trial_order_again = true;
-              disp('Trying to generate trial-order without repeats again!');
+            % If still it does not find a solution, try again!
+            if trial_sample == trial_order(trial_order_idx-1)
+              disp('This attempt failed! Trying to generate trial-order without repeats again!');
               trial_order = obj.generate_trial_order();
-              break;
+            else
+              trial_order(trial_order_idx) = trial_sample;
+              trial_stack( find( trial_stack == trial_sample, 1 ) ) = [];
             end
-            trial_order(trial_order_idx) = randsample( trial_stack{rep_ind}, 1 );
-            trial_stack{rep_ind}(trial_stack{rep_ind} == trial_order(trial_order_idx)) = [];
           end
         end
+        trial_order_idx = trial_order_idx+1;
+      end
     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -265,7 +282,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       end
     end
   end
-end
+ end
 
 function acquired = get_latest_acquired_patches(program)
 
