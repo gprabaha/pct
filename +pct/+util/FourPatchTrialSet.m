@@ -30,21 +30,25 @@ end
 function patch_types = get_patch_types()
 
 patch_types = {
- struct('acquireable_by', {{'m1'}}, 'block_type', 'self', 'agent', 'hitch') ...
- struct('acquireable_by', {{'m2'}}, 'block_type', 'self', 'agent', 'algo') ...
- struct('acquireable_by', {{'m1', 'm2'}}, 'block_type', 'compete', 'agent', 'either') ...
- struct('acquireable_by', {{'m1', 'm2'}}, 'block_type', 'cooperate', 'agent', 'either') ...
+ struct('acquirable_by', {{'m1'}}, 'block_type', 'self', 'agent', 'hitch') ...
+ struct('acquirable_by', {{'m2'}}, 'block_type', 'self', 'agent', 'algo') ...
+ struct('acquirable_by', {{'m1', 'm2'}}, 'block_type', 'compete', 'agent', 'either') ...
+ struct('acquirable_by', {{'m1', 'm2'}}, 'block_type', 'cooperate', 'agent', 'either') ...
 };
 
 end
 
 function trial_set = generate_four_patch_trial_set_against_algo()
 
-trial_set = {};
-patch_types = get_patch_types();
-disp(patch_types);
-idx = 0;
-% Forced reward inequity
+% Intialization assignments %
+
+trial_set         = {};
+patch_types       = get_patch_types();
+idx               = 0;
+
+% Patch list for each trial types %
+
+% Forced reward inequity %
 
 % 1
 idx = idx+1;
@@ -73,46 +77,9 @@ trial_set{idx} = [
   patch_types{2} ...
 ];
 
-% Self and Competition
+% Self and Competition %
 
 % 4
 % FILL IN THE REST
 
 end
-
-%{
-
-function patches = trial_type1()
-
-patches = {
-  {struct('acquireable_by', {{'m1'}}, 'block_type', 'self', 'agent', 'hitch')} ...
-  {struct('acquireable_by', {{'m1'}}, 'block_type', 'self', 'agent', 'hitch')} ...
-  {struct('acquireable_by', {{'m1'}}, 'block_type', 'self', 'agent', 'hitch')} ...
-  {struct('acquireable_by', {{'m2'}}, 'block_type', 'self', 'agent', 'algo')} ...
-};
-
-end
-
-function patches = trial_type2()
-
-patches = {
-  {struct('acquireable_by', {{'m1'}}, 'block_type', 'self', 'agent', 'hitch')} ...
-  {struct('acquireable_by', {{'m1'}}, 'block_type', 'self', 'agent', 'hitch')} ...
-  {struct('acquireable_by', {{'m2'}}, 'block_type', 'self', 'agent', 'algo')} ...
-  {struct('acquireable_by', {{'m2'}}, 'block_type', 'self', 'agent', 'algo')} ...
-};
-
-end
-
-function patches = trial_type3()
-
-patches = {
-  {struct('acquireable_by', {{'m1'}}, 'block_type', 'self', 'agent', 'hitch')} ...
-  {struct('acquireable_by', {{'m2'}}, 'block_type', 'self', 'agent', 'algo')} ...
-  {struct('acquireable_by', {{'m2'}}, 'block_type', 'self', 'agent', 'algo')} ...
-  {struct('acquireable_by', {{'m2'}}, 'block_type', 'self', 'agent', 'algo')} ...
-};
-
-end
-
-%}

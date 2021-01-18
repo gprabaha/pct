@@ -4,6 +4,7 @@ if num_patches > 4
   error('Number of patches cannot be more than 4!');
 end
 
+possible_rotation_angles = 0:30:359;
 rect_size = [ rect.X2-rect.X1, rect.Y2-rect.Y1 ];
 
 % Adjusting for rectangular screen
@@ -37,7 +38,7 @@ if num_patches > 1
 else
 end
 
-random_frame_rotation_angle = rand * 360;
+random_frame_rotation_angle = randsample( possible_rotation_angles, 1 );
 random_angle_frame_rotation_matrix = rotation_matrix_generator( random_frame_rotation_angle );
 coordinates = random_angle_frame_rotation_matrix * coordinates;
 coordinates(adjustment_dim, :) = coordinates(adjustment_dim, :) * adjustment_ratio;

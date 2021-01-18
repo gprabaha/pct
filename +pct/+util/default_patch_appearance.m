@@ -10,10 +10,12 @@ color = repmat( 255, 1, 3 );
 
 switch ( strategy )
   case 'self'
-    if ( ismember('m1', info.AcquirableBy) )
+    if ( ismember('hitch', info.Agent) )
       color = [255, 0, 0];
-    else
+    elseif ( ismember('algo', info.Agent) )
       color = [0, 0, 255];
+    else
+      color = [0, 255, 0]; 
     end
     
   case 'compete'

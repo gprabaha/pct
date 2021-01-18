@@ -50,20 +50,28 @@ end
 
 function data_scaffold = make_trial_data_scaffold(program, patch_info)
 
-data_scaffold = struct();
+% Initial assignments %
 
-data_scaffold.last_state = nan;
-data_scaffold.last_patch_type = nan;
-data_scaffold.last_agent = nan;
+data_scaffold                     = struct();
+data_scaffold.last_state          = nan;
+data_scaffold.last_patch_type     = nan;
+data_scaffold.last_agent          = nan;
+data_scaffold.m2_saccade_time     = nan;
+data_scaffold.patch_info          = patch_info;
 
+% For states in the first part of the trial %
+
+% fixation
 data_scaffold.fixation.entry_time = nan;
 data_scaffold.fixation.exit_time = nan;
 data_scaffold.fixation.did_fixate = nan;
 
+% fix_hold_patch
 data_scaffold.fix_hold_patch.entry_time = nan;
 data_scaffold.fix_hold_patch.exit_time = nan;
 data_scaffold.fix_hold_patch.did_fixate = nan;
 
+% just_patches
 data_scaffold.just_patches.entry_time = nan;
 % The first dimension is agent index and the second one is patch index
 data_scaffold.just_patches.patch_entry_times = cell( 2, count_patches( program ) );
@@ -73,10 +81,37 @@ data_scaffold.just_patches.exit_time = nan;
 data_scaffold.just_patches.did_fixate = nan;
 data_scaffold.just_patches.acquired_patches = cell( 1, count_patches(program) );
 
+% For states in the second part of the trial %
+
+% second_fixation
+data_scaffold.second_fixation.entry_time = nan;
+data_scaffold.second_fixation.exit_time = nan;
+data_scaffold.second_fixation.did_fixate = nan;
+
+% fix_hold_remaining_patches
+data_scaffold.fix_hold_remaining_patch.entry_time = nan;
+data_scaffold.fix_hold_remaining_patch.exit_time = nan;
+data_scaffold.fix_hold_remaining_patch.did_fixate = nan;
+
+% just_remaining_patches
+data_scaffold.just_patches.entry_time = nan;
+% The first dimension is agent index and the second one is patch index
+data_scaffold.just_remaining_patches.patch_entry_times = cell( 2, count_patches( program ) );
+data_scaffold.just_remaining_patches.patch_exit_times = cell( 2, count_patches( program ) );
+data_scaffold.just_remaining_patches.patch_acquired_times = nan( 2, count_patches( program ) );
+data_scaffold.just_remaining_patches.exit_time = nan;
+data_scaffold.just_remaining_patches.did_fixate = nan;
+data_scaffold.just_remaining_patches.acquired_patches = cell( 1, count_patches(program) );
+
+
+% Deviation states %
+
+% error_penalty
 data_scaffold.error_penalty.entry_time = nan;
 data_scaffold.error_penalty.exit_time = nan;
 data_scaffold.error_penalty.did_fixate = nan;
 
+% pause
 data_scaffold.pause.entry_time = nan;
 data_scaffold.pause.exit_time = nan;
 
@@ -87,9 +122,6 @@ if ( isfield(program.Value, 'current_patch_identitites') )
 else
   data_scaffold.patch_identities = {};
 end
-
-data_scaffold.m2_saccade_time = nan;
-data_scaffold.patch_info = patch_info;
 
 end
 
