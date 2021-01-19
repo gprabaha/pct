@@ -25,7 +25,7 @@ state.UserData.num_patches_remaining = num_patches;
 % No patches were acquired
 state.UserData.patch_acquired = false( 1, num_patches );
 % The IDs of the agent who acquired the patch.
-state.UserData.patch_acquired_by = zeros( num_sources, num_patches );
+state.UserData.patch_acquired_by = zeros( 1, num_patches );
 % No patches were entered
 state.UserData.mark_entered = false( num_sources, num_patches );
 % No patches were exited
@@ -50,7 +50,7 @@ maybe_update_computer_generated_m2( program, state );
 main_window = program.Value.window;
 
 draw_patches( program, main_window );
-draw_cursor( program );
+draw_cursors( program, state );
 flip( main_window );
 
 debug_window_is_present = program.Value.debug_window_is_present;
@@ -116,17 +116,53 @@ end
 
 end
 
-function draw_cursor(program)
+function draw_cursors(program, state)
 
 is_debug = pct.util.is_debug( program );
-pct.util.draw_gaze_cursor( program, is_debug );
+
+if ( ~patch_acquired_count_criterion_met(program, state, m1_agent_index()) )
+  pct.util.draw_m1_gaze_cursor( program, is_debug );
+end
+if ( ~patch_acquired_count_criterion_met(program, state, m2_agent_index()) )
+  pct.util.draw_m2_gaze_cursor( program, is_debug );
+end
 
 end
 
 function draw_debug_cursor(program)
 
 is_debug = true;
-pct.util.draw_gaze_cursor( program, is_debug );
+pct.util.draw_gaze_cursors( program, is_debug );
+
+end
+
+function tf = patch_acquired_count_criterion_met(program, state, agent_index)
+
+patch_acquired_by = state.UserData.patch_acquired_by;
+num_acquired = sum( patch_acquired_by == agent_index );
+
+patch_params = pct.util.get_patch_parameters( program );
+tf = num_acquired >= patch_params.max_num_patches_acquireable_per_trial;
+
+end
+
+function tf = can_acquire_patch(patch_info, agent_index, program, state)
+
+% Check whether the agent `agent_index` has already acquired more than 
+% `max_num_patches_acquireable_per_trial`. If so, then the patch
+% definitely cannot be acquired. Otherwise, if the patch is a self patch,
+% check whether the patch's agent matches the agent given by `agent_index`.
+
+if ( patch_acquired_count_criterion_met(program, state, agent_index) )
+  tf = false;
+  return
+end
+
+if ( strcmp(patch_info.Strategy, 'self') )
+  tf = can_acquire_self( patch_info, agent_index );
+else
+  tf = true;
+end
 
 end
 
@@ -138,14 +174,27 @@ assert( numel(acq_by) == 1 ...
   , 'Expected self patch to be acquireable by a single source, only.' );
 
 if ( strcmp(acq_by, 'm1') )
-  tf = source_index == 1;
+  tf = source_index == m1_agent_index();
   
 elseif ( strcmp(acq_by, 'm2') )
-  tf = source_index == 2;
+  tf = source_index == m2_agent_index();
   
 else
   error( 'Unknown acquireable by id "%s".', acq_by );
 end
+
+end
+
+function tf = can_acquire_cooperate_patch(patch_info, program, state, num_agents)
+
+for i = 1:num_agents
+  if ( ~can_acquire_patch(patch_info, i, program, state) )
+    tf = false;
+    return
+  end
+end
+
+tf = true;
 
 end
 
@@ -176,8 +225,9 @@ for i = 1:numel(patch_info)
   
   in_bounds = target.IsInBounds;
   dur_met = target.IsDurationMet;
+  num_agents = numel( in_bounds );
   
-  for j = 1:numel(in_bounds)
+  for j = 1:num_agents
     if ( in_bounds(j) && ~state.UserData.mark_entered(j, i) && ~dur_met(j) )
       % Subject (j) entered this patch (i)
       patch_entry_timestamp( state, program, j, i );
@@ -195,8 +245,9 @@ for i = 1:numel(patch_info)
     switch ( strategy )
       case 'self'
         for j = 1:numel(dur_met)
-          if ( dur_met(j) && can_acquire_self(info, j) )
+          if ( dur_met(j) && can_acquire_patch(info, j, program, state) )
             acquire_patch( info, state, program, i, j );
+            
             program.Value.data.Value(end).last_patch_type = 'self';
             if j==1
               program.Value.data.Value(end).last_agent = 'hitch';
@@ -209,7 +260,7 @@ for i = 1:numel(patch_info)
         
       case 'compete'
         for j = 1:numel(dur_met)
-          if ( dur_met(j) )
+          if ( dur_met(j) && can_acquire_patch(info, j, program, state) )
             acquire_patch( info, state, program, i, j );
             program.Value.data.Value(end).last_patch_type = 'compete';
             if j==1
@@ -222,7 +273,8 @@ for i = 1:numel(patch_info)
         end
         
       case 'cooperate'
-        if ( all(dur_met) )
+        if ( all(dur_met) && ...
+             can_acquire_cooperate_patch(info, program, state, num_agents) )
           acquire_patch( info, state, program, i, j );
           
           % Add a patch acquired time stamp for each subject that is not
@@ -319,4 +371,12 @@ initialize_saccades( generator_m2, patch_info, program, state.UserData.patch_acq
 program.Value.data.Value(end).m2_saccade_time = ...
   generator_m2.get_current_saccade_time();
 
+end
+
+function ind = m1_agent_index()
+ind = 1;
+end
+
+function ind = m2_agent_index()
+ind = 2;
 end

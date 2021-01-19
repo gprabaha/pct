@@ -148,14 +148,14 @@ end
 function draw_cursor(program)
 
 is_debug = pct.util.is_debug( program );
-pct.util.draw_gaze_cursor( program, is_debug );
+pct.util.draw_gaze_cursors( program, is_debug );
 
 end
 
 function draw_debug_cursor(program)
 
 is_debug = true;
-pct.util.draw_gaze_cursor( program, is_debug );
+pct.util.draw_gaze_cursors( program, is_debug );
 
 end
 

@@ -95,6 +95,7 @@ STRUCTURE.patch_params = struct( ...
   , 'start_block_type', 'cooperate' ...
   , 'persist_patch_info_until_exhausted', false ...
   , 'max_num_trials_persist_patch_info', 2 ...
+  , 'max_num_patches_acquireable_per_trial', 1 ...
 );
 
 % Default to using a patch generator that makes info for M1 self patches
@@ -115,6 +116,8 @@ time_in.present_patches = Inf;
 time_in.juice_reward = 1;
 time_in.pause = 60;
 time_in.iti = 0;
+time_in.iti_patch_sequence_1 = 0;
+time_in.iti_patch_sequence_2 = 0;
 
 TIMINGS.time_in = time_in;
 

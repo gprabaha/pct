@@ -40,10 +40,12 @@ end
 
 function update_data_scaffold(program, patch_info)
 
+scaffold = make_trial_data_scaffold( program, patch_info );
+
 if ( isempty(program.Value.data.Value) )
-    program.Value.data.Value = make_trial_data_scaffold( program, patch_info );
+  program.Value.data.Value = scaffold;
 else
-    program.Value.data.Value(end+1) = make_trial_data_scaffold( program, patch_info );
+  program.Value.data.Value(end+1) = scaffold;
 end
 
 end
@@ -91,6 +93,14 @@ data_scaffold.error_penalty.did_fixate = nan;
 % pause
 data_scaffold.pause.entry_time = nan;
 data_scaffold.pause.exit_time = nan;
+
+% reward
+data_scaffold.juice_reward.entry_time = nan;
+data_scaffold.juice_reward.exit_time = nan;
+
+% iti
+data_scaffold.iti.entry_time = nan;
+data_scaffold.iti.exit_time = nan;
 
 data_scaffold.training_stage_reward = program.Value.rewards.training;
 
@@ -315,8 +325,11 @@ function establish_patch_info(program)
 
 all_targets = program.Value.patch_targets;
 
-program.Value.current_patches = ...
+[patch_info, patch_sequence_index] = ...
   generate( program.Value.patch_generator, all_targets, program );
+
+program.Value.current_patches = patch_info;
+program.Value.current_patch_sequence_index = patch_sequence_index;
 
 end
 
@@ -329,10 +342,14 @@ current_patches = program.Value.current_patches;
 current_stimuli = cell( 1, num_patches );
 
 for i = 1:num_patches
-  stim_name = pct.util.nth_patch_stimulus_name( i );
+  patch_info = current_patches(i);
+  
+  % @Note: This is a bit tricky. The patch index may be different from
+  % the value `i`, in the case that it is a hold-over patch from a previous
+  % trial.
+  stim_name = pct.util.nth_patch_stimulus_name( patch_info.Index );
   stimulus = stimuli.(stim_name);
   
-  patch_info = current_patches(i);
   patch_color = patch_info.Color;
   patch_pos = patch_info.Position;
   

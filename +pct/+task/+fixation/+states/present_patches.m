@@ -68,7 +68,7 @@ end
 
 function draw_cursor(program)
 
-pct.util.draw_gaze_cursor( program );
+pct.util.draw_gaze_cursors( program );
 
 end
 

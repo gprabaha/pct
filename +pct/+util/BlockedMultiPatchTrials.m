@@ -28,6 +28,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
     next_set_id                         = 1;
     next_patch_id                       = 1;
     trial_sequence_id                   = 0;
+    patch_sequence_index                = 1;
     
     repeat_wrong_trials_later           = true;
     prevent_consecutive_trial_repeat    = true;
@@ -59,6 +60,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       defaults.start_block_type                   = '';
       defaults.persist_patch_info_until_exhausted = false;
       defaults.max_num_trials_persist_patch_info  = 2;
+      defaults.max_num_patches_acquireable_per_trial = 1;
       defaults.trial_set_generator                = pct.util.FourPatchTrialSet;
       
       
@@ -196,7 +198,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
     % HOW DO WE END THE TASK AFTER ALL TRIALS ARE OVER?? %
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    function patch_info = generate(obj, patch_targets, program)
+    function [patch_info, patch_sequence_index] = generate(obj, patch_targets, program)
       
       % Initial assignments %
       
@@ -214,6 +216,8 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       % Operations %
       
       if( obj.get_new_trial_info(program) )
+        obj.patch_sequence_index = 1; % first presentation.
+        
         sequence_id = sequence_id + 1;
         obj.trial_sequence_id = sequence_id;
         trial_type_id = obj.trial_order(sequence_id);
@@ -252,10 +256,13 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
         patch_info = filter_non_acquired_patches( last_info, latest_acquired_patches );
         obj.last_patch_info = patch_info;
         obj.presented_for_second_time = true;
+        obj.patch_sequence_index = 2; % second presentation.
         
       else % The previous trial was not initiated so the monkeys did not see the patches
         patch_info = obj.last_patch_info;
       end
+      
+      patch_sequence_index = obj.patch_sequence_index;
     end
   end
  end
