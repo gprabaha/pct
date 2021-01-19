@@ -271,7 +271,7 @@ function states = make_states(program, conf)
 states = containers.Map();
 state_names = { 'new_trial', ...
   'fixation', 'fix_hold_patch', 'just_patches', 'juice_reward', ...
-  'error_penalty', 'pause' };
+  'error_penalty', 'pause', 'iti' };
 
 for i = 1:numel(state_names)
   state_func = sprintf( 'pct.task.fixation.states.%s', state_names{i} );

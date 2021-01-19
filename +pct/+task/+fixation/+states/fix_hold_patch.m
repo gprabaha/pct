@@ -16,6 +16,8 @@ end
 
 function entry(state, program)
 
+pct.util.state_entry_timestamp( program, state );
+
 % Reset fix acquired state and target state.
 state.UserData.fixation_acquired_state = fixation_acquired_state();
 
@@ -30,8 +32,6 @@ end
 reset( program.Value.targets.fix_hold_square );
 
 reset_targets( program );
-
-timestamp_entry( state, program );
 update_last_state( state, program );
 
 if ( should_abort )
@@ -66,17 +66,17 @@ end
 
 function exit(state, program)
 
+pct.util.state_exit_timestamp( program, state );
+
 fix_acq_state = state.UserData.fixation_acquired_state;
 quantity = 0.025;
 
 if ( fix_acq_state.Acquired )
-  timestamp_exit( state, program );
   did_fixate( state, program, fix_acq_state.Acquired );
   % Bridging reward
   pct.util.deliver_reward( program, 1, quantity );
   next( state, program.Value.states('just_patches') );
 else
-  timestamp_exit( state, program );
   did_fixate( state, program, fix_acq_state.Acquired );
   next( state, program.Value.states('error_penalty') );
 end
@@ -89,18 +89,6 @@ fix_state = struct();
 fix_state.Acquired = false;
 fix_state.Entered = false;
 fix_state.Broke = false;
-
-end
-
-function timestamp_entry(state, program)
-
-program.Value.data.Value(end).(state.Name).entry_time = elapsed( program.Value.task );
-
-end
-
-function timestamp_exit(state, program)
-
-program.Value.data.Value(end).(state.Name).exit_time = elapsed( program.Value.task );
 
 end
 
@@ -183,14 +171,11 @@ if ( fix_hold_target.IsDurationMet )
   
 elseif ( fix_hold_target.IsInBounds )  
   % Mark that we entered the target.
-  if ( ~fix_acq_state.Entered )
-    fprintf( '\n\n=====Entered======\n\n' );
-  end
   fix_acq_state.Entered = true;
   
 elseif ( fix_acq_state.Entered )
   % Looked away from the target, so proceed to the exit function.
-  fix_state.Broke = true;
+  fix_acq_state.Broke = true;
   escape( state );
   
 else

@@ -21,7 +21,7 @@ if (debug_window_is_present)
   flip( program.Value.debug_window );
 end
 
-timestamp_entry( state, program );
+pct.util.state_entry_timestamp( program, state );
 
 end
 
@@ -31,20 +31,9 @@ end
 
 function exit(state, program)
 
+pct.util.state_exit_timestamp( program, state );
+
 states = program.Value.states;
-timestamp_exit( state, program );
-next( state, states('new_trial') );
-
-end
-
-function timestamp_entry(state, program)
-
-program.Value.data.Value(end).(state.Name).entry_time = elapsed( program.Value.task );
-
-end
-
-function timestamp_exit(state, program)
-
-program.Value.data.Value(end).(state.Name).exit_time = elapsed( program.Value.task );
+next( state, states('iti') );
 
 end

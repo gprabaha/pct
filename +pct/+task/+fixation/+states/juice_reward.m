@@ -15,6 +15,8 @@ end
 
 function entry(state, program)
 
+pct.util.state_entry_timestamp( program, state );
+
 flip( program.Value.window );
 debug_window_is_present = program.Value.debug_window_is_present;
 
@@ -49,8 +51,10 @@ end
 
 function exit(state, program)
 
+pct.util.state_exit_timestamp( program, state );
+
 states = program.Value.states;
-next( state, states('new_trial') );
+next( state, states('iti') );
 
 end
 

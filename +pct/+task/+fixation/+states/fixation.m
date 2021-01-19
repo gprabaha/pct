@@ -21,7 +21,7 @@ reset( program.Value.targets.fix_square );
 
 handle_computer_generated_m2( program );
 
-timestamp_entry( state, program );
+pct.util.state_entry_timestamp( program, state );
 update_last_state( state, program );
 
 end
@@ -45,14 +45,14 @@ end
 
 function exit(state, program)
 
+pct.util.state_exit_timestamp( program, state );
+
 fix_acq_state = state.UserData.fixation_acquired_state;
 
 if ( fix_acq_state.Acquired )
-  timestamp_exit( state, program );
   did_fixate( state, program, fix_acq_state.Acquired );
   next( state, program.Value.states('fix_hold_patch') );
 else
-  timestamp_exit( state, program );
   did_fixate( state, program, fix_acq_state.Acquired );
   next( state, program.Value.states('error_penalty') );
 end
@@ -65,18 +65,6 @@ fix_state = struct();
 fix_state.Acquired = false;
 fix_state.Entered = false;
 fix_state.Broke = false;
-
-end
-
-function timestamp_entry(state, program)
-
-program.Value.data.Value(end).(state.Name).entry_time = elapsed( program.Value.task );
-
-end
-
-function timestamp_exit(state, program)
-
-program.Value.data.Value(end).(state.Name).exit_time = elapsed( program.Value.task );
 
 end
 

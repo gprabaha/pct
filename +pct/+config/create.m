@@ -114,6 +114,7 @@ time_in.error_penalty = 3;
 time_in.present_patches = Inf;
 time_in.juice_reward = 1;
 time_in.pause = 60;
+time_in.iti = 0;
 
 TIMINGS.time_in = time_in;
 

@@ -15,6 +15,8 @@ end
 
 function entry(state, program)
 
+pct.util.state_entry_timestamp( program, state );
+
 num_patches = count_patches( program );
 num_sources = 2;  % m1 and m2
 
@@ -37,7 +39,6 @@ reset_targets( program );
 
 handle_computer_generated_m2( program, state );
 
-timestamp_entry( state, program );
 update_last_state( state, program );
 
 end
@@ -72,6 +73,7 @@ end
 
 function exit(state, program)
 
+pct.util.state_exit_timestamp( program, state );
 register_acquired_patches( state, program.Value.data );
 
 num_remaining = state.UserData.num_patches_remaining;
@@ -87,20 +89,7 @@ if ( num_remaining > 0 && error_if_not_all_acquired )
   next_state = 'error_penalty';
 end
 
-timestamp_exit( state, program );
 next( state, program.Value.states(next_state) );
-
-end
-
-function timestamp_entry(state, program)
-
-program.Value.data.Value(end).(state.Name).entry_time = elapsed( program.Value.task );
-
-end
-
-function timestamp_exit(state, program)
-
-program.Value.data.Value(end).(state.Name).exit_time = elapsed( program.Value.task );
 
 end
 
