@@ -27,7 +27,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
     num_trials_persisted_patch_info     = 0;    
     next_set_id                         = 1;
     next_patch_id                       = 1;
-    next_trial_id                       = 1;
+    trial_sequence_id                   = 0;
     
     repeat_wrong_trials_later           = true;
     prevent_consecutive_trial_repeat    = true;
@@ -47,6 +47,12 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       % Need to check with the 'pause' state for the 'trials_per_block'
       % parameter
       
+%       'next_block_strategy', 'sequential' ...
+%   , 'block_types', {{'compete', 'cooperate'}} ...
+%   , 'start_block_type', 'cooperate' ...
+%   , 'persist_patch_info_until_exhausted', false ...
+%   , 'max_num_trials_persist_patch_info', 2 ...
+      
       defaults.trial_reps                         = 2; % repeats of each trial
       defaults.trials_per_block                   = 50; % gets a break after 50 trials
       defaults.current_trial_number               = 1;
@@ -54,7 +60,13 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       defaults.repeat_wrong_trials_later          = true;
       defaults.prevent_consecutive_trial_repeat   = true;
       defaults.max_num_trials_persist_patch_info  = 2;
+      defaults.next_block_strategy                = [];   
+      defaults.block_types                        = {};
+      defaults.start_block_type                   = '';
+      defaults.persist_patch_info_until_exhausted = false;
+      defaults.max_num_trials_persist_patch_info  = 2;
       defaults.trial_set_generator                = pct.util.FourPatchTrialSet;
+      
       
       % Operations for final assignment %
       
@@ -133,30 +145,48 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       obj.trial_order = trial_order;  
     end
     
+    % Check if this is the second presentation of the patches
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    function tf = is_second_presentation(obj)
+      % Function to check of this is the second part of the trial and thus
+      % if the patch info needs to be persisted
+      
+      % Initial assignment %
+      
+      tf = false;
+      
+      % Operations %
+      
+      if( obj.presented_for_first_time && ~obj.presented_for_second_time )
+        tf = true;
+      end
+    end
+    
     % Should next trial info be fetched?
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    function tf = get_new_trial_info(obj, num_patches, ...
-        latest_acquired_patches, program)
+    function tf = get_new_trial_info(obj, program)
       % Function to determine if patch information pertaining to the next
       % trial need to be procured
       
       % Initial assignments %
       
-      tf            = true;
+      tf            = false;
       trial_data    = program.Value.data.Value;
       
       % Operations %
       
       % Check if this is the first trial
       if ( isempty(trial_data) )
+        tf = true;
         return
       end
       
       % Check if current number of patches is not the same as the initial
       % number of patches whiich would imply that the second part of the
       % trial has been reached
-      if ( numel(obj.last_patch_info) ~= num_patches )
+      if ( obj.is_second_presentation )
         return
       end
       
@@ -165,23 +195,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       % Note this stage is called 'fixation' because it is the first
       % fixation at the beginning of a trial
       did_initiate_last_trial = last_trial_data.fixation.did_fixate;
-      if (~did_initiate_last_trial)
-        tf = did_initiate_last_trial;
-        return
-      end
-    end
-    
-    function tf = is_second_presentation(obj)
-      % Function to check of this is the second part of the trial and thus
-      % if the patch info needs to be persisted
-      
-      % Initial assignment %
-      tf = false;
-      
-      if( obj.presented_for_first_time && ~obj.presented_for_second_time )
-        tf = true;
-      end
-      
+      tf = did_initiate_last_trial;
     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -195,9 +209,9 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       latest_acquired_patches   = get_latest_acquired_patches( program );
       appearance_func           = program.Value.stimuli_setup.patch.patch_appearance_func;
       num_patches               = numel( patch_targets );
-      trial_id                  = obj.next_trial_id;
+      sequence_id               = obj.trial_sequence_id;
       if isempty(obj.trial_set)
-        obj.trial_set           = obj.trial_set_generator.generate();
+        obj.trial_set           = obj.trial_set_generator.generate_trial_set();
       end
       if isempty(obj.trial_order)
         obj.trial_order         = obj.generate_trial_order();
@@ -205,8 +219,10 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       
       % Operations %
       
-      if( obj.generate_new_trial_info() )
-        trial_type_id = obj.trial_order(trial_id);
+      if( obj.get_new_trial_info(program) )
+        sequence_id = sequence_id + 1;
+        obj.trial_sequence_id = sequence_id;
+        trial_type_id = obj.trial_order(sequence_id);
         trial_patches = obj.trial_set{trial_type_id};
         
         radius = program.Value.patch_distribution_radius;
@@ -217,14 +233,15 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
         
         for i = 1:num_patches
           new_patch_info                = pct.util.PatchInfo();
-          new_patch_info.AcquirableBy   = trial_patches{i}.acquirable_by; % This needs to be changed to patch_list(i).Acq...
-          new_patch_info.Agent          = trial_patches{i}.agent;
-          new_patch_info.Strategy       = trial_patches{i}.strategy; % This too
+          new_patch_info.AcquirableBy   = trial_patches(i).acquirable_by;
+          new_patch_info.Agent          = trial_patches(i).agent;
+          new_patch_info.Strategy       = trial_patches(i).block_type;  % change this to strategy.
           new_patch_info.Position       = coordinates(:, i);
           new_patch_info.Target         = patch_targets{i};
           new_patch_info.Index          = i;
           new_patch_info.ID             = obj.next_patch_id;
-          new_patch_info.TrialSetID     = trial_type_id;
+          new_patch_info.TrialTypeID    = trial_type_id;
+          new_patch_info.SequenceID     = sequence_id;
           
           % Configure color, and other appearence properties.
           new_patch_info = appearance_func( new_patch_info );
@@ -251,7 +268,11 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
 
 function acquired = get_latest_acquired_patches(program)
 
+% Initial assignments %
+
 trial_data = program.Value.data.Value;
+
+% Operations %
 
 if ( isempty(trial_data) )
   acquired = {};
@@ -263,8 +284,12 @@ end
 
 function remaining_patches = filter_non_acquired_patches(possible_patches, maybe_acquired_patches)
 
+% Inititl assignments %
+
 acquired_patches = maybe_acquired_patches(cellfun(@(x) ~isempty(x), maybe_acquired_patches));
 acquired_patches = vertcat( pct.util.PatchInfo.empty(), acquired_patches{:} );
+
+% Operations %
 
 possible_ids = [possible_patches.ID];
 acquired_ids = [acquired_patches.ID];

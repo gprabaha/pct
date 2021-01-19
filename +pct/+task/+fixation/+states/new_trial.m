@@ -81,27 +81,27 @@ data_scaffold.just_patches.exit_time = nan;
 data_scaffold.just_patches.did_fixate = nan;
 data_scaffold.just_patches.acquired_patches = cell( 1, count_patches(program) );
 
-% For states in the second part of the trial %
-
-% second_fixation
-data_scaffold.second_fixation.entry_time = nan;
-data_scaffold.second_fixation.exit_time = nan;
-data_scaffold.second_fixation.did_fixate = nan;
-
-% fix_hold_remaining_patches
-data_scaffold.fix_hold_remaining_patch.entry_time = nan;
-data_scaffold.fix_hold_remaining_patch.exit_time = nan;
-data_scaffold.fix_hold_remaining_patch.did_fixate = nan;
-
-% just_remaining_patches
-data_scaffold.just_patches.entry_time = nan;
-% The first dimension is agent index and the second one is patch index
-data_scaffold.just_remaining_patches.patch_entry_times = cell( 2, count_patches( program ) );
-data_scaffold.just_remaining_patches.patch_exit_times = cell( 2, count_patches( program ) );
-data_scaffold.just_remaining_patches.patch_acquired_times = nan( 2, count_patches( program ) );
-data_scaffold.just_remaining_patches.exit_time = nan;
-data_scaffold.just_remaining_patches.did_fixate = nan;
-data_scaffold.just_remaining_patches.acquired_patches = cell( 1, count_patches(program) );
+% % For states in the second part of the trial %
+% 
+% % second_fixation
+% data_scaffold.second_fixation.entry_time = nan;
+% data_scaffold.second_fixation.exit_time = nan;
+% data_scaffold.second_fixation.did_fixate = nan;
+% 
+% % fix_hold_remaining_patches
+% data_scaffold.fix_hold_remaining_patch.entry_time = nan;
+% data_scaffold.fix_hold_remaining_patch.exit_time = nan;
+% data_scaffold.fix_hold_remaining_patch.did_fixate = nan;
+% 
+% % just_remaining_patches
+% data_scaffold.just_patches.entry_time = nan;
+% % The first dimension is agent index and the second one is patch index
+% data_scaffold.just_remaining_patches.patch_entry_times = cell( 2, count_patches( program ) );
+% data_scaffold.just_remaining_patches.patch_exit_times = cell( 2, count_patches( program ) );
+% data_scaffold.just_remaining_patches.patch_acquired_times = nan( 2, count_patches( program ) );
+% data_scaffold.just_remaining_patches.exit_time = nan;
+% data_scaffold.just_remaining_patches.did_fixate = nan;
+% data_scaffold.just_remaining_patches.acquired_patches = cell( 1, count_patches(program) );
 
 
 % Deviation states %

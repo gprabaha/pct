@@ -6,6 +6,7 @@ classdef PatchInfo
   properties
     AcquirableBy = {};
     Strategy = 'self';
+    Agent = '';
     
     Color = zeros( 1, 3 );
     Position = zeros( 1, 3 );
@@ -14,7 +15,8 @@ classdef PatchInfo
     
     Index = 1;
     ID = 1;
-    SetID = 1;
+    TrialTypeID = 1;
+    SequenceID = 1;
   end
   
   methods
@@ -36,15 +38,21 @@ classdef PatchInfo
       tf = ismember( 'm2', obj.AcquirableBy );
     end
     
-    function obj = set.SetID(obj, v)
+    function obj = set.TrialTypeID(obj, v)
       validateattributes( v, {'double'}, {'scalar', 'integer'} ...
-        , mfilename, 'SetIndex' );
-      obj.SetID = v;
+        , mfilename, 'TrialTypeID' );
+      obj.TrialTypeID = v;
+    end
+    
+    function obj = set.SequenceID(obj, v)
+      validateattributes( v, {'double'}, {'scalar', 'integer'} ...
+        , mfilename, 'SequenceID' );
+      obj.SequenceID = v;
     end
     
     function obj = set.ID(obj, v)
       validateattributes( v, {'double'}, {'scalar', 'integer'} ...
-        , mfilename, 'SetIndex' );
+        , mfilename, 'ID' );
       obj.ID = v;
     end
     
@@ -52,6 +60,12 @@ classdef PatchInfo
       validateattributes( v, {'double'}, {'scalar', 'integer'} ...
         , mfilename, 'Index' );
       obj.Index = v;
+    end
+    
+    function obj = set.Agent(obj, v)
+      validateattributes( v, {'char'}, {'scalartext'} ...
+        , mfilename, 'Agent' );
+      obj.Agent = v;
     end
   end
 end
