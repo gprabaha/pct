@@ -13,9 +13,9 @@ switch ( strategy )
     if ( ismember('hitch', info.Agent) )
       color = [255, 0, 0];
     elseif ( ismember('algo', info.Agent) )
-      color = [0, 0, 255];
+      color = [0, 255, 0];
     else
-      color = [0, 255, 0]; 
+      color = [102, 0, 255]; 
     end
     
   case 'compete'

@@ -30,6 +30,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
     trial_sequence_id                   = 0;
     patch_sequence_index                = 1;
     
+    all_trials_over                     = false;
     repeat_wrong_trials_later           = true;
     prevent_consecutive_trial_repeat    = true;
     generate_trial_order_again          = false;
@@ -79,6 +80,43 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
     
     % Generate all trials in order
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    function trial_order = generate_trial_order(obj)
+      
+      % Initial assignments %
+      
+      num_trial_types   = numel(obj.trial_set);
+      n_reps            = obj.trial_reps;
+      trial_order       = [];
+      
+      % Operations %
+      
+      for rep = 1:n_reps
+        % Generate temporary shuffled trial sequence
+        temp_trial_seq = randperm(num_trial_types, num_trial_types);
+        % Accept for the first rep
+        if rep == 1
+          trial_order = [trial_order temp_trial_seq];
+        % For other reps  
+        else
+          % Check if the end of previous rep is same as the beginning of
+          % the upcoming shuffled triel sequence
+          if trial_order(end) ~= temp_trial_seq(1)
+            trial_order = [trial_order temp_trial_seq];
+          else
+            while trial_order(end) == temp_trial_seq(1)
+              temp_trial_seq = randperm(num_trial_types, num_trial_types);
+            end
+            trial_order = [trial_order temp_trial_seq];
+          end
+        end
+      end
+      
+      obj.trial_order = trial_order;
+    end
+    
+    
+    %{
     
     function trial_order = generate_trial_order(obj)
       % Generates an array containing an ordered list of all possible
@@ -141,6 +179,8 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       obj.trial_order = trial_order;  
     end
     
+    %}
+    
     % Check if this is the second presentation of the patches
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
@@ -194,9 +234,8 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       tf = did_initiate_last_trial;
     end
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % HOW DO WE END THE TASK AFTER ALL TRIALS ARE OVER?? %
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Top-level function to fetch the information of the patches to display
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     function [patch_info, patch_sequence_index] = generate(obj, patch_targets, program)
       
@@ -220,6 +259,13 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
         
         sequence_id = sequence_id + 1;
         obj.trial_sequence_id = sequence_id;
+        
+        % To end task when trials are over
+        if( obj.trial_sequence_id > numel(obj.trial_order))
+          obj.all_trials_over = true;
+          return;
+        end
+        
         trial_type_id = obj.trial_order(sequence_id);
         trial_patches = obj.trial_set{trial_type_id};
         
@@ -233,7 +279,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
           new_patch_info                = pct.util.PatchInfo();
           new_patch_info.AcquirableBy   = trial_patches(i).acquirable_by;
           new_patch_info.Agent          = trial_patches(i).agent;
-          new_patch_info.Strategy       = trial_patches(i).block_type;  % change this to strategy.
+          new_patch_info.Strategy       = trial_patches(i).strategy; %strategy; %block_type;  % change this to strategy.
           new_patch_info.Position       = coordinates(:, i);
           new_patch_info.Target         = patch_targets{i};
           new_patch_info.Index          = i;

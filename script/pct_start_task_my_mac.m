@@ -12,6 +12,8 @@ conf.TIMINGS.time_in.fixation = 10;
 conf.TIMINGS.time_in.just_patches = 10;
 conf.TIMINGS.time_in.juice_reward = 1.5;
 conf.TIMINGS.time_in.pause = 25;
+conf.TIMINGS.time_in.iti_patch_sequence_1 = 0;
+conf.TIMINGS.time_in.iti_patch_sequence_2 = 1;
 
 conf.META.m1_subject = 'human';
 conf.META.m2_subject = 'computer_naive';
