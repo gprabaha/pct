@@ -237,7 +237,8 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
     % Top-level function to fetch the information of the patches to display
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    function [patch_info, patch_sequence_index] = generate(obj, patch_targets, program)
+    function [patch_info, patch_sequence_index, all_trials_over] = ...
+        generate(obj, patch_targets, program)
       
       % Initial assignments %
       
@@ -245,6 +246,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       appearance_func           = program.Value.stimuli_setup.patch.patch_appearance_func;
       num_patches               = numel( patch_targets );
       sequence_id               = obj.trial_sequence_id;
+      all_trials_over           = obj.all_trials_over;
       if isempty(obj.trial_set)
         obj.trial_set           = obj.trial_set_generator.generate_trial_set();
       end
