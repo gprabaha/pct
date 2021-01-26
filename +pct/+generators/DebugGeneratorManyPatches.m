@@ -27,8 +27,7 @@ classdef DebugGeneratorManyPatches < handle
     end
     
     function initialize_fixation(obj, program)
-      rect = program.Value.window.Rect;
-      rect_size = [ rect.X2-rect.X1, rect.Y2-rect.Y1 ];
+      rect_size = make_window_rect( program.Value.window );
       obj.visited_patch_list = [];
       obj.source.SettableX = rect_size(1)/2;
       obj.source.SettableY = rect_size(2)/2;
@@ -64,6 +63,11 @@ classdef DebugGeneratorManyPatches < handle
           get_m2_acquireable_patch_info( patch_info, is_patch_acquired );
         
         if ( isempty(m2_acquireable_patch_info) )
+          % No acquireable patches, so just stay fixating in center.
+          total_time = program.Value.config.TIMINGS.time_in.fixation;
+          rect_size = make_window_rect( program.Value.window );
+          obj.saccades = generate_fixation_saccade_list( rect_size, total_time );
+          reset( obj.frame_timer );
           return;
         end
         
@@ -86,7 +90,7 @@ classdef DebugGeneratorManyPatches < handle
         m2_target_patch = m2_acquireable_patch_info(m2_patch_ind);
         obj.visited_patch_list = [obj.visited_patch_list m2_target_patch];
         ori = [obj.current_x, obj.current_y];
-        
+
         obj.saccades = generate_saccade_to_patch( ori, m2_target_patch, program );
         reset( obj.frame_timer );
       end
@@ -252,5 +256,12 @@ for patch_ind = 1:numel(maybe_m2_patches)
   end
   current_patch_ind = target_patch_ind;
 end
+
+end
+
+function rect_size = make_window_rect(window)
+
+rect = window.Rect;
+rect_size = [ rect.X2-rect.X1, rect.Y2-rect.Y1 ];
 
 end

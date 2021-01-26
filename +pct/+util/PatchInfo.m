@@ -22,6 +22,9 @@ classdef PatchInfo
   end
   
   methods
+    
+    % Internal methods %
+    
     function obj = set.AcquirableBy(obj, to)
       validateattributes( to, {'cell'}, {}, mfilename, 'AcquirableBy' );
       to = cellstr( to );
@@ -33,11 +36,6 @@ classdef PatchInfo
     
     function obj = set.Strategy(obj, v)
       obj.Strategy = validatestring( v, obj.Strategies, mfilename, 'strategy' );
-    end
-    
-    function tf = acquireable_by_m2(obj)
-      % True if m2 can, potentially, acquire this patch.
-      tf = ismember( 'm2', obj.AcquirableBy );
     end
     
     function obj = set.TrialTypeID(obj, v)
@@ -68,6 +66,13 @@ classdef PatchInfo
       validateattributes( v, {'char'}, {'scalartext'} ...
         , mfilename, 'Agent' );
       obj.Agent = v;
+    end
+    
+    % Methods called by scripts outside %
+    
+    function tf = acquireable_by_m2(obj)
+      % True if m2 can, potentially, acquire this patch.
+      tf = ismember( 'm2', obj.AcquirableBy );
     end
   end
 end

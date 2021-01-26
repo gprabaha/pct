@@ -35,6 +35,16 @@ patch_types = {
 
 end
 
+function trial_set = only_m1_self()
+
+patch_type = ...
+  struct('acquirable_by', {{'m1'}}, 'strategy', 'self', 'agent', 'hitch');
+
+trial_set = [patch_type, patch_type, patch_type, patch_type];
+trial_set = repmat( {trial_set}, 4, 1 );
+
+end
+
 function trial_set = generate_four_patch_trial_set_against_algo()
 
 % Intialization assignments %

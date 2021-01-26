@@ -53,7 +53,7 @@ maybe_update_computer_generated_m2( program, state );
 
 main_window = program.Value.window;
 
-draw_patches( program, main_window );
+draw_patches( program, state, main_window );
 draw_cursors( program, state );
 flip( main_window );
 
@@ -61,7 +61,7 @@ debug_window_is_present = program.Value.debug_window_is_present;
 if (debug_window_is_present)
   debug_window = program.Value.debug_window;
   
-  draw_patches( program, debug_window );
+  draw_patches( program, state, debug_window );
   draw_debug_cursor( program );
   flip( debug_window );
 end
@@ -69,7 +69,11 @@ end
 check_targets( state, program );
 
 % Exit if all patches were acquired.
-if ( state.UserData.num_patches_remaining == 0 )
+% if ( state.UserData.num_patches_remaining == 0 )
+m1_done_collecting = patch_acquired_count_criterion_met(program, state, pct.util.m1_agent_index());
+m2_done_collecting = patch_acquired_count_criterion_met(program, state, pct.util.m2_agent_index());
+
+if ( m1_done_collecting && m2_done_collecting )
   escape( state );
 end
 
@@ -85,7 +89,7 @@ num_remaining = state.UserData.num_patches_remaining;
 error_if_not_all_acquired = ...
   program.Value.config.STRUCTURE.error_if_not_all_patches_acquired;
 
-% Default to reward. 
+% Default to reward.
 next_state = 'juice_reward';
 
 if ( num_remaining > 0 && error_if_not_all_acquired )
@@ -103,16 +107,20 @@ program.Value.data.Value(end).last_state = 'jp';
 
 end
 
-function draw_patches(program, window)
+function draw_patches(program, state, window)
 
-stimuli = program.Value.current_patch_stimuli;
-patch_targets = { program.Value.current_patches.Target };
-is_debug = pct.util.is_debug( program );
+% Initial assignments %
+
+stimuli         = program.Value.current_patch_stimuli;
+patch_targets   = { program.Value.current_patches.Target };
+is_debug        = pct.util.is_debug( program );
+
+% Operations %
 
 for i = 1:numel(stimuli)
   stimulus = stimuli{i};
   draw( stimulus, window );
-  
+
   if ( is_debug )
     draw( patch_targets{i}.Bounds, window );
   end
@@ -122,12 +130,20 @@ end
 
 function draw_cursors(program, state)
 
+% Initial assignment %
+
 is_debug = pct.util.is_debug( program );
 
-if ( ~patch_acquired_count_criterion_met(program, state, pct.util.m1_agent_index()) )
+
+% Operations %
+
+m1_still_working = ~patch_acquired_count_criterion_met(program, state, pct.util.m1_agent_index());
+m2_still_working = ~patch_acquired_count_criterion_met(program, state, pct.util.m2_agent_index());
+
+if ( m1_still_working )
   pct.util.draw_m1_gaze_cursor( program, is_debug );
 end
-if ( ~patch_acquired_count_criterion_met(program, state, pct.util.m2_agent_index()) )
+if ( m2_still_working )
   pct.util.draw_m2_gaze_cursor( program, is_debug );
 end
 
@@ -263,7 +279,7 @@ for i = 1:numel(patch_info)
             if j==1
               program.Value.data.Value(end).last_agent = 'hitch';
             elseif j==2
-              program.Value.data.Value(end).last_agent = 'm2_cursor';
+              program.Value.data.Value(end).last_agent = 'computer_naive_random';
             end
             break;
           end
@@ -278,7 +294,7 @@ for i = 1:numel(patch_info)
             if j==1
               program.Value.data.Value(end).last_agent = 'hitch';
             elseif j==2
-              program.Value.data.Value(end).last_agent = 'm2_cursor';
+              program.Value.data.Value(end).last_agent = 'computer_naive_random';
             end
             break;
           end
@@ -290,7 +306,7 @@ for i = 1:numel(patch_info)
           acquire_patch( info, state, program, i, pct.util.cooperate_index() );
           
           % Add a patch acquired time stamp for each subject that is not
-          % subject `j`
+          % subject `j` 
           remaining_subjects = setdiff( 1:numel(in_bounds), j );
           
           for k = 1:numel(remaining_subjects)

@@ -4,22 +4,22 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
   % randomized order such that no two subsequent trials are the same.
   
   properties
-    patch_types                         = { 'self', 'compete', 'cooperate' };
-    trial_reps                          = 10;
-    trial_set                           = [];
-    trial_order                         = [];
-    trial_set_generator                 = [];
-    last_patch_info                     = pct.util.PatchInfo.empty();
-    next_set_id                         = 1;
-    next_patch_id                       = 1;
-    trial_sequence_id                   = 1;
-    patch_sequence_id                   = 1;
+    patch_types                           = { 'self', 'compete', 'cooperate' };
+    trial_reps                            = 10;
+    trial_set                             = [];
+    trial_order                           = [];
+    trial_set_generator                   = [];
+    last_patch_info                       = pct.util.PatchInfo.empty();
+    next_set_id                           = 1;
+    next_patch_id                         = 1;
+    trial_sequence_id                     = 1;
+    patch_sequence_id                     = 1;
     
     % Indicators %
-    all_trials_over                     = false;
-    generate_trial_order_again          = false;
-    presented_for_first_time            = false;
-    presented_for_second_time           = false;
+    all_trials_over                       = false;
+    generate_trial_order_again            = false;
+    presented_for_first_time              = false;
+    presented_for_second_time             = false;
     max_num_patches_acquireable_per_trial = 1;
   end
   
@@ -155,6 +155,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       num_patches               = numel( patch_targets );
       sequence_id               = obj.trial_sequence_id;
       all_trials_over           = obj.all_trials_over;
+      patch_sequence_id         = 0;
       
       if isempty(obj.trial_set)
         obj.trial_set           = obj.trial_set_generator.generate_trial_set();
@@ -162,8 +163,6 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       if isempty(obj.trial_order)
         obj.trial_order         = obj.generate_trial_order();
       end
-      
-      patch_sequence_id = 0;
       
       % Operations %
       

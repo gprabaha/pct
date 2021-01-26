@@ -208,7 +208,7 @@ function last_agent_id = check_last_agent_id(data, trials_so_far)
 last_agent = data(trials_so_far).last_agent;
 if strcmp(last_agent, 'hitch')
   last_agent_id = 1;
-elseif strcmp(last_agent, 'm2_cursor')
+elseif strcmp(last_agent, 'computer_naive_random')
   last_agent_id = 2;
 else
   last_agent_id = 0;
