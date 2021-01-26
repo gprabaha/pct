@@ -20,6 +20,10 @@ pct.util.state_entry_timestamp( program, state );
 num_patches = count_patches( program );
 num_sources = 2;  % m1 and m2
 
+state.UserData.agent_indices = [...
+  pct.util.m1_agent_index(), pct.util.m2_agent_index() ...
+];
+
 % All patches remaining
 state.UserData.num_patches_remaining = num_patches;
 % No patches were acquired
@@ -120,10 +124,10 @@ function draw_cursors(program, state)
 
 is_debug = pct.util.is_debug( program );
 
-if ( ~patch_acquired_count_criterion_met(program, state, m1_agent_index()) )
+if ( ~patch_acquired_count_criterion_met(program, state, pct.util.m1_agent_index()) )
   pct.util.draw_m1_gaze_cursor( program, is_debug );
 end
-if ( ~patch_acquired_count_criterion_met(program, state, m2_agent_index()) )
+if ( ~patch_acquired_count_criterion_met(program, state, pct.util.m2_agent_index()) )
   pct.util.draw_m2_gaze_cursor( program, is_debug );
 end
 
@@ -139,7 +143,10 @@ end
 function tf = patch_acquired_count_criterion_met(program, state, agent_index)
 
 patch_acquired_by = state.UserData.patch_acquired_by;
-num_acquired = sum( patch_acquired_by == agent_index );
+acquired_by_agent_only = patch_acquired_by == agent_index;
+acquired_by_multiplie = patch_acquired_by == pct.util.cooperate_index();
+
+num_acquired = sum( acquired_by_agent_only | acquired_by_multiplie );
 
 patch_params = pct.util.get_patch_parameters( program );
 tf = num_acquired >= patch_params.max_num_patches_acquireable_per_trial;
@@ -174,10 +181,10 @@ assert( numel(acq_by) == 1 ...
   , 'Expected self patch to be acquireable by a single source, only.' );
 
 if ( strcmp(acq_by, 'm1') )
-  tf = source_index == m1_agent_index();
+  tf = source_index == pct.util.m1_agent_index();
   
 elseif ( strcmp(acq_by, 'm2') )
-  tf = source_index == m2_agent_index();
+  tf = source_index == pct.util.m2_agent_index();
   
 else
   error( 'Unknown acquireable by id "%s".', acq_by );
@@ -198,14 +205,16 @@ tf = true;
 
 end
 
-function acquire_patch(patch_info, state, program, patch_index, source_index)
+function acquire_patch(patch_info, state, program, patch_index, agent_index)
 
-patch_acquired_timestamp( state, program, source_index, patch_index );
+patch_acquired_timestamp( state, program, agent_index, patch_index );
+
+patch_info.AcquiredByIndex = agent_index;
 
 state.UserData.patch_acquired(patch_index) = true;
 state.UserData.num_patches_remaining = ...
   state.UserData.num_patches_remaining - 1;
-state.UserData.patch_acquired_by(patch_index) = source_index;
+state.UserData.patch_acquired_by(patch_index) = agent_index;
 state.UserData.acquired_patch_info{patch_index} = patch_info;
 
 end
@@ -215,6 +224,7 @@ function check_targets(state, program)
 patch_info = program.Value.current_patches;
 stimuli = program.Value.current_patch_stimuli;
 patches_acquired = state.UserData.patch_acquired;
+agent_indices = state.UserData.agent_indices;
 
 for i = 1:numel(patch_info)
   stimulus = stimuli{i};
@@ -246,7 +256,8 @@ for i = 1:numel(patch_info)
       case 'self'
         for j = 1:numel(dur_met)
           if ( dur_met(j) && can_acquire_patch(info, j, program, state) )
-            acquire_patch( info, state, program, i, j );
+            agent_index = agent_indices(j);
+            acquire_patch( info, state, program, i, agent_index );
             
             program.Value.data.Value(end).last_patch_type = 'self';
             if j==1
@@ -261,7 +272,8 @@ for i = 1:numel(patch_info)
       case 'compete'
         for j = 1:numel(dur_met)
           if ( dur_met(j) && can_acquire_patch(info, j, program, state) )
-            acquire_patch( info, state, program, i, j );
+            agent_index = agent_indices(j);
+            acquire_patch( info, state, program, i, agent_index );
             program.Value.data.Value(end).last_patch_type = 'compete';
             if j==1
               program.Value.data.Value(end).last_agent = 'hitch';
@@ -275,7 +287,7 @@ for i = 1:numel(patch_info)
       case 'cooperate'
         if ( all(dur_met) && ...
              can_acquire_cooperate_patch(info, program, state, num_agents) )
-          acquire_patch( info, state, program, i, j );
+          acquire_patch( info, state, program, i, pct.util.cooperate_index() );
           
           % Add a patch acquired time stamp for each subject that is not
           % subject `j`
@@ -371,12 +383,4 @@ initialize_saccades( generator_m2, patch_info, program, state.UserData.patch_acq
 program.Value.data.Value(end).m2_saccade_time = ...
   generator_m2.get_current_saccade_time();
 
-end
-
-function ind = m1_agent_index()
-ind = 1;
-end
-
-function ind = m2_agent_index()
-ind = 2;
 end

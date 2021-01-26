@@ -3,6 +3,7 @@ KbName( 'UnifyKeyNames' );
 Screen( 'Preference', 'VisualDebuglevel', 0 );
 
 conf = pct.config.reconcile( pct.config.load() );
+conf = pct.config.prune( conf );
 
 conf.TIMINGS.time_in.fixation = 10;
 conf.TIMINGS.time_in.just_patches = 10;

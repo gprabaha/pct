@@ -7,6 +7,7 @@ KbName( 'UnifyKeyNames' );
 Screen( 'Preference', 'VisualDebuglevel', 0 );
 
 conf = pct.config.reconcile( pct.config.load() );
+conf = pct.config.prune( conf );
 
 conf.TIMINGS.time_in.fixation = 10;
 conf.TIMINGS.time_in.just_patches = 10;
@@ -39,7 +40,6 @@ conf.STRUCTURE.pause_state_criterion = @(program) pct.util.pause_after_num_trial
 conf.STRUCTURE.num_patches = 2;
 
 % Trial structure parameters
-conf.STRUCTURE.patch_params.trials_per_block = 3;
 conf.STRUCTURE.patch_generator = ...
   @(program) pct.util.BlockedMultiPatchTrials(conf.STRUCTURE.patch_params);
 conf.STRUCTURE.pause_state_criterion = ...
@@ -84,8 +84,6 @@ conf.STIMULI.setup.patch.patch_appearance_func = ...
 %}
 
 conf.STRUCTURE.error_if_not_all_patches_acquired = false;
-conf.STRUCTURE.patch_params.persist_patch_info_until_exhausted = true;
-conf.STRUCTURE.patch_params.max_num_trials_persist_patch_info = 2;
 conf.TIMINGS.time_in.just_patches = 2;
 conf.INTERFACE.display_task_progress = false;
 

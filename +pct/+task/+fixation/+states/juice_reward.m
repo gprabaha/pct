@@ -60,33 +60,62 @@ end
 
 function give_juice_reward(program)
 
-quantity = program.Value.rewards.training;
+m1_quantity = calculate_m1_reward( program );
 
-just_patches_trial_data = program.Value.data.Value(end).just_patches;
-patch_acquired_times = just_patches_trial_data.patch_acquired_times;
-
-if ( ~isempty(patch_acquired_times) )
-  m1_acquired_times = patch_acquired_times(1, :);
-  % The number of patches m1 acquired is the number of patch acquired
-  % time stamps that are valid (i.e., not NaN).
-  num_m1_acquired_patches = sum( ~isnan(m1_acquired_times) );
-else
-  num_m1_acquired_patches = 0;
+if ( m1_quantity > 0 )  
+  pct.util.deliver_reward( program, 1, m1_quantity );
 end
 
-if ( num_m1_acquired_patches > 0 )
-  pct.util.deliver_reward( program, 1, quantity * num_m1_acquired_patches );
-  
-  % Adding lines to deliver multiple pulses for patches collected instead
-  % of one big pulse
-  
-%   patches_to_reward = num_m1_acquired_patches;
-%   for pulse_ind = 1:patches_to_reward
-%     if pulse_ind > 1
-%       pause(0.2);
-%     end
-%     pct.util.deliver_reward( program, 1, quantity );
-%   end
 end
+
+function num_acquired = num_acquired_patches_in_sequence(program, agent_index)
+
+num_acquired = 0;
+
+patch_sequence_index = program.Value.current_patch_sequence_index;
+num_trials_in_sequence = 2;
+
+if ( patch_sequence_index ~= num_trials_in_sequence )
+  % Only give reward on the last choice in the sequence.
+  return
+end
+
+data = program.Value.data.Value;
+assert( numel(data) >= num_trials_in_sequence ...
+  , 'Expected at least %d preceding trials.', num_trials_in_sequence );
+
+for i = 1:num_trials_in_sequence
+  trial_data = data(end-(i-1));
+  acquired_patches = trial_data.just_patches.acquired_patches;
+  
+  for j = 1:numel(acquired_patches)
+    maybe_acquired = acquired_patches{j};
+    
+    if ( ~isempty(maybe_acquired) )
+      acquired_by_ind = maybe_acquired.AcquiredByIndex;
+      
+      if ( acquired_by_ind == agent_index || ...
+           acquired_by_ind == pct.util.cooperate_index() )
+         num_acquired = num_acquired + 1;
+      end
+    end
+  end
+end
+
+end
+
+function quantity = calculate_m1_reward(program)
+
+num_acquired = num_acquired_patches_in_sequence( program, pct.util.m1_agent_index() );
+per_patch_quantity = program.Value.rewards.training;
+quantity = per_patch_quantity * num_acquired;
+
+end
+
+function quantity = calculate_m2_reward(program)
+
+num_acquired = num_acquired_patches_in_sequence( program, pct.util.m2_agent_index() );
+per_patch_quantity = program.Value.rewards.training;
+quantity = per_patch_quantity * num_acquired;
 
 end

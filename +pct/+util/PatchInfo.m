@@ -5,6 +5,8 @@ classdef PatchInfo
   
   properties
     AcquirableBy = {};
+    AcquiredByName = '';
+    AcquiredByIndex = 0;
     Strategy = 'self';
     Agent = '';
     

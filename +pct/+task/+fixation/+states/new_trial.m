@@ -12,10 +12,16 @@ end
 function entry(state, program)
 
 states = program.Value.states;
+task = program.Value.task;
 pause_flag = program.Value.pause_flag;
 
-establish_patch_info( program );
+should_escape = establish_patch_info( program );
 configure_patch_stimuli( program );
+
+if ( should_escape )
+  escape( task );
+  return
+end
 
 if ( should_go_to_pause_state(program) &&  ~pause_flag )
   next( state, states('pause') );
@@ -321,11 +327,11 @@ tf = program.Value.structure.pause_state_criterion( program );
 
 end
 
-function establish_patch_info(program)
+function should_abort = establish_patch_info(program)
 
 all_targets = program.Value.patch_targets;
 
-[patch_info, patch_sequence_index] = ...
+[patch_info, patch_sequence_index, should_abort] = ...
   generate( program.Value.patch_generator, all_targets, program );
 
 program.Value.current_patches = patch_info;

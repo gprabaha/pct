@@ -20,6 +20,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
     generate_trial_order_again          = false;
     presented_for_first_time            = false;
     presented_for_second_time           = false;
+    max_num_patches_acquireable_per_trial = 1;
   end
   
   methods
@@ -41,8 +42,13 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       
       obj.trial_reps                            = params.trial_reps;
       obj.patch_types                           = params.patch_types;
-      obj.trial_set_generator                   = params.trial_set_generator;
       obj.max_num_patches_acquireable_per_trial = params.max_num_patches_acquireable_per_trial;
+      
+      if ( ~isempty(params.trial_set_generator) )
+        obj.trial_set_generator = params.trial_set_generator;
+      else
+        obj.trial_set_generator = defaults.trial_set_generator;
+      end
     end    
     
     % Generate all trials in order
@@ -149,12 +155,15 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       num_patches               = numel( patch_targets );
       sequence_id               = obj.trial_sequence_id;
       all_trials_over           = obj.all_trials_over;
+      
       if isempty(obj.trial_set)
         obj.trial_set           = obj.trial_set_generator.generate_trial_set();
       end
       if isempty(obj.trial_order)
         obj.trial_order         = obj.generate_trial_order();
       end
+      
+      patch_sequence_id = 0;
       
       % Operations %
       
@@ -167,6 +176,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
         
         % To end task when trials are over
         if( obj.trial_sequence_id > numel(obj.trial_order))
+          all_trials_over = true;
           obj.all_trials_over = true;
           return;
         end
