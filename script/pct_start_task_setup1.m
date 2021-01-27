@@ -1,6 +1,10 @@
+
+
 logger = pct.util.Logger();
 logger.include_everything = true;
 pct.util.set_logger( logger );
+
+
 KbName( 'UnifyKeyNames' );
 Screen( 'Preference', 'VisualDebuglevel', 0 );
 
@@ -14,13 +18,13 @@ conf = pct.config.prune( conf );
 % Trial details %
 %%%%%%%%%%%%%%%%%
 conf.STRUCTURE.pause_state_criterion = ...
-  @(program) pct.util.pause_after_num_trials(program, 10);
+  @(program) pct.util.pause_after_num_trials(program, 50);
 conf.STRUCTURE.num_patches = 4;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 % Trial progress display %
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-conf.INTERFACE.display_task_progress = true;
+conf.INTERFACE.display_task_progress = false;
 
 %%%%%%%%%%%%%%
 % Generators %
@@ -42,22 +46,22 @@ conf.REWARDS.pause = 0.2;
 conf.TIMINGS.time_in.fixation = 10;
 conf.TIMINGS.time_in.just_patches = 2.5;
 conf.TIMINGS.time_in.juice_reward = 1.5;
-conf.TIMINGS.time_in.pause = 4;
+conf.TIMINGS.time_in.pause = 60;
 conf.TIMINGS.time_in.iti_patch_sequence_1 = 1;
 conf.TIMINGS.time_in.iti_patch_sequence_2 = 1;
 
 %%%%%%%%%%%%%%%%%%%
 % Subject details %
 %%%%%%%%%%%%%%%%%%%
-conf.META.m1_subject = 'human';
+conf.META.m1_subject = 'hitch';
 conf.META.m2_subject = 'computer_naive_random';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Hardware interface details %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-conf.INTERFACE.gaze_source_type = 'mouse';
+conf.INTERFACE.gaze_source_type = 'digital_eyelink';
 conf.INTERFACE.gaze_source_type_m2 = 'generator';
-conf.INTERFACE.reward_output_type = 'none'; % 'none'; 'arduino'; 'ni';
+conf.INTERFACE.reward_output_type = 'arduino'; %'none'; 'ni';
 conf.INTERFACE.skip_sync_tests = true;
 conf.INTERFACE.has_m2 = true;
 
@@ -65,11 +69,14 @@ conf.INTERFACE.has_m2 = true;
 % Screen details %
 %%%%%%%%%%%%%%%%%%
 conf.SCREEN.rect = [];
-conf.SCREEN.rect = [ 0, 0, 560, 350 ];
-conf.SCREEN.index = 0;
-conf.SCREEN.calibration_rect = [ 0, 0, 1600, 900 ];
+conf.SCREEN.index = 1;
+conf.SCREEN.calibration_rect = [0, 0, 1600, 900];
 % Debug screen
-conf.DEBUG_SCREEN.is_present = false;
+conf.DEBUG_SCREEN.is_present = true;
+conf.DEBUG_SCREEN.index = 2;
+conf.DEBUG_SCREEN.background_color = [ 0 0 0 ];
+% Debug screen rect accounts for resolution of monkey monitor
+conf.DEBUG_SCREEN.rect = [ 0, 0, 1600, 900 ];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Fixation square properties %
@@ -82,7 +89,7 @@ conf.STIMULI.setup.fix_hold_square.target_padding = 20;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Patch display parameters %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-conf.STIMULI.patch_distribution_radius = 0.3;
+conf.STIMULI.patch_distribution_radius = 0.16;
 conf.STIMULI.setup.patch.size = [100, 100];
 % Optionally use a handle to a different function to change the appearance
 % properties of a patch.
@@ -126,5 +133,5 @@ pct.task.fixation.start( conf, ...
 %%%%%%%%%%%%%%%
 % Saving data %
 %%%%%%%%%%%%%%%
-conf.INTERFACE.save_data = false;
+conf.INTERFACE.save_data = true;
 conf.PATHS.remote = 'C:\Users\Clockwork\Dropbox (ChangLab)\prabaha-changlab\pct-training-hitch\comp-coop\new';

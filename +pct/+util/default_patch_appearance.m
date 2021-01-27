@@ -12,10 +12,10 @@ switch ( strategy )
   case 'self'
     if ( ismember('hitch', info.Agent) )
       color = [255, 0, 0];
-    elseif ( ismember('algo', info.Agent) )
-      color = [0, 255, 0];
+    elseif ( ismember('computer_naive_random', info.Agent) )
+      color = [102, 0, 255];
     else
-      color = [102, 0, 255]; 
+      color = [0, 255, 0];
     end
     
   case 'compete'
