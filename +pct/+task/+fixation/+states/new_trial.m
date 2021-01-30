@@ -425,33 +425,6 @@ display_accuracy( online_data_rep );
 display_patch_legend( online_data_rep );
 display_last_n_trials( online_data_rep, num_trials_to_display );
 
-%{
-
-%[ strcmp( online_data_rep.Value(1:end).last_state, 'fix' ) ];
-overall_accuracy = mean( [online_data_rep.Value(1:end).did_correctly] & ...
-  [online_data_rep.Value(1:end).did_initiate] )*100;
-
-comp_patch_ids = [online_data_rep.Value(1:end).last_patch_type_id] == 3;
-coop_patch_ids = [online_data_rep.Value(1:end).last_patch_type_id] == 4;
-
-accuracy_comp = [online_data_rep.Value(1:end).did_correctly] & ...
-  [online_data_rep.Value(1:end).did_initiate] & ...
-  ([online_data_rep.Value(1:end).last_agent_id] == 1);
-accuracy_comp = mean( accuracy_comp(comp_patch_ids) )*100;
-
-accuracy_coop = [online_data_rep.Value(1:end).did_correctly] & ...
-  [online_data_rep.Value(1:end).did_initiate] & ...
-  ([online_data_rep.Value(1:end).last_agent_id] == 1);
-accuracy_coop = mean( accuracy_coop(coop_patch_ids) )*100;
-
-fprintf( 'Overall accuracy of initiated trials: %0.2f percent\n\n', overall_accuracy );
-fprintf( 'Overall accuracy of compete trials: %0.2f percent\n\n', accuracy_comp );
-fprintf( 'Overall accuracy of cooperate trials: %0.2f percent\n\n', accuracy_coop );
-  
-display_juice_received( online_data_rep, program );
-
-%}
-
 end
 
 function display_m1_agent(online_data_rep)
