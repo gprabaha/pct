@@ -168,7 +168,7 @@ end
 
 function tf = check_if_correct(data, trials_so_far)
 
-tf = ~isnan( data(trials_so_far).error_penalty.entry_time );
+tf = ~isnan( data(trials_so_far).just_patches.entry_time );
 
 end
 
