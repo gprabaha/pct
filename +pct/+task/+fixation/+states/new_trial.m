@@ -150,20 +150,8 @@ if( length(data) > 1 )
   online_data_rep.Value(trials_so_far).trial_sequence         = data(trials_so_far).trial_sequence;
   online_data_rep.Value(trials_so_far).last_state_reached     = check_last_state(data, trials_so_far);
   online_data_rep.Value(trials_so_far).patches_presented      = check_patches_presented( data, trials_so_far );
-  % Have to write these functions
   online_data_rep.Value(trials_so_far).m1_choice              = check_m1_acquired_patch( data, trials_so_far );
   online_data_rep.Value(trials_so_far).m2_choice              = check_m2_acquired_patch( data, trials_so_far );
-  
-  %{
-  
-  online_data_rep.Value(trials_so_far).last_patch_type        = check_last_patch_type(data, trials_so_far);
-  online_data_rep.Value(trials_so_far).last_patch_type_id     = check_last_patch_type_id(data, trials_so_far);
-  online_data_rep.Value(trials_so_far).last_agent             = check_last_agent(data, trials_so_far);
-  online_data_rep.Value(trials_so_far).last_agent_id          = check_last_agent_id(data, trials_so_far);
-  online_data_rep.Value(trials_so_far).response_times         = check_response_times(data, trials_so_far);
-  online_data_rep.Value(trials_so_far).training_stage_reward  = data(trials_so_far).training_stage_reward;
-  
-  %}
   
   if ( interface.display_task_progress )
     display_data( online_data_rep, program );
@@ -200,13 +188,15 @@ first_seq_data = data( trial_sequences == 1 );
 second_seq_data = data( trial_sequences == 2 );
 
 if ~isempty( first_seq_data )
-  first_seq_did_initiate = ~isnan( [ first_seq_data(1:end).fix_hold_patch.entry_time ] );
+  first_init_data = [ first_seq_data(1:end).fix_hold_patch ];
+  first_seq_did_initiate = ~isnan( [ first_init_data(1:end).entry_time ] );
   frac_init_first_seq_overall = mean( first_seq_did_initiate );
 else
   frac_init_first_seq_overall = 0;
 end
 if ~isempty( second_seq_data )
-  second_seq_did_initiate = ~isnan( [ second_seq_data(1:end).fix_hold_patch.entry_time ] );
+  second_init_data = [ second_seq_data(1:end).fix_hold_patch ];
+  second_seq_did_initiate = ~isnan( [ second_init_data(1:end).entry_time ] );
   frac_init_second_seq_overall = mean( second_seq_did_initiate );
 else
   frac_init_second_seq_overall = 0;
@@ -421,14 +411,6 @@ end
 
 end
 
-
-function response_times = check_response_times(data, trials_so_far)
-
-response_times = data(trials_so_far).just_patches.patch_acquired_times - ...
-    data(trials_so_far).just_patches.entry_time;
-
-end
-
 function display_data(online_data_rep, program)
 
 interface = program.Value.interface;
@@ -541,7 +523,7 @@ else
   oldest_trial = unique_trials(end - n + 1);
   oldest_trial_index = find( trial_indices == oldest_trial , 1 );
   for trial = oldest_trial_index:numel( online_data_rep.Value )
-    data_cell(trial,:) = { ...
+    data_cell(trial-oldest_trial_index+1,:) = { ...
       online_data_rep.Value(trial).trial_index, ...
       online_data_rep.Value(trial).trial_sequence, ...
       online_data_rep.Value(trial).last_state_reached, ...
@@ -554,8 +536,8 @@ else
     'VariableNames',{'Trial' 'Seq' 'Last_st' 'Patches' 'M1_acq' 'M2_acq'});
 end
 
-fprintf( '\n# Performance over the last 10 trials #\n' )
-fprintf( '---------------------------------------\n\n' )
+fprintf( '\n# Performance over the last %d trials #\n', n );
+fprintf( '---------------------------------------\n\n' );
 
 disp(data_table);
 

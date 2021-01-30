@@ -44,7 +44,7 @@ conf.REWARDS.pause = 0.2;
 %%%%%%%%%%%%%%%%%%%%%%%%%
 % Timings in each state %
 %%%%%%%%%%%%%%%%%%%%%%%%%
-conf.TIMINGS.time_in.fixation = 10;
+conf.TIMINGS.time_in.fixation = 5;
 conf.TIMINGS.time_in.just_patches = 2.5;
 conf.TIMINGS.time_in.juice_reward = 1.5;
 conf.TIMINGS.time_in.pause = 60;

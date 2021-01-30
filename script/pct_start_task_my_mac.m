@@ -21,7 +21,7 @@ conf.STRUCTURE.num_patches = 4;
 % Trial progress display %
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 conf.INTERFACE.display_task_progress = true;
-conf.INTERFACE.num_trials_to_display = 10;
+conf.INTERFACE.num_trials_to_display = 3;
 
 %%%%%%%%%%%%%%
 % Generators %
@@ -40,7 +40,7 @@ conf.REWARDS.pause = 0.2;
 %%%%%%%%%%%%%%%%%%%%%%%%%
 % Timings in each state %
 %%%%%%%%%%%%%%%%%%%%%%%%%
-conf.TIMINGS.time_in.fixation = 10;
+conf.TIMINGS.time_in.fixation = 5;
 conf.TIMINGS.time_in.just_patches = 2.5;
 conf.TIMINGS.time_in.juice_reward = 1.5;
 conf.TIMINGS.time_in.pause = 4;
