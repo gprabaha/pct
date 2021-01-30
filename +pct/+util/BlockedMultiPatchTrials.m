@@ -12,7 +12,8 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
     last_patch_info                       = pct.util.PatchInfo.empty();
     next_set_id                           = 1;
     next_patch_id                         = 1;
-    trial_sequence_id                     = 1;
+    trial_index                           = 0;
+    trial_sequence_id                     = 0;
     patch_sequence_id                     = 1;
     
     % Indicators %
@@ -50,6 +51,24 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
         obj.trial_set_generator = defaults.trial_set_generator;
       end
     end    
+    
+    % Update trial index if not second presentation
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    function trial_index  = update_trial_index(obj)
+      % Function to update trial index unless it is the second presentation
+      % of patches
+      
+      % Initial assignment %
+      
+      trial_index  = obj.trial_index;
+      
+      % Operations %
+      
+      if ( ~obj.is_second_presentation )
+        trial_index = trial_index + 1;
+      end
+    end
     
     % Generate all trials in order
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -144,7 +163,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
     % Top-level function to fetch the information of the patches to display
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    function [patch_info, patch_sequence_id, all_trials_over] = ...
+    function [patch_info, trial_index, patch_sequence_id, all_trials_over] = ...
         generate(obj, patch_targets, program)
       
       % Initial assignments %
@@ -153,18 +172,24 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       latest_acquired_patches   = get_latest_acquired_patches( program );
       appearance_func           = program.Value.stimuli_setup.patch.patch_appearance_func;
       num_patches               = numel( patch_targets );
+      trial_index               = obj.trial_index;
       sequence_id               = obj.trial_sequence_id;
-      all_trials_over           = obj.all_trials_over;
       patch_sequence_id         = 0;
+      all_trials_over           = obj.all_trials_over;
       
-      if isempty(obj.trial_set)
+      if isempty(obj.trial_set) % For the first presentation
         obj.trial_set           = obj.trial_set_generator.generate_trial_set();
+      else
+ 
       end
       if isempty(obj.trial_order)
         obj.trial_order         = obj.generate_trial_order();
       end
       
       % Operations %
+      
+      trial_index = obj.update_trial_index();
+      obj.trial_index = trial_index;
       
       if( obj.get_new_trial_info(program) )
         obj.patch_sequence_id = 1; % first presentation.

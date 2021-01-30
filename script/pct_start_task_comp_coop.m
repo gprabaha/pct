@@ -31,8 +31,8 @@ conf.TIMINGS.time_in.pause = 60;
 %%%%%%%%%%%%%%%%%%%
 % Subject details %
 %%%%%%%%%%%%%%%%%%%
-conf.META.m1_subject = 'hitch';
-conf.META.m2_subject = 'computer_naive';
+conf.META.m1_agent = 'hitch';
+conf.META.m2_agent = 'computer_naive';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Hardware interface details %

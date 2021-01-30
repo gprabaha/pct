@@ -20,6 +20,10 @@ classdef FourPatchTrialSet
       patch_info = pct.util.default_patch_appearance( patch_info );
     end
     
+    function patch_types = fetch_patch_types(obj)
+      patch_types = get_patch_types();
+    end
+    
   end
 end
 

@@ -28,6 +28,7 @@ function make_all(program, conf, params)
 make_task( program, conf );
 make_states( program, conf );
 make_data( program, conf );
+make_metadata( program, conf );
 make_online_data_rep( program, conf );
 make_patch_generator( program, conf );
 make_training_stage_name( program, conf );
@@ -110,6 +111,13 @@ function data = make_data(program, conf)
 data = ptb.Reference();
 program.Value.data = data;
 program.Value.data_directory = session_data_directory( conf );
+
+end
+
+function metadata = make_metadata(program, conf)
+
+metadata = get_metadata( conf );
+program.Value.metadata = metadata;
 
 end
 
@@ -720,6 +728,10 @@ end
 
 function signal = get_signal(conf)
 signal = conf.SIGNAL;
+end
+
+function metadata = get_metadata(conf)
+metadata = conf.META;
 end
 
 function patch_distribution_radius = get_patch_distribution_radius( conf )

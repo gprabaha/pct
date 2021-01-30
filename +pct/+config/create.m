@@ -37,13 +37,14 @@ INTERFACE.tracker_sync_interval = 1;
 INTERFACE.skip_sync_tests = false;
 INTERFACE.save_data = true;
 INTERFACE.display_task_progress = true;
+INTERFACE.num_trials_to_display = 10;
 INTERFACE.has_m2 = false;
 INTERFACE.m2_is_computer = true;
 
 %   META
 META = struct();
-META.m1_subject = '';
-META.m2_subject = '';
+META.m1_agent = '';
+META.m2_agent = '';
 
 %	SCREEN
 SCREEN = struct();
@@ -87,14 +88,12 @@ STRUCTURE.pause_state_criterion = ...
 STRUCTURE.generator_m2 = @(program, tracker) pct.generators.DebugGenerator( tracker );
 STRUCTURE.error_if_not_all_patches_acquired = true;
 STRUCTURE.prevent_next_patch_repeat = true;
-
 STRUCTURE.patch_params = struct( ...
     'max_num_patches_acquireable_per_trial', 1 ...
   , 'trial_reps', 10 ...
   , 'patch_types', {{'self', 'compete', 'cooperate'}} ...
   , 'trial_set_generator', [] ...
 );
-
 % Default to using a patch generator that makes info for M1 self patches
 % only.
 STRUCTURE.patch_generator = @(program) pct.util.PatchInfoM1Only();

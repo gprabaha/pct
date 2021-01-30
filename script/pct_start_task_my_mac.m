@@ -21,6 +21,7 @@ conf.STRUCTURE.num_patches = 4;
 % Trial progress display %
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 conf.INTERFACE.display_task_progress = true;
+conf.INTERFACE.num_trials_to_display = 10;
 
 %%%%%%%%%%%%%%
 % Generators %
@@ -49,8 +50,8 @@ conf.TIMINGS.time_in.iti_patch_sequence_2 = 1;
 %%%%%%%%%%%%%%%%%%%
 % Subject details %
 %%%%%%%%%%%%%%%%%%%
-conf.META.m1_subject = 'human';
-conf.META.m2_subject = 'computer_naive_random';
+conf.META.m1_agent = 'human';
+conf.META.m2_agent = 'computer_naive_random';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Hardware interface details %
