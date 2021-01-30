@@ -333,9 +333,12 @@ if isempty( acquired_patches )
 else
   for patch_index = 1:numel( acquired_patches )
     maybe_patch_info = acquired_patches{patch_index};
-    if ( ~isempty(maybe_patch_info) && maybe_patch_info.AcquiredByIndex == pct.util.m1_agent_index() )
-      m1_acquired_patch = maybe_patch_info.Strategy;
-      break
+    if ( ~isempty(maybe_patch_info) ) 
+      if ( maybe_patch_info.AcquiredByIndex == pct.util.m1_agent_index() || ...
+          maybe_patch_info.AcquiredByIndex == pct.util.cooperate_index() )
+        m1_acquired_patch = maybe_patch_info.Strategy;
+        break
+      end
     end
   end
   if isempty(  m1_acquired_patch )
@@ -359,9 +362,12 @@ if isempty( acquired_patches )
 else
   for patch_index = 1:numel( acquired_patches )
     maybe_patch_info = acquired_patches{patch_index};
-    if ( ~isempty(maybe_patch_info) && maybe_patch_info.AcquiredByIndex == pct.util.m2_agent_index() )
-      m2_acquired_patch = maybe_patch_info.Strategy;
-      break
+    if ( ~isempty(maybe_patch_info) )
+      if ( maybe_patch_info.AcquiredByIndex == pct.util.m2_agent_index() || ...
+          maybe_patch_info.AcquiredByIndex == pct.util.cooperate_index() )
+        m2_acquired_patch = maybe_patch_info.Strategy;
+        break
+      end
     end
   end
   if isempty(  m2_acquired_patch )

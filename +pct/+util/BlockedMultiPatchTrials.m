@@ -55,7 +55,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
     % Update trial index if not second presentation
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    function trial_index  = update_trial_index(obj)
+    function trial_index  = update_trial_index(obj, program)
       % Function to update trial index unless it is the second presentation
       % of patches
       
@@ -65,7 +65,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       
       % Operations %
       
-      if ( ~obj.is_second_presentation )
+      if ( ~obj.is_second_presentation(program) )
         trial_index = trial_index + 1;
       end
     end
@@ -110,17 +110,25 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
     % Check if this is the second presentation of the patches
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    function tf = is_second_presentation(obj)
+    function tf = is_second_presentation(obj, program)
       % Function to check of this is the second part of the trial and thus
       % if the patch info needs to be persisted
       
       % Initial assignment %
       
-      tf = false;
+      tf            = false;
+      trial_data    = program.Value.data.Value;
       
       % Operations %
+      if ( isempty(trial_data) )
+        return
+      end
       
-      if( obj.presented_for_first_time && ~obj.presented_for_second_time )
+      last_trial_data = trial_data(end);
+      did_initiate_last_trial = last_trial_data.fixation.did_fixate;
+      
+      if( did_initiate_last_trial && obj.presented_for_first_time && ...
+          ~obj.presented_for_second_time )
         tf = true;
       end
     end
@@ -146,18 +154,15 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       end
       
       last_trial_data = trial_data(end);
-      % Note this stage is called 'fixation' because it is the first
-      % fixation at the beginning of a trial
       did_initiate_last_trial = last_trial_data.fixation.did_fixate;
       
       % Check if current number of patches is not the same as the initial
       % number of patches whiich would imply that the second part of the
       % trial has been reached
-      if ( obj.is_second_presentation )
+      if ( obj.is_second_presentation(program) )
         return
       end
       
-      % Check if the last trial was initiated
       tf = did_initiate_last_trial;
         
     end
@@ -250,7 +255,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       
       % Operations %
       
-      trial_index = obj.update_trial_index();
+      trial_index = obj.update_trial_index(program);
       obj.trial_index = trial_index;
       
       if( obj.get_new_trial_info(program) )
@@ -297,19 +302,21 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
         obj.presented_for_first_time = true;
         obj.presented_for_second_time = false;
         
-      elseif( obj.is_second_presentation() )
-        last_info = obj.last_patch_info;
-        patch_info = filter_non_acquired_patches( last_info, latest_acquired_patches );
-        obj.last_patch_info = patch_info;
-        obj.presented_for_first_time = false;
-        obj.presented_for_second_time = true;
-        obj.patch_sequence_id = 2; % second presentation.
+      else
+        if( obj.is_second_presentation(program) )
+          last_info = obj.last_patch_info;
+          patch_info = filter_non_acquired_patches( last_info, latest_acquired_patches );
+          obj.last_patch_info = patch_info;
+          obj.presented_for_first_time = true;
+          obj.presented_for_second_time = true;
+          obj.patch_sequence_id = 2; % second presentation.
         
-      else % The previous trial was not initiated so the monkeys did not see the patches
-        obj.patch_sequence_id = 1;
-        patch_info = obj.last_patch_info;
-        obj.presented_for_first_time = false;
-        obj.presented_for_second_time = false;
+        else % The previous trial was not initiated so the monkeys did not see the patches
+          obj.patch_sequence_id = 1;
+          patch_info = obj.last_patch_info;
+          obj.presented_for_first_time = true;
+          obj.presented_for_second_time = false;
+        end
       end
       
       patch_sequence_id = obj.patch_sequence_id;
