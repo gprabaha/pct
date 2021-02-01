@@ -8,6 +8,7 @@ if ( ~isempty(program.Value.generator_m2) )
 end
 
 update( program.Value.updater );
+update_saccade_velocity_estimators( program );
 
 if ( pct.util.is_debug(program) )
   debug_update_loop_frame_time( program );
@@ -18,6 +19,13 @@ if ( strcmp(program.Value.interface.gaze_source_type, 'digital_eyelink') )
 end
 
 update( program.Value.keyboard_queue );
+
+end
+
+function update_saccade_velocity_estimators(program)
+
+update( program.Value.gaze_position_history_m1 );
+update( program.Value.gaze_position_history_m2 );
 
 end
 

@@ -15,15 +15,40 @@ classdef DebugGeneratorManyPatches < handle
     
     current_x = 0;
     current_y = 0;
+    
+    velocity_estimator = [];
+    use_velocity_estimator = false;
+    
+    allow_speed_adjustment = true;
+    speed_increment = 1;
+    current_speed_offset = 0;
+    
   end
   methods
-    function obj = DebugGeneratorManyPatches(source)
+    function obj = DebugGeneratorManyPatches(source, velocity_estimator, varargin)
+      defaults = struct();
+      defaults.use_velocity_estimator = false;
+      defaults.allow_speed_adjustment = true;
+      defaults.speed_increment = 1;
+      params = shared_utils.general.parsestruct( defaults, varargin );
+      
       obj.source = source;
       obj.frame_timer = ptb.Clock();
       
       source.SettableX = 0;
       source.SettableY = 0;
       source.SettableIsValidSample = true;
+      
+      obj.velocity_estimator = velocity_estimator;
+      obj.use_velocity_estimator = params.use_velocity_estimator;
+      obj.allow_speed_adjustment = params.allow_speed_adjustment;
+      obj.speed_increment = params.speed_increment;
+    end
+    
+    function set.velocity_estimator(obj, estimator)
+      validateattributes( estimator, {'pct.util.OnlineSaccadeVelocityEstimator'} ...
+        , {}, mfilename, 'velocity_estimator' );
+      obj.velocity_estimator = estimator;
     end
     
     function initialize_fixation(obj, program)
@@ -41,11 +66,6 @@ classdef DebugGeneratorManyPatches < handle
     
     function initialize_saccades(obj, patch_info, program, is_patch_acquired)
       reset( obj.frame_timer );
-      
-%       m2_acquireable_patch_info = ...
-%         get_m2_acquireable_patch_info( patch_info, is_patch_acquired );
-%       
-%       obj.saccades = generate_saccade_list( m2_acquireable_patch_info, program );
       obj.saccades = {};
     end
     
@@ -96,6 +116,14 @@ classdef DebugGeneratorManyPatches < handle
       end
     end
     
+    function increment_saccade_speed(obj, amount)      
+      obj.current_speed_offset = ...
+        obj.speed_increment * amount + obj.current_speed_offset;
+      
+      pct.util.log( sprintf('Speed offset: %0.2f', obj.current_speed_offset) ...
+        , pct.util.LogInfo('saccade_speed_change') );
+    end
+    
     function update(obj, program)
       saccade_list = obj.saccades;
       
@@ -108,11 +136,42 @@ classdef DebugGeneratorManyPatches < handle
       saccade_index = 1;
       origin_val = saccade_list{saccade_index}.origin;
       destination_val = saccade_list{saccade_index}.destination;
-      total_time_val = saccade_list{saccade_index}.total_time;
-      average_velocity = 1/total_time_val;
+      
+      if ( obj.use_velocity_estimator )
+        % Average across time, as well as x and y components
+        average_velocity = get_median_velocity( obj.velocity_estimator );
+        
+        if ( isempty(average_velocity) || any(~isfinite(average_velocity)) )
+          warning( non_finite_velocity_warning_msg() );
+          average_speed = 1 / saccade_list{saccade_index}.total_time;
+        else
+          pct.util.log( ...
+            sprintf('Velocity: %0.2f', average_velocity), pct.util.LogInfo(log_id()) );
+%           average_speed = norm( average_velocity );
+          average_speed = mean( abs(average_velocity) );
+        end
+        
+        if ( average_speed == 0 )
+          total_time_val = saccade_list{saccade_index}.total_time;
+          average_speed = 1 / total_time_val;
+        else
+          total_time_val = 1 / average_speed;
+        end
+      else
+        total_time_val = saccade_list{saccade_index}.total_time;
+        average_speed = 1/total_time_val;
+      end
+      
+      if ( obj.allow_speed_adjustment )
+        average_speed = max( 0.0001, average_speed + obj.current_speed_offset );
+        total_time_val = 1 / average_speed;
+      end
+      
+      pct.util.log( sprintf('Time: %0.2f; Speed: %0.2f', total_time_val, average_speed) ...
+        , pct.util.LogInfo(log_id()) );
       
       [X_pos, Y_pos] = pct.generators.update_X_Y_pos_gaussian_velocity(...
-        current_t, origin_val, destination_val, average_velocity);
+        current_t, origin_val, destination_val, average_speed);
       assert(~isnan( X_pos));
       
       curr_x = X_pos + normrnd( 0, obj.noise );
@@ -264,4 +323,12 @@ function rect_size = make_window_rect(window)
 rect = window.Rect;
 rect_size = [ rect.X2-rect.X1, rect.Y2-rect.Y1 ];
 
+end
+
+function m = non_finite_velocity_warning_msg()
+m = 'Estimated elocity was non-finite; falling back to manually specified velocity & time.';
+end
+
+function id = log_id()
+id = mfilename;
 end

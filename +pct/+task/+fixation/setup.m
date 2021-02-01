@@ -66,6 +66,9 @@ end
 [tracker_m1, tracker_m2] = make_eye_trackers( program, updater, ni_scan_input, data_directory, conf );
 [sampler_m1, sampler_m2] = make_gaze_samplers( program, updater, tracker_m1, tracker_m2 );
 
+make_saccade_velocity_estimators( program, sampler_m1, sampler_m2 );
+make_m2_gaze_generator( program, conf );
+
 make_eye_tracker_sync( program, conf );
 
 make_reward_manager( program, conf, ni_scan_output );
@@ -454,10 +457,6 @@ function [tracker_m1, tracker_m2, edf_filename_m1, edf_filename_m2] = ...
 
 interface = get_interface( conf );
 signal = get_signal( conf );
-structure = get_structure( conf );
-
-saccade_speed = conf.STIMULI.setup.gaze_cursor_m2.saccade_speed;
-wait_time = conf.STIMULI.setup.gaze_cursor_m2.wait_time;
 
 m1_source_type = interface.gaze_source_type;
 m2_source_type = interface.gaze_source_type_m2;
@@ -473,19 +472,35 @@ calibration_rect = conf.CALIB_SCREEN.rect;
 [tracker_m2, edf_filename_m2] = make_eye_tracker( updater, ni_scan_input ...
   , m2_channel_indices, calibration_rect, m2_source_type, data_directory, conf );
 
+program.Value.tracker = tracker_m1;
+program.Value.tracker_m2 = tracker_m2;
+program.Value.edf_filename_m1 = edf_filename_m1;
+program.Value.edf_filename_m2 = edf_filename_m2;
+
+end
+
+function make_m2_gaze_generator(program, conf)
+
+interface = get_interface( conf );
+stimuli_setup = get_stimuli_setup( conf );
+structure = get_structure( conf );
+
+saccade_speed = stimuli_setup.gaze_cursor_m2.saccade_speed;
+wait_time = stimuli_setup.gaze_cursor_m2.wait_time;
+
+tracker_m2 = program.Value.tracker_m2;
+saccade_velocity_estimator_m1 = program.Value.saccade_velocity_estimator_m1;
+
 if ( interface.m2_is_computer )
-  generator_m2 = structure.generator_m2( program, tracker_m2 );
+  generator_m2 = ...
+    structure.generator_m2( program, tracker_m2, saccade_velocity_estimator_m1 );
 else
   generator_m2 = [];
 end
 
-program.Value.tracker = tracker_m1;
-program.Value.tracker_m2 = tracker_m2;
 program.Value.generator_m2 = generator_m2;
 program.Value.generator_m2_saccade_speed = saccade_speed;
 program.Value.generator_m2_wait_time = wait_time;
-program.Value.edf_filename_m1 = edf_filename_m1;
-program.Value.edf_filename_m2 = edf_filename_m2;
 
 end
 
@@ -570,6 +585,21 @@ sync_info.next_iteration = 1;
 sync_info.tracker_sync_interval = conf.INTERFACE.tracker_sync_interval;
 
 program.Value.tracker_sync = sync_info;
+
+end
+
+function make_saccade_velocity_estimators(program, sampler_m1, sampler_m2)
+
+history_m1 = pct.util.GazePositionHistory( sampler_m1 );
+history_m2 = pct.util.GazePositionHistory( sampler_m2 );
+
+estimator_m1 = pct.util.OnlineSaccadeVelocityEstimator( history_m1 );
+estimator_m2 = pct.util.OnlineSaccadeVelocityEstimator( history_m2 );
+
+program.Value.gaze_position_history_m1 = history_m1;
+program.Value.gaze_position_history_m2 = history_m2;
+program.Value.saccade_velocity_estimator_m1 = estimator_m1;
+program.Value.saccade_velocity_estimator_m2 = estimator_m2;
 
 end
 
@@ -666,6 +696,9 @@ function make_key_listeners(program, keyboard_queue)
 
 add_listener( keyboard_queue ...
   , @(key_state) pct.training.fixation_training_stage_key_listener(key_state, program) );
+
+add_listener( keyboard_queue ...
+  , @(key_state) pct.util.modify_saccade_velocity_key_listener(key_state, program) );
 
 end
 

@@ -1,5 +1,6 @@
 logger = pct.util.Logger();
-logger.include_everything = true;
+logger.include_everything = false;
+logger.include_tags{end+1} = 'saccade_speed_change';
 pct.util.set_logger( logger );
 KbName( 'UnifyKeyNames' );
 Screen( 'Preference', 'VisualDebuglevel', 0 );
@@ -20,7 +21,7 @@ conf.STRUCTURE.num_patches = 4;
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 % Trial progress display %
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-conf.INTERFACE.display_task_progress = true;
+conf.INTERFACE.display_task_progress = false;
 conf.INTERFACE.num_trials_to_display = 3;
 
 %%%%%%%%%%%%%%
@@ -28,8 +29,14 @@ conf.INTERFACE.num_trials_to_display = 3;
 %%%%%%%%%%%%%%
 conf.STRUCTURE.patch_generator = ...
   @(program) pct.util.BlockedMultiPatchTrials(conf.STRUCTURE.patch_params);
+
 conf.STRUCTURE.generator_m2 = ...
-  @(program, tracker) pct.generators.DebugGeneratorManyPatches(tracker);
+  @(program, tracker, vel_estimator) pct.generators.DebugGeneratorManyPatches( ...
+    tracker, vel_estimator ...
+    , 'use_velocity_estimator', false ...
+    , 'allow_speed_adjustment', true ...
+    , 'speed_increment', 1 ...
+);
 
 %%%%%%%%%%%%%%%%%%
 % Reward details %

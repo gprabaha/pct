@@ -259,6 +259,10 @@ for i = 1:numel(patch_info)
       patch_entry_timestamp( state, program, j, i );
       state.UserData.mark_entered(j, i) = true;
       state.UserData.entered_by(i) = j;
+      % Assume subject (j) entered this patch via a saccade, in which case
+      % we calculate a smoothed velocity over some number of preceding
+      % position samples.
+      update_saccade_velocity_histories( program, j );
       
     elseif ( state.UserData.mark_entered(j, i) && ~in_bounds(j) && ~dur_met(j) )
       % Subject (j) exited this patch (i)
@@ -371,6 +375,22 @@ end
 function register_acquired_patches(state, data)
 
 data.Value(end).just_patches.acquired_patches = state.UserData.acquired_patch_info;
+
+end
+
+function update_saccade_velocity_histories(program, agent_index)
+
+if ( agent_index == pct.util.m1_agent_index() )
+  history = program.Value.saccade_velocity_estimator_m1;
+  
+elseif ( agent_index == pct.util.m2_agent_index() )
+  history = program.Value.saccade_velocity_estimator_m2;
+  
+else
+  error( 'Unhandled agent index "%d".', agent_index );
+end
+
+register_saccade_end( history );
 
 end
 
