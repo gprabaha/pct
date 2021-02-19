@@ -48,7 +48,7 @@ conf.TIMINGS.time_in.fixation = 5;
 conf.TIMINGS.time_in.just_patches = 2.5;
 conf.TIMINGS.time_in.juice_reward = 1.5;
 conf.TIMINGS.time_in.pause = 60;
-conf.TIMINGS.time_in.iti_patch_sequence_1 = 1;
+conf.TIMINGS.time_in.iti_patch_sequence_1 = 0;
 conf.TIMINGS.time_in.iti_patch_sequence_2 = 1;
 
 %%%%%%%%%%%%%%%%%%%

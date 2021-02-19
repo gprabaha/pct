@@ -69,6 +69,13 @@ data_scaffold.last_patch_type         = nan;
 data_scaffold.last_agent              = nan;
 data_scaffold.m2_saccade_time         = nan;
 data_scaffold.patch_info              = patch_info;
+data_scaffold.training_stage_reward   = program.Value.rewards.training;
+
+if ( isfield(program.Value, 'current_patch_identitites') )
+  data_scaffold.patch_identities      = program.Value.current_patch_identities;
+else
+  data_scaffold.patch_identities      = {};
+end
 
 % For states in the first part of the trial %
 
@@ -110,14 +117,6 @@ data_scaffold.juice_reward.exit_time = nan;
 % iti
 data_scaffold.iti.entry_time = nan;
 data_scaffold.iti.exit_time = nan;
-
-data_scaffold.training_stage_reward = program.Value.rewards.training;
-
-if ( isfield(program.Value, 'current_patch_identitites') )
-  data_scaffold.patch_identities = program.Value.current_patch_identities;
-else
-  data_scaffold.patch_identities = {};
-end
 
 end
 

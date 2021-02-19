@@ -21,7 +21,7 @@ conf.STRUCTURE.num_patches = 4;
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 % Trial progress display %
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-conf.INTERFACE.display_task_progress = false;
+conf.INTERFACE.display_task_progress = true;
 conf.INTERFACE.num_trials_to_display = 3;
 
 %%%%%%%%%%%%%%
@@ -33,7 +33,7 @@ conf.STRUCTURE.patch_generator = ...
 conf.STRUCTURE.generator_m2 = ...
   @(program, tracker, vel_estimator) pct.generators.DebugGeneratorManyPatches( ...
     tracker, vel_estimator ...
-    , 'use_velocity_estimator', false ...
+    , 'use_velocity_estimator', true ...
     , 'allow_speed_adjustment', true ...
     , 'speed_increment', 1 ...
 );
@@ -51,7 +51,7 @@ conf.TIMINGS.time_in.fixation = 5;
 conf.TIMINGS.time_in.just_patches = 2.5;
 conf.TIMINGS.time_in.juice_reward = 1.5;
 conf.TIMINGS.time_in.pause = 4;
-conf.TIMINGS.time_in.iti_patch_sequence_1 = 1;
+conf.TIMINGS.time_in.iti_patch_sequence_1 = 0;
 conf.TIMINGS.time_in.iti_patch_sequence_2 = 1;
 
 %%%%%%%%%%%%%%%%%%%
