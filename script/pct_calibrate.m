@@ -20,7 +20,8 @@ reward_info.manager_type = reward_manager_type_from_config( conf );
 reward_info.serial_port = conf.SERIAL.port;
 
 
-run_calibration( screen_info, reward_info, 9 );
+n_cal_pts = 9;
+run_calibration( screen_info, reward_info, n_cal_pts );
 
 end
 
@@ -32,8 +33,5 @@ if ( isfield(conf, 'INTERFACE') && isfield(conf.INTERFACE, 'reward_output_type')
   type = validatestring( conf.INTERFACE.reward_output_type ...
     , {'ni', 'arduino', 'none'}, mfilename, 'reward_output_type' );
 end
-n_cal_pts = 9;
-
-run_calibration( screen_info, reward_channel_index, reward_size, n_cal_pts );
 
 end

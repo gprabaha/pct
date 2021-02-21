@@ -1,9 +1,6 @@
-
-
 logger = pct.util.Logger();
 logger.include_everything = true;
 pct.util.set_logger( logger );
-
 
 KbName( 'UnifyKeyNames' );
 Screen( 'Preference', 'VisualDebuglevel', 0 );
@@ -32,8 +29,14 @@ conf.INTERFACE.num_trials_to_display = 10;
 %%%%%%%%%%%%%%
 conf.STRUCTURE.patch_generator = ...
   @(program) pct.util.BlockedMultiPatchTrials(conf.STRUCTURE.patch_params);
+
 conf.STRUCTURE.generator_m2 = ...
-  @(program, tracker) pct.generators.DebugGeneratorManyPatches(tracker);
+  @(program, tracker, vel_estimator) pct.generators.DebugGeneratorManyPatches( ...
+    tracker, vel_estimator ...
+    , 'use_velocity_estimator', false ...
+    , 'allow_speed_adjustment', false ...
+    , 'speed_increment', 1 ...
+);
 
 %%%%%%%%%%%%%%%%%%
 % Reward details %
@@ -69,15 +72,21 @@ conf.INTERFACE.has_m2 = true;
 %%%%%%%%%%%%%%%%%%
 % Screen details %
 %%%%%%%%%%%%%%%%%%
+calibration_rect = [0, 0, 1600, 900];
+
 conf.SCREEN.rect = [];
 conf.SCREEN.index = 1;
-conf.SCREEN.calibration_rect = [0, 0, 1600, 900];
+conf.SCREEN.calibration_rect = calibration_rect;
 % Debug screen
-conf.DEBUG_SCREEN.is_present = true;
-conf.DEBUG_SCREEN.index = 2;
+conf.DEBUG_SCREEN.is_present = false;
+conf.DEBUG_SCREEN.index = 1;
 conf.DEBUG_SCREEN.background_color = [ 0 0 0 ];
 % Debug screen rect accounts for resolution of monkey monitor
-conf.DEBUG_SCREEN.rect = [ 0, 0, 1600, 900 ];
+conf.DEBUG_SCREEN.rect = calibration_rect;
+% Calib screen
+conf.CALIB_SCREEN.full_size = [];
+conf.CALIB_SCREEN.index = 1;
+conf.CALIB_SCREEN.rect = calibration_rect;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Fixation square properties %
