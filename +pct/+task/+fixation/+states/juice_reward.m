@@ -47,6 +47,8 @@ pulse_duration = quantity;
 if ( state.UserData.num_pulses < num_collected_patches_m1 )
   if ( isnan(reward_timer) || ...
        toc(reward_timer) > pulse_duration + inter_pulse_interval )
+    pct.util.log( 'Delivering reward', pct.util.LogInfo('juice_reward') );
+     
     pct.util.deliver_reward( program, 1, quantity );
     state.UserData.reward_timer = tic();
     state.UserData.num_pulses = state.UserData.num_pulses + 1;

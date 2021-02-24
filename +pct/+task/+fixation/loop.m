@@ -1,6 +1,7 @@
 function loop(task, program)
 
 handle_ni_daq_update( program );
+handle_arduino_reward_manager_update( program );
 
 if ( ~isempty(program.Value.generator_m2) )
   % Update computer-generated m2 gaze coordinates.
@@ -26,6 +27,14 @@ function update_saccade_velocity_estimators(program)
 
 update( program.Value.gaze_position_history_m1 );
 update( program.Value.gaze_position_history_m2 );
+
+end
+
+function handle_arduino_reward_manager_update(program)
+
+if ( ~isempty(program.Value.arduino_reward_manager) )
+  update( program.Value.arduino_reward_manager );
+end
 
 end
 
