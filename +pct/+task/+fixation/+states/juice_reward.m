@@ -23,7 +23,6 @@ debug_window_is_present = program.Value.debug_window_is_present;
 if (debug_window_is_present)
   flip( program.Value.debug_window );
 end
-give_juice_reward( program );
 
 state.UserData.reward_timer = nan;
 state.UserData.num_pulses = 0;
@@ -42,7 +41,7 @@ reward_timer            = state.UserData.reward_timer;
 
 % Operations %
 
-num_collected_patches = sum( ~isnan( program.Value.data.Value(end).just_patches.patch_acquired_times ) );
+num_collected_patches = num_acquired_patches_in_sequence( program, pct.util.m1_agent_index() );
 pulse_duration = quantity;
 
 if ( state.UserData.num_pulses < num_collected_patches )
@@ -67,16 +66,6 @@ pct.util.state_exit_timestamp( program, state );
 
 states = program.Value.states;
 next( state, states('iti') );
-
-end
-
-function give_juice_reward(program)
-
-m1_quantity = calculate_m1_reward( program );
-
-if ( m1_quantity > 0 )  
-  pct.util.deliver_reward( program, 1, m1_quantity );
-end
 
 end
 
