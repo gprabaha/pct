@@ -41,10 +41,10 @@ reward_timer            = state.UserData.reward_timer;
 
 % Operations %
 
-num_collected_patches = num_acquired_patches_in_sequence( program, pct.util.m1_agent_index() );
+num_collected_patches_m1 = num_acquired_patches_in_sequence( program, pct.util.m1_agent_index() );
 pulse_duration = quantity;
 
-if ( state.UserData.num_pulses < num_collected_patches )
+if ( state.UserData.num_pulses < num_collected_patches_m1 )
   if ( isnan(reward_timer) || ...
        toc(reward_timer) > pulse_duration + inter_pulse_interval )
     pct.util.deliver_reward( program, 1, quantity );
