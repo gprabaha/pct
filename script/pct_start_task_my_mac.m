@@ -1,6 +1,6 @@
 logger = pct.util.Logger();
 logger.include_everything = false;
-logger.include_tags{end+1} = 'saccade_speed_change';
+% logger.include_tags{end+1} = 'juice_reward';
 pct.util.set_logger( logger );
 KbName( 'UnifyKeyNames' );
 Screen( 'Preference', 'VisualDebuglevel', 0 );
