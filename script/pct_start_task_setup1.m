@@ -1,5 +1,6 @@
 logger = pct.util.Logger();
-logger.include_everything = true;
+logger.include_everything = false;
+logger.include_tags{end+1} = 'juice_reward';
 pct.util.set_logger( logger );
 
 KbName( 'UnifyKeyNames' );
@@ -21,12 +22,14 @@ conf.STRUCTURE.num_patches = 4;
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 % Trial progress display %
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-conf.INTERFACE.display_task_progress = true;
+conf.INTERFACE.display_task_progress = false;
 conf.INTERFACE.num_trials_to_display = 10;
 
 %%%%%%%%%%%%%%
 % Generators %
 %%%%%%%%%%%%%%
+
+conf.STRUCTURE.error_if_not_all_patches_acquired = 0;
 conf.STRUCTURE.patch_generator = ...
   @(program) pct.util.BlockedMultiPatchTrials(conf.STRUCTURE.patch_params);
 
@@ -63,7 +66,7 @@ conf.META.m2_agent = 'computer_naive_random';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Hardware interface details %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-conf.INTERFACE.gaze_source_type = 'digital_eyelink';
+conf.INTERFACE.gaze_source_type = 'digital_eyelink'; %'mouse';
 conf.INTERFACE.gaze_source_type_m2 = 'generator';
 conf.INTERFACE.reward_output_type = 'arduino'; %'none'; 'ni';
 conf.INTERFACE.skip_sync_tests = true;

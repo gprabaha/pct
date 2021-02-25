@@ -23,7 +23,6 @@ debug_window_is_present = program.Value.debug_window_is_present;
 if (debug_window_is_present)
   flip( program.Value.debug_window );
 end
-
 state.UserData.reward_timer = nan;
 state.UserData.num_pulses = 0;
 
@@ -42,6 +41,7 @@ reward_timer            = state.UserData.reward_timer;
 % Operations %
 
 num_collected_patches_m1 = num_acquired_patches_in_sequence( program, pct.util.m1_agent_index() );
+%disp( num_collected_patches_m1 );
 pulse_duration = quantity;
 
 if ( state.UserData.num_pulses < num_collected_patches_m1 )
