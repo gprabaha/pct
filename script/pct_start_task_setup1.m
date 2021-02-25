@@ -35,7 +35,7 @@ conf.STRUCTURE.generator_m2 = ...
     tracker, vel_estimator ...
     , 'use_velocity_estimator', false ...
     , 'allow_speed_adjustment', false ...
-    , 'speed_increment', 1 ...
+    , 'speed_increment', 0.5 ...
 );
 
 %%%%%%%%%%%%%%%%%%
@@ -72,7 +72,7 @@ conf.INTERFACE.has_m2 = true;
 %%%%%%%%%%%%%%%%%%
 % Screen details %
 %%%%%%%%%%%%%%%%%%
-calibration_rect = [0, 0, 1600, 900];
+calibration_rect = [0, 0, 1920, 1080];
 
 conf.SCREEN.rect = [];
 conf.SCREEN.index = 1;
@@ -91,16 +91,16 @@ conf.CALIB_SCREEN.rect = calibration_rect;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Fixation square properties %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-conf.STIMULI.setup.fix_square.size = [80, 80];
+conf.STIMULI.setup.fix_square.size = [100, 100];
 conf.STIMULI.setup.fix_square.target_padding = 20;
-conf.STIMULI.setup.fix_hold_square.size = [80, 80];
+conf.STIMULI.setup.fix_hold_square.size = [100, 100];
 conf.STIMULI.setup.fix_hold_square.target_padding = 20;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Patch display parameters %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 conf.STIMULI.patch_distribution_radius = 0.16;
-conf.STIMULI.setup.patch.size = [100, 100];
+conf.STIMULI.setup.patch.size = [130, 130];
 % Optionally use a handle to a different function to change the appearance
 % properties of a patch.
 conf.STIMULI.setup.patch.patch_appearance_func = ...

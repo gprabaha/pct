@@ -88,6 +88,7 @@ trial_set{idx} = [
   patch_types{2} ...
 ];
 
+%{
 % Self and Competition %
 
 % 4
@@ -260,5 +261,5 @@ trial_set{idx} = [
   patch_types{4} ...
   patch_types{4} ...
 ];
-
+%}
 end
