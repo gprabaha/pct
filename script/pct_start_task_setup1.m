@@ -21,7 +21,7 @@ conf.STRUCTURE.num_patches = 4;
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 % Trial progress display %
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-conf.INTERFACE.display_task_progress = false;
+conf.INTERFACE.display_task_progress = true;
 conf.INTERFACE.num_trials_to_display = 10;
 
 %%%%%%%%%%%%%%
