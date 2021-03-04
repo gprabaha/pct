@@ -201,12 +201,12 @@ else
   frac_init_second_seq_overall = 0;
 end
 
-if numel(first_seq_did_initiate) < 50
+if numel(first_seq_did_initiate) < 51
   frac_init_first_seq_last_50 = frac_init_first_seq_overall;
 else
   frac_init_first_seq_last_50 = mean( first_seq_did_initiate(end-50:end) );
 end
-if numel(second_seq_did_initiate) < 50
+if numel(second_seq_did_initiate) < 51
   frac_init_second_seq_last_50 = frac_init_second_seq_overall;
 else
   frac_init_second_seq_last_50 = mean( second_seq_did_initiate(end-50:end) );

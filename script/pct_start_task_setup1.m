@@ -22,11 +22,14 @@ conf.STRUCTURE.num_patches = 4;
 % Trial progress display %
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 conf.INTERFACE.display_task_progress = true;
-conf.INTERFACE.num_trials_to_display = 10;
+conf.INTERFACE.num_trials_to_display = 5;
 
 %%%%%%%%%%%%%%
 % Generators %
 %%%%%%%%%%%%%%
+
+conf.STRUCTURE.patch_params.trial_reps = 100;
+
 conf.STRUCTURE.patch_generator = ...
   @(program) pct.util.BlockedMultiPatchTrials(conf.STRUCTURE.patch_params);
 
