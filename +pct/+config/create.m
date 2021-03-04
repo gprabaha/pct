@@ -206,6 +206,8 @@ REWARDS = struct();
 REWARDS.training = .3;
 REWARDS.pause = .4;
 REWARDS.total_reward = 0;
+REWARDS.key_press = 0;
+REWARDS.bridge = 0;
 
 % EXPORT
 conf.PATHS = PATHS;
