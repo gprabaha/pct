@@ -1,5 +1,7 @@
 logger = pct.util.Logger();
-logger.include_everything = true;
+logger.include_everything = false;
+logger.include_tags{end+1} = 'reward';
+logger.include_tags{end+1} = 'pause_state';
 pct.util.set_logger( logger );
 
 KbName( 'UnifyKeyNames' );
@@ -46,6 +48,8 @@ conf.STRUCTURE.generator_m2 = ...
 %%%%%%%%%%%%%%%%%%
 conf.REWARDS.training = 0.3;
 conf.REWARDS.pause = 0.2;
+conf.REWARDS.key_press = 0.2;
+conf.REWARDS.bridge = 0.1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 % Timings in each state %
