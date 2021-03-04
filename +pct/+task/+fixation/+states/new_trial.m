@@ -531,9 +531,9 @@ function tf = should_go_to_pause_state(program)
 
 tf = false;
    
-if ( isfield(program.Value, 'go_to_pause_state_override') && ...
-     program.Value.go_to_pause_state_override )
-  program.Value.go_to_pause_state_override = false;
+if ( isfield(program.Value, 'pause_state_key_flag') && ...
+     program.Value.pause_state_key_flag )
+  program.Value.pause_state_key_flag = false;
   tf = true;
   
 elseif ( program.Value.structure.pause_state_criterion(program) )
