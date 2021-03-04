@@ -26,8 +26,6 @@ state.UserData.num_pulses = 0;
 
 timestamp_entry( state, program );
 
-program.Value.pause_flag = true;
-
 end
 
 function loop(state, program)
