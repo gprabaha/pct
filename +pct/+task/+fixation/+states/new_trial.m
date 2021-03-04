@@ -13,7 +13,6 @@ function entry(state, program)
 
 states = program.Value.states;
 task = program.Value.task;
-pause_flag = program.Value.pause_flag;
 
 should_escape = establish_patch_info( program );
 configure_patch_stimuli( program );
@@ -23,13 +22,13 @@ if ( should_escape )
   return
 end
 
-if ( should_go_to_pause_state(program) &&  ~pause_flag )
+if ( should_go_to_pause_state(program) )
   next( state, states('pause') );
+  
 else
   update_training_stages( program );
   update_data_scaffold( program, program.Value.current_patches );
   process_data( program );
-  program.Value.pause_flag = false;
   
   next( state, states('fixation') );
 end
@@ -201,12 +200,12 @@ else
   frac_init_second_seq_overall = 0;
 end
 
-if numel(first_seq_did_initiate) < 50
+if numel(first_seq_did_initiate) < 51
   frac_init_first_seq_last_50 = frac_init_first_seq_overall;
 else
   frac_init_first_seq_last_50 = mean( first_seq_did_initiate(end-50:end) );
 end
-if numel(second_seq_did_initiate) < 50
+if numel(second_seq_did_initiate) < 51
   frac_init_second_seq_last_50 = frac_init_second_seq_overall;
 else
   frac_init_second_seq_last_50 = mean( second_seq_did_initiate(end-50:end) );
@@ -530,7 +529,16 @@ end
 
 function tf = should_go_to_pause_state(program)
 
-tf = program.Value.structure.pause_state_criterion( program );
+tf = false;
+   
+if ( isfield(program.Value, 'pause_state_key_flag') && ...
+     program.Value.pause_state_key_flag )
+  program.Value.pause_state_key_flag = false;
+  tf = true;
+  
+elseif ( program.Value.structure.pause_state_criterion(program) )
+  tf = true;
+end
 
 end
 

@@ -1,5 +1,7 @@
 logger = pct.util.Logger();
-logger.include_everything = true;
+logger.include_everything = false;
+logger.include_tags{end+1} = 'reward';
+logger.include_tags{end+1} = 'pause_state';
 pct.util.set_logger( logger );
 
 KbName( 'UnifyKeyNames' );
@@ -22,11 +24,14 @@ conf.STRUCTURE.num_patches = 4;
 % Trial progress display %
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 conf.INTERFACE.display_task_progress = true;
-conf.INTERFACE.num_trials_to_display = 10;
+conf.INTERFACE.num_trials_to_display = 5;
 
 %%%%%%%%%%%%%%
 % Generators %
 %%%%%%%%%%%%%%
+
+conf.STRUCTURE.patch_params.trial_reps = 100;
+
 conf.STRUCTURE.patch_generator = ...
   @(program) pct.util.BlockedMultiPatchTrials(conf.STRUCTURE.patch_params);
 
@@ -43,6 +48,8 @@ conf.STRUCTURE.generator_m2 = ...
 %%%%%%%%%%%%%%%%%%
 conf.REWARDS.training = 0.3;
 conf.REWARDS.pause = 0.2;
+conf.REWARDS.key_press = 0.2;
+conf.REWARDS.bridge = 0.1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 % Timings in each state %
