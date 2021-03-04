@@ -156,6 +156,13 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       last_trial_data = trial_data(end);
       did_initiate_last_trial = last_trial_data.fixation.did_fixate;
       
+      if ( ~did_initiate_last_trial && obj.patch_sequence_id == 2 )
+        % Failure to initiate the second portion of the trial should result
+        % in a new set of patches displaying.
+        tf = true;
+        return
+      end
+      
       % Check if current number of patches is not the same as the initial
       % number of patches whiich would imply that the second part of the
       % trial has been reached
