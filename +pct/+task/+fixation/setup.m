@@ -39,8 +39,6 @@ data_directory = program.Value.data_directory;
 keyboard_queue = make_keyboard_queue( program );
 make_key_listeners( program, keyboard_queue );
 
-make_pause_flag( program, conf );
-
 training_stage_manager = make_training_stage_manager( program, conf );
 
 make_training_data( program, conf, params, training_stage_manager );
@@ -146,12 +144,6 @@ end
 function make_training_stage_name(program, conf)
 
 program.Value.training_stage_name = '';
-
-end
-
-function make_pause_flag( program, conf )
-
-program.Value.pause_flag = false;
 
 end
 
@@ -699,6 +691,12 @@ add_listener( keyboard_queue ...
 
 add_listener( keyboard_queue ...
   , @(key_state) pct.util.modify_saccade_velocity_key_listener(key_state, program) );
+
+add_listener( keyboard_queue ...
+  , @(key_state) pct.util.maybe_go_to_pause_state(key_state, program) );
+
+add_listener( keyboard_queue ...
+  , @(key_state) pct.util.trigger_key_press_reward(key_state, program) );
 
 end
 
