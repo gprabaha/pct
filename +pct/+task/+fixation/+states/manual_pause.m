@@ -1,9 +1,9 @@
-function state = pause(program, conf)
+function state = manual_pause(program, conf)
 
 time_in = conf.TIMINGS.time_in;
 
 state = ptb.State();
-state.Name = 'pause';
+state.Name = 'manual_pause';
 
 state.Duration = time_in.(state.Name);
 
@@ -15,16 +15,11 @@ end
 
 function entry(state, program)
 
-pct.util.log( 'Entering automatic pause', pct.util.LogInfo('pause_state') );
-
 flip( program.Value.window );
 debug_window_is_present = program.Value.debug_window_is_present;
 if (debug_window_is_present)
   flip( program.Value.debug_window );
 end
-
-state.UserData.reward_timer = nan;
-state.UserData.num_pulses = 0;
 
 timestamp_entry( state, program );
 
@@ -32,17 +27,7 @@ end
 
 function loop(state, program)
 
-quantity = program.Value.rewards.pause;
-inter_pulse_interval = 15;
-reward_timer = state.UserData.reward_timer;
-pulse_duration = quantity;
-
-if ( isnan(reward_timer) || ...
-     toc(reward_timer) > pulse_duration + inter_pulse_interval )
-  pct.util.deliver_reward( program, 1, quantity );
-  state.UserData.reward_timer = tic();
-  state.UserData.num_pulses = state.UserData.num_pulses + 1;
-end
+check_key_escape_override( state, program );
 
 end
 
@@ -51,6 +36,16 @@ function exit(state, program)
 states = program.Value.states;
 timestamp_exit( state, program );
 next( state, states('new_trial') );
+
+end
+
+function check_key_escape_override(state, program)
+
+if ( program.Value.pause_state_key_flag )
+  pct.util.log( 'Exiting pause state.', pct.util.LogInfo('pause_state') );
+  program.Value.pause_state_key_flag = false;
+  escape( state );
+end
 
 end
 

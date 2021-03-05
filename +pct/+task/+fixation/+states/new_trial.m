@@ -22,8 +22,10 @@ if ( should_escape )
   return
 end
 
-if ( should_go_to_pause_state(program) )
-  next( state, states('pause') );
+[go_to_pause, pause_state_name] = should_go_to_pause_state( program );
+
+if ( go_to_pause )
+  next( state, states(pause_state_name) );
   
 else
   update_training_stages( program );
@@ -109,9 +111,14 @@ data_scaffold.error_penalty.did_fixate = nan;
 data_scaffold.pause.entry_time = nan;
 data_scaffold.pause.exit_time = nan;
 
+% manual pause
+data_scaffold.manual_pause.entry_time = nan;
+data_scaffold.manual_pause.exit_time = nan;
+
 % reward
 data_scaffold.juice_reward.entry_time = nan;
 data_scaffold.juice_reward.exit_time = nan;
+data_scaffold.juice_reward.pre_reward_delay = nan;
 
 % iti
 data_scaffold.iti.entry_time = nan;
@@ -527,17 +534,20 @@ apply( manager, program );
 
 end
 
-function tf = should_go_to_pause_state(program)
+function [tf, state_name] = should_go_to_pause_state(program)
 
 tf = false;
+state_name = '';
    
 if ( isfield(program.Value, 'pause_state_key_flag') && ...
      program.Value.pause_state_key_flag )
   program.Value.pause_state_key_flag = false;
   tf = true;
+  state_name = 'manual_pause';
   
-elseif ( program.Value.structure.pause_state_criterion(program) )
+elseif ( program.Value.structure.pause_state_criterion(program) )  
   tf = true;
+  state_name = 'pause';
 end
 
 end

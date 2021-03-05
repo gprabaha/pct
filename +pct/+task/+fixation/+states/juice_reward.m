@@ -23,8 +23,15 @@ debug_window_is_present = program.Value.debug_window_is_present;
 if (debug_window_is_present)
   flip( program.Value.debug_window );
 end
+
+pre_reward_delay = calculate_pre_reward_delay( program );
+
 state.UserData.reward_timer = nan;
 state.UserData.num_pulses = 0;
+state.UserData.reward_delay_timer = tic;
+state.UserData.reward_delay = pre_reward_delay;
+
+program.Value.data.Value(end).juice_reward.pre_reward_delay = pre_reward_delay;
 
 end
 
@@ -44,7 +51,8 @@ num_collected_patches_m1 = num_acquired_patches_in_sequence( program, pct.util.m
 %disp( num_collected_patches_m1 );
 pulse_duration = quantity;
 
-if ( state.UserData.num_pulses < num_collected_patches_m1 )
+if ( state.UserData.num_pulses < num_collected_patches_m1 && ...
+     toc(state.UserData.reward_delay_timer) > state.UserData.reward_delay )
   if ( isnan(reward_timer) || ...
        toc(reward_timer) > pulse_duration + inter_pulse_interval )
     pct.util.log( 'Delivering reward', pct.util.LogInfo('juice_reward') );
@@ -107,18 +115,12 @@ end
 
 end
 
-function quantity = calculate_m1_reward(program)
+function delay = calculate_pre_reward_delay(program)
 
-num_acquired = num_acquired_patches_in_sequence( program, pct.util.m1_agent_index() );
-per_patch_quantity = program.Value.rewards.training;
-quantity = per_patch_quantity * num_acquired;
+delay_mean = program.Value.config.TIMINGS.time_in.pre_reward_delay_mean;
+delay_span = program.Value.config.TIMINGS.time_in.pre_reward_delay_variation;
 
-end
-
-function quantity = calculate_m2_reward(program)
-
-num_acquired = num_acquired_patches_in_sequence( program, pct.util.m2_agent_index() );
-per_patch_quantity = program.Value.rewards.training;
-quantity = per_patch_quantity * num_acquired;
+delay_variation = (rand * 2 - 1) * delay_span;
+delay = max( 0, delay_mean + delay_variation );
 
 end
