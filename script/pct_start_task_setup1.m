@@ -79,10 +79,10 @@ conf.INTERFACE.has_m2 = true;
 %%%%%%%%%%%%%%%%%%
 % Screen details %
 %%%%%%%%%%%%%%%%%%
-calibration_rect = [0, 0, 1920, 1080];
+calibration_rect = [0, 0, 1600, 900];
 
 conf.SCREEN.rect = [];
-conf.SCREEN.index = 1;
+conf.SCREEN.index = 3;
 conf.SCREEN.calibration_rect = calibration_rect;
 % Debug screen
 conf.DEBUG_SCREEN.is_present = false;
@@ -133,7 +133,7 @@ conf.STIMULI.setup.gaze_cursor_m2.image_file = fullfile([cursor_path 'gray-star.
 %%%%%%%%%%%%%%%%%%%
 % Port for reward %
 %%%%%%%%%%%%%%%%%%%
-conf.SERIAL.port = 'COM5';
+conf.SERIAL.port = 'COM3';
 
 %%%%%%%%%%%%%%%%%%%
 % Save new config %

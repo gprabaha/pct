@@ -195,7 +195,7 @@ STIMULI.setup.patch = struct( ....
 %	SERIAL
 SERIAL = struct();
 SERIAL.port = 'COM3';
-SERIAL.channels = { 'A' };
+SERIAL.channels = { 'A', 'B' };
 
 % SIGNAL
 SIGNAL = struct();
