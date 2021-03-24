@@ -7,11 +7,11 @@ else
 end
 
 screen_info = struct();
-screen_info.full_rect = [];
-screen_info.calibration_rect = conf.CALIB_SCREEN.rect;
+screen_info.full_rect = conf.CALIB_SCREEN.rect;
+screen_info.calibration_rect = conf.CALIB_SCREEN.calibration_rect;
 screen_info.screen_index = conf.CALIB_SCREEN.index;
-screen_info.debug_screen_index = conf.CALIB_SCREEN.debug_screen_index;
-screen_info.debug_screen_rect = conf.CALIB_SCREEN.debug_screen_rect;
+screen_info.debug_screen_index = conf.DEBUG_SCREEN.index;
+screen_info.debug_screen_rect = conf.DEBUG_SCREEN.rect;
 
 reward_info = struct();
 reward_info.channel_index = 1;
