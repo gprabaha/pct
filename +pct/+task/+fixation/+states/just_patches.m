@@ -54,7 +54,7 @@ maybe_update_computer_generated_m2( program, state );
 main_window = program.Value.window;
 
 draw_patches( program, state, main_window );
-draw_cursors( program, state );
+draw_cursors( program, state, false );
 flip( main_window );
 
 debug_window_is_present = program.Value.debug_window_is_present;
@@ -62,7 +62,8 @@ if (debug_window_is_present)
   debug_window = program.Value.debug_window;
   
   draw_patches( program, state, debug_window );
-  draw_debug_cursor( program );
+  draw_cursors( program, state, true );
+%   draw_debug_cursor( program );
   flip( debug_window );
 end
 
@@ -128,14 +129,7 @@ end
 
 end
 
-function draw_cursors(program, state)
-
-% Initial assignment %
-
-is_debug = pct.util.is_debug( program );
-
-
-% Operations %
+function draw_cursors(program, state, is_debug)
 
 m1_still_working = ~patch_acquired_count_criterion_met(program, state, pct.util.m1_agent_index());
 m2_still_working = ~patch_acquired_count_criterion_met(program, state, pct.util.m2_agent_index());
