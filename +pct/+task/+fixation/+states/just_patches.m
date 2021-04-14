@@ -24,6 +24,9 @@ state.UserData.agent_indices = [...
   pct.util.m1_agent_index(), pct.util.m2_agent_index() ...
 ];
 
+state.UserData.stimuli = program.Value.current_patch_stimuli;
+state.UserData.targets = { program.Value.current_patches.Target };
+
 % All patches remaining
 state.UserData.num_patches_remaining = num_patches;
 % No patches were acquired
@@ -53,7 +56,7 @@ maybe_update_computer_generated_m2( program, state );
 
 main_window = program.Value.window;
 
-draw_patches( program, state, main_window );
+draw_patches( state, main_window, false );
 draw_cursors( program, state, false );
 flip( main_window );
 
@@ -61,22 +64,22 @@ debug_window_is_present = program.Value.debug_window_is_present;
 if (debug_window_is_present)
   debug_window = program.Value.debug_window;
   
-  draw_patches( program, state, debug_window );
+  draw_patches( state, debug_window, true );
   draw_cursors( program, state, true );
-%   draw_debug_cursor( program );
   flip( debug_window );
 end
 
 check_targets( state, program );
 
 % Exit if all patches were acquired.
-% if ( state.UserData.num_patches_remaining == 0 )
-m1_done_collecting = patch_acquired_count_criterion_met(program, state, pct.util.m1_agent_index());
-m2_done_collecting = patch_acquired_count_criterion_met(program, state, pct.util.m2_agent_index());
+m1_done_collecting = ...
+  patch_acquired_count_criterion_met( program, state, pct.util.m1_agent_index() );
+m2_done_collecting = ...
+  patch_acquired_count_criterion_met( program, state, pct.util.m2_agent_index() );
 
-if ( m1_done_collecting && m2_done_collecting )
-  escape( state );
-end
+% if ( m1_done_collecting && m2_done_collecting )
+%   escape( state );
+% end
 
 end
 
@@ -108,21 +111,22 @@ program.Value.data.Value(end).last_state = 'jp';
 
 end
 
-function draw_patches(program, state, window)
+function draw_patches(state, window, is_debug)
 
 % Initial assignments %
 
-stimuli         = program.Value.current_patch_stimuli;
-patch_targets   = { program.Value.current_patches.Target };
-is_debug        = pct.util.is_debug( program );
+stimuli         = state.UserData.stimuli;
+patch_targets   = state.UserData.targets;
 
 % Operations %
 
 for i = 1:numel(stimuli)
   stimulus = stimuli{i};
   draw( stimulus, window );
+end
 
-  if ( is_debug )
+if ( is_debug )
+  for i = 1:numel(patch_targets)
     draw( patch_targets{i}.Bounds, window );
   end
 end
@@ -227,6 +231,10 @@ state.UserData.num_patches_remaining = ...
 state.UserData.patch_acquired_by(patch_index) = agent_index;
 state.UserData.acquired_patch_info{patch_index} = patch_info;
 
+% Set the FaceColor of the acquired patch to an arbitrary color / image.
+acquired_face_color = patch_info.GetAcquiredFaceColor( patch_info, program.Value.images );
+state.UserData.stimuli{patch_index}.FaceColor = acquired_face_color;
+
 end
 
 function check_targets(state, program)
@@ -318,10 +326,6 @@ for i = 1:numel(patch_info)
       otherwise
         error( 'Unhandled strategy "%s".', strategy );
     end
-  end
-  
-  if ( patches_acquired(i) )
-    stimulus.FaceColor = [0, 0, 0];
   end
 end
 

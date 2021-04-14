@@ -117,20 +117,6 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       % Initial assignment %
       
       tf            = false;
-      trial_data    = program.Value.data.Value;
-      
-      % Operations %
-      if ( isempty(trial_data) )
-        return
-      end
-      
-      last_trial_data = trial_data(end);
-      did_initiate_last_trial = last_trial_data.fixation.did_fixate;
-      
-      if( did_initiate_last_trial && obj.presented_for_first_time && ...
-          ~obj.presented_for_second_time )
-        tf = true;
-      end
     end
     
     % Should next trial info be fetched?
@@ -142,96 +128,26 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
       
       % Initial assignments %
       
-      tf            = false;
+      tf            = true;
       trial_data    = program.Value.data.Value;
       
       % Operations %
       
       % Check if this is the first trial
       if ( isempty(trial_data) )
-        tf = true;
         return
       end
       
       last_trial_data = trial_data(end);
       did_initiate_last_trial = last_trial_data.fixation.did_fixate;
       
-      if ( ~did_initiate_last_trial && obj.patch_sequence_id == 2 )
-        % Failure to initiate the second portion of the trial should result
-        % in a new set of patches displaying.
-        tf = true;
+      if ( did_initiate_last_trial )
         return
       end
       
-      % Check if current number of patches is not the same as the initial
-      % number of patches whiich would imply that the second part of the
-      % trial has been reached
-      if ( obj.is_second_presentation(program) )
-        return
-      end
-      
-      tf = did_initiate_last_trial;
-        
+      % The last trial was not initiated, so reuse it.
+      tf = false;
     end
-    
-    %{
-    function [all_trials_over, patch_sequence_id, patch_info] = ...
-        generate_new_trial_info(obj, patch_targets, program)
-      
-      % Initial assignment %
-      
-      patch_info                = pct.util.PatchInfo.empty();
-      appearance_func           = program.Value.stimuli_setup.patch.patch_appearance_func;
-      num_patches               = numel( patch_targets );
-      sequence_id               = obj.trial_sequence_id;
-      patch_sequence_id         = 0;
-      all_trials_over           = obj.all_trials_over;
-      
-      % Operations %
-      obj.patch_sequence_id = 1; % first presentation.
-        
-      % Update trial sequence
-      sequence_id = sequence_id + 1;
-      obj.trial_sequence_id = sequence_id;
-
-      % To end task when trials are over
-      if( obj.trial_sequence_id > numel(obj.trial_order))
-        all_trials_over = true;
-        obj.all_trials_over = true;
-        return;
-      end
-
-      % Fetch the list of patches
-      trial_type_id = obj.trial_order(sequence_id);
-      trial_patches = obj.trial_set{trial_type_id};
-
-      % Extract patch info
-      radius = program.Value.patch_distribution_radius;
-      rect = program.Value.window.Rect;
-      coordinates = pct.util.assign_patch_coordinates( num_patches, radius, rect );
-
-      for i = 1:num_patches
-        new_patch_info                = pct.util.PatchInfo();
-        new_patch_info.AcquirableBy   = trial_patches(i).acquirable_by;
-        new_patch_info.Agent          = trial_patches(i).agent;
-        new_patch_info.Strategy       = trial_patches(i).strategy; %strategy; %block_type;  % change this to strategy.
-        new_patch_info.Position       = coordinates(:, i);
-        new_patch_info.Target         = patch_targets{i};
-        new_patch_info.Index          = i;
-        new_patch_info.ID             = obj.next_patch_id;
-        new_patch_info.TrialTypeID    = trial_type_id;
-        new_patch_info.SequenceID     = sequence_id;
-
-        % Configure color, and other appearence properties.
-        new_patch_info = appearance_func( new_patch_info );
-        patch_info(end+1) = new_patch_info;
-        obj.next_patch_id = obj.next_patch_id + 1;
-      end
-      obj.last_patch_info = patch_info;
-      obj.presented_for_first_time = true;
-      obj.presented_for_second_time = false;
-    end
-    %}
     
     % Top-level function to fetch the information of the patches to display
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -287,18 +203,20 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
         radius = program.Value.patch_distribution_radius;
         rect = program.Value.window.Rect;
         coordinates = pct.util.assign_patch_coordinates( num_patches, radius, rect );
+        get_acquired_face_color = program.Value.config.STRUCTURE.get_patch_acquired_face_color;
         
         for i = 1:num_patches
-          new_patch_info                = pct.util.PatchInfo();
-          new_patch_info.AcquirableBy   = trial_patches(i).acquirable_by;
-          new_patch_info.Agent          = trial_patches(i).agent;
-          new_patch_info.Strategy       = trial_patches(i).strategy; %strategy; %block_type;  % change this to strategy.
-          new_patch_info.Position       = coordinates(:, i);
-          new_patch_info.Target         = patch_targets{i};
-          new_patch_info.Index          = i;
-          new_patch_info.ID             = obj.next_patch_id;
-          new_patch_info.TrialTypeID    = trial_type_id;
-          new_patch_info.SequenceID     = sequence_id;
+          new_patch_info                          = pct.util.PatchInfo();
+          new_patch_info.AcquirableBy             = trial_patches(i).acquirable_by;
+          new_patch_info.Agent                    = trial_patches(i).agent;
+          new_patch_info.Strategy                 = trial_patches(i).strategy; %strategy; %block_type;  % change this to strategy.
+          new_patch_info.Position                 = coordinates(:, i);
+          new_patch_info.Target                   = patch_targets{i};
+          new_patch_info.Index                    = i;
+          new_patch_info.ID                       = obj.next_patch_id;
+          new_patch_info.TrialTypeID              = trial_type_id;
+          new_patch_info.SequenceID               = sequence_id;
+          new_patch_info.GetAcquiredFaceColor     = get_acquired_face_color;
           
           % Configure color, and other appearence properties.
           new_patch_info = appearance_func( new_patch_info );

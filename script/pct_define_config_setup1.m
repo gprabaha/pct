@@ -1,4 +1,8 @@
-function pct_define_config_setup1()
+function conf = pct_define_config_setup1(do_save)
+
+if ( nargin < 1 )
+  do_save = true;
+end
 
 %%%%%%%%%%%%%%%
 % Load config %
@@ -131,6 +135,9 @@ conf.SERIAL.port = 'COM3';
 %%%%%%%%%%%%%%%%%%%
 % Save new config %
 %%%%%%%%%%%%%%%%%%%
-pct.config.save( conf );
+
+if ( do_save )
+  pct.config.save( conf );
+end
 
 end

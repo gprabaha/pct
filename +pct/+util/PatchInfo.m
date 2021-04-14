@@ -19,6 +19,8 @@ classdef PatchInfo
     ID = 1;
     TrialTypeID = 1;
     SequenceID = 1;
+    
+    GetAcquiredFaceColor = @(self, images) [];
   end
   
   methods
@@ -66,6 +68,12 @@ classdef PatchInfo
       validateattributes( v, {'char'}, {'scalartext'} ...
         , mfilename, 'Agent' );
       obj.Agent = v;
+    end
+    
+    function obj = set.GetAcquiredFaceColor(obj, f)
+      validateattributes( f, {'function_handle'}, {'scalar'} ...
+        , mfilename, 'GetAcquiredFaceColor' );
+      obj.GetAcquiredFaceColor = f;
     end
     
     % Methods called by scripts outside %

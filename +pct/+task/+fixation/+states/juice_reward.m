@@ -42,13 +42,14 @@ function loop(state, program)
 quantity                = program.Value.rewards.training;
 inter_pulse_interval    = 5e-2;  % 10ms;
 patch_sequence_index    = program.Value.current_patch_sequence_index;
-num_trials_in_sequence  = 2;
+num_trials_in_sequence  = 1;
 reward_timer            = state.UserData.reward_timer;
 
 % Operations %
 
-num_collected_patches_m1 = num_acquired_patches_in_sequence( program, pct.util.m1_agent_index() );
-%disp( num_collected_patches_m1 );
+num_collected_patches_m1 = num_acquired_patches_in_sequence( ...
+  program, pct.util.m1_agent_index(), num_trials_in_sequence );
+
 pulse_duration = quantity;
 
 if ( state.UserData.num_pulses < num_collected_patches_m1 && ...
@@ -79,12 +80,11 @@ next( state, states('iti') );
 
 end
 
-function num_acquired = num_acquired_patches_in_sequence(program, agent_index)
+function num_acquired = num_acquired_patches_in_sequence(program, agent_index, num_trials_in_sequence)
 
 num_acquired = 0;
 
 patch_sequence_index = program.Value.current_patch_sequence_index;
-num_trials_in_sequence = 2;
 
 if ( patch_sequence_index ~= num_trials_in_sequence )
   % Only give reward on the last choice in the trial sequence.

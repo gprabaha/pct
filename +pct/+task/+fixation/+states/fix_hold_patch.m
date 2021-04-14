@@ -74,12 +74,9 @@ quantity = program.Value.config.REWARDS.bridge;
 if ( fix_acq_state.Acquired )
   did_fixate( state, program, fix_acq_state.Acquired );
   % Bridging reward
-  
-  if ( pct.util.is_second_trial_portion(program) )
-    pct.util.deliver_reward( program, 1, quantity );
-  end
-  
+  pct.util.deliver_reward( program, 1, quantity );
   next( state, program.Value.states('just_patches') );
+  
 else
   did_fixate( state, program, fix_acq_state.Acquired );
   next( state, program.Value.states('error_penalty') );

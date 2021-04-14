@@ -72,6 +72,7 @@ make_eye_tracker_sync( program, conf );
 make_reward_manager( program, conf, ni_scan_output );
 
 stimuli = make_stimuli( program, window, conf );
+make_images( program, window, conf );
 make_targets( program, updater, window, sampler_m1, sampler_m2, stimuli, conf );
 
 make_structure( program, conf );
@@ -313,6 +314,20 @@ program.Value.stimuli_setup = stim_setup;
 
 end
 
+function images = make_images(program, window, conf)
+
+image_files = conf.STIMULI.images;
+images = struct( 'name', {}, 'image', {} );
+
+for i = 1:numel(image_files)
+  im = image_file_to_image_object( window, image_files{i}.file );
+  images(end+1) = struct( 'name', image_files{i}.name, 'image', im );
+end
+
+program.Value.images = images;
+
+end
+
 function targets = make_targets(program, updater, window ...
   , sampler_m1, sampler_m2, stimuli, conf)
 
@@ -404,6 +419,18 @@ target.Duration = stim_descr.target_duration;
 
 end
 
+function img = image_file_to_image_object(window, image_file)
+
+[im_mat, ~, im_alpha] = imread( image_file );
+
+if ( ~isempty(im_alpha) )
+  im_mat(:, :, end+1) = im_alpha;
+end
+
+img = ptb.Image( window, im_mat );
+
+end
+
 function stim = make_stimulus(window, description)
 
 switch ( description.class )
@@ -425,13 +452,7 @@ stim.Scale.Units = 'px';
 
 if ( isfield(description, 'use_image') && description.use_image )
   try
-    [im_mat, ~, im_alpha] = imread( description.image_file );
-    
-    if ( ~isempty(im_alpha) )
-      im_mat(:, :, end+1) = im_alpha;
-    end
-    
-    img = ptb.Image( window, im_mat );
+    img = image_file_to_image_object( window, description.image_file );
     stim.FaceColor = img;
     
   catch err
