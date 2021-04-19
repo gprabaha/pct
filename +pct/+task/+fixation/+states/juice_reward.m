@@ -26,8 +26,10 @@ end
 
 pre_reward_delay = calculate_pre_reward_delay( program );
 
-state.UserData.reward_timer = nan;
-state.UserData.num_pulses = 0;
+state.UserData.reward_timer_m1 = nan;
+state.UserData.reward_timer_m2 = nan;
+state.UserData.num_pulses_m1 = 0;
+state.UserData.num_pulses_m2 = 0;
 state.UserData.reward_delay_timer = tic;
 state.UserData.reward_delay = pre_reward_delay;
 
@@ -43,24 +45,41 @@ quantity                = program.Value.rewards.training;
 inter_pulse_interval    = 5e-2;  % 10ms;
 patch_sequence_index    = program.Value.current_patch_sequence_index;
 num_trials_in_sequence  = 1;
-reward_timer            = state.UserData.reward_timer;
+reward_timer_m1         = state.UserData.reward_timer_m1;
+reward_timer_m2         = state.UserData.reward_timer_m2;
 
 % Operations %
 
 num_collected_patches_m1 = num_acquired_patches_in_sequence( ...
   program, pct.util.m1_agent_index(), num_trials_in_sequence );
 
+num_collected_patches_m2 = num_acquired_patches_in_sequence( ...
+  program, pct.util.m2_agent_index(), num_trials_in_sequence );
+
 pulse_duration = quantity;
 
-if ( state.UserData.num_pulses < num_collected_patches_m1 && ...
-     toc(state.UserData.reward_delay_timer) > state.UserData.reward_delay )
-  if ( isnan(reward_timer) || ...
-       toc(reward_timer) > pulse_duration + inter_pulse_interval )
-    pct.util.log( 'Delivering reward', pct.util.LogInfo('juice_reward') );
+if ( toc(state.UserData.reward_delay_timer) > state.UserData.reward_delay )
+  reward_timer_dur = pulse_duration + inter_pulse_interval;
+  
+  deliver_m1 = should_deliver_reward(...
+    state.UserData.num_pulses_m1, num_collected_patches_m1, reward_timer_m1, reward_timer_dur );
+  
+  deliver_m2 = should_deliver_reward(...
+    state.UserData.num_pulses_m2, num_collected_patches_m2, reward_timer_m2, reward_timer_dur );
+  
+  if ( deliver_m1 )
+    pct.util.log( 'Delivering reward for m1', pct.util.LogInfo('juice_reward') );
      
     pct.util.deliver_reward( program, 1, quantity );
-    state.UserData.reward_timer = tic();
-    state.UserData.num_pulses = state.UserData.num_pulses + 1;
+    state.UserData.reward_timer_m1 = tic();
+    state.UserData.num_pulses_m1 = state.UserData.num_pulses_m1 + 1;
+  end
+  if ( deliver_m2 )
+    pct.util.log( 'Delivering reward for m2', pct.util.LogInfo('juice_reward') );
+     
+    pct.util.deliver_reward( program, 2, quantity );
+    state.UserData.reward_timer_m2 = tic();
+    state.UserData.num_pulses_m2 = state.UserData.num_pulses_m2 + 1;
   end
 end
 
@@ -77,6 +96,13 @@ pct.util.state_exit_timestamp( program, state );
 
 states = program.Value.states;
 next( state, states('iti') );
+
+end
+
+function tf = should_deliver_reward(num_pulses, num_patches, reward_timer, pulse_dur)
+
+tf = num_pulses < num_patches && ...
+     (isnan(reward_timer) || toc(reward_timer) > pulse_dur);
 
 end
 
