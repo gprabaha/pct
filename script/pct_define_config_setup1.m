@@ -120,12 +120,26 @@ conf.STIMULI.setup.gaze_cursor_m2.visible = true;
 conf.STIMULI.setup.gaze_cursor_m2.size = [25 25 ];
 conf.STIMULI.setup.gaze_cursor_m2.color = [ 255, 0, 255 ];
 conf.STIMULI.setup.gaze_cursor_m2.saccade_time = 0.6;
+
 % Optional usage of image for cursor
-cursor_path = [repdir '/pct/bitmaps/cursors/'];
+cursor_path = fullfile( repdir, 'pct/bitmaps/cursors/' );
+acquired_patches_path = fullfile( repdir, 'pct/bitmaps/acquired' );
+
 conf.STIMULI.setup.gaze_cursor.use_image = true;
 conf.STIMULI.setup.gaze_cursor.image_file = fullfile([cursor_path 'gray-triangle.png']);
 conf.STIMULI.setup.gaze_cursor_m2.use_image = true;
 conf.STIMULI.setup.gaze_cursor_m2.image_file = fullfile([cursor_path 'gray-star.png']);
+
+conf.STIMULI.images = {...
+  struct( ...
+      'name', 'm1_self_acquired' ...
+    , 'file', fullfile(acquired_patches_path, 'm1_self_acquired.png') ...
+  ) ...
+  , struct( ...
+      'name', 'm2_self_acquired' ...
+    , 'file', fullfile(acquired_patches_path, 'm2_self_acquired.png') ...
+  )
+};
 
 %%%%%%%%%%%%%%%%%%%
 % Port for reward %
