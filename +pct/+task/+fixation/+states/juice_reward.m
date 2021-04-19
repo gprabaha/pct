@@ -130,10 +130,11 @@ for i = 1:num_trials_in_sequence
     
     if ( ~isempty(maybe_acquired) )
       acquired_by_ind = maybe_acquired.AcquiredByIndex;
+      reward_count = maybe_acquired.RewardCount;
       
       if ( acquired_by_ind == agent_index || ...
            acquired_by_ind == pct.util.cooperate_index() )
-         num_acquired = num_acquired + 1;
+         num_acquired = num_acquired + reward_count;
       end
     end
   end

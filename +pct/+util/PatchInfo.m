@@ -9,6 +9,7 @@ classdef PatchInfo
     AcquiredByIndex = 0;
     Strategy = 'self';
     Agent = '';
+    RewardCount = 1;
     
     Color = zeros( 1, 3 );
     Position = zeros( 1, 3 );
@@ -21,6 +22,7 @@ classdef PatchInfo
     SequenceID = 1;
     
     GetAcquiredFaceColor = @(self, images) [];
+    GetFaceColor = @(self, images) [];
   end
   
   methods
@@ -74,6 +76,18 @@ classdef PatchInfo
       validateattributes( f, {'function_handle'}, {'scalar'} ...
         , mfilename, 'GetAcquiredFaceColor' );
       obj.GetAcquiredFaceColor = f;
+    end
+    
+    function obj = set.GetFaceColor(obj, f)
+      validateattributes( f, {'function_handle'}, {'scalar'} ...
+        , mfilename, 'GetFaceColor' );
+      obj.GetFaceColor = f;
+    end
+    
+    function obj = set.RewardCount(obj, v)
+      validateattributes( v, {'double'}, {'scalar'} ...
+        , mfilename, 'RewardCount' );
+      obj.RewardCount = v;
     end
     
     % Methods called by scripts outside %

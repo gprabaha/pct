@@ -99,6 +99,7 @@ STRUCTURE.patch_params = struct( ...
 % only.
 STRUCTURE.patch_generator = @(program) pct.util.PatchInfoM1Only();
 STRUCTURE.get_patch_acquired_face_color = @pct.util.default_get_patch_acquired_face_color;
+STRUCTURE.get_patch_face_color = @pct.util.default_get_patch_face_color;
 
 %	TIMINGS
 TIMINGS = struct();

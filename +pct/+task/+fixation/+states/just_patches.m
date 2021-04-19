@@ -244,9 +244,7 @@ stimuli = program.Value.current_patch_stimuli;
 patches_acquired = state.UserData.patch_acquired;
 agent_indices = state.UserData.agent_indices;
 
-for i = 1:numel(patch_info)
-  stimulus = stimuli{i};
-  
+for i = 1:numel(patch_info)  
   info = patch_info(i);
   target = info.Target;
   strategy = info.Strategy;

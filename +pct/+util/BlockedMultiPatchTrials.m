@@ -204,10 +204,12 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
         rect = program.Value.window.Rect;
         coordinates = pct.util.assign_patch_coordinates( num_patches, radius, rect );
         get_acquired_face_color = program.Value.config.STRUCTURE.get_patch_acquired_face_color;
+        get_face_color = program.Value.config.STRUCTURE.get_patch_face_color;
         
         for i = 1:num_patches
           new_patch_info                          = pct.util.PatchInfo();
           new_patch_info.AcquirableBy             = trial_patches(i).acquirable_by;
+          new_patch_info.RewardCount              = trial_patches(i).reward_count;
           new_patch_info.Agent                    = trial_patches(i).agent;
           new_patch_info.Strategy                 = trial_patches(i).strategy; %strategy; %block_type;  % change this to strategy.
           new_patch_info.Position                 = coordinates(:, i);
@@ -217,6 +219,7 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
           new_patch_info.TrialTypeID              = trial_type_id;
           new_patch_info.SequenceID               = sequence_id;
           new_patch_info.GetAcquiredFaceColor     = get_acquired_face_color;
+          new_patch_info.GetFaceColor             = get_face_color;
           
           % Configure color, and other appearence properties.
           new_patch_info = appearance_func( new_patch_info );

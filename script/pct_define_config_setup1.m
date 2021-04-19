@@ -124,6 +124,7 @@ conf.STIMULI.setup.gaze_cursor_m2.saccade_time = 0.6;
 % Optional usage of image for cursor
 cursor_path = fullfile( repdir, 'pct/bitmaps/cursors/' );
 acquired_patches_path = fullfile( repdir, 'pct/bitmaps/acquired' );
+available_patches_patch = fullfile( repdir, 'pct/bitmaps/available' );
 
 conf.STIMULI.setup.gaze_cursor.use_image = true;
 conf.STIMULI.setup.gaze_cursor.image_file = fullfile([cursor_path 'gray-triangle.png']);
@@ -140,6 +141,18 @@ conf.STIMULI.images = {...
     , 'file', fullfile(acquired_patches_path, 'm2_self_acquired.png') ...
   )
 };
+
+n_rewards = 2;
+for i = 1:n_rewards
+  conf.STIMULI.images{end+1} = struct( ...
+      'name', sprintf('m1_self_reward%d', i) ...
+    , 'file', fullfile(available_patches_patch, sprintf('m1_self_reward%d.png', i)) ...
+  );
+  conf.STIMULI.images{end+1} = struct( ...
+      'name', sprintf('m2_self_reward%d', i) ...
+    , 'file', fullfile(available_patches_patch, sprintf('m2_self_reward%d.png', i)) ...
+  );
+end
 
 %%%%%%%%%%%%%%%%%%%
 % Port for reward %

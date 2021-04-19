@@ -580,13 +580,9 @@ for i = 1:num_patches
   % the value `i`, in the case that it is a hold-over patch from a previous
   % trial.
   stim_name = pct.util.nth_patch_stimulus_name( patch_info.Index );
-  stimulus = stimuli.(stim_name);
-  
-  patch_color = patch_info.Color;
-  patch_pos = patch_info.Position;
-  
-  stimulus.FaceColor = patch_color;
-  stimulus.Position.Value = patch_pos;
+  stimulus = stimuli.(stim_name);  
+  stimulus.FaceColor = patch_info.GetFaceColor( patch_info, program.Value.images );
+  stimulus.Position.Value = patch_info.Position;
   
   current_stimuli{i} = stimulus;
 end
