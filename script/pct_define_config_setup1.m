@@ -177,18 +177,18 @@ end
 %%%%%%%%%%%%%%%%%%%
 conf.SERIAL.port = 'COM3';
 
-%%%%%%%%%%%%%%%%%%%
-% Save new config %
-%%%%%%%%%%%%%%%%%%%
-
-if ( do_save )
-  pct.config.save( conf );
-end
-
 %%%%%%%%%%%%%%%
 % Saving data %
 %%%%%%%%%%%%%%%
 conf.INTERFACE.save_data = true;
 conf.PATHS.remote = 'C:\Users\setup1\Dropbox (ChangLab)\prabaha_changlab\pct-training-hitch\patch-with-dots-training-data\OnePatchOneReward';
+
+
+%%%%%%%%%%%%%%%%%%%
+% Save new config %
+%%%%%%%%%%%%%%%%%%%
+if ( do_save )
+  pct.config.save( conf );
+end
 
 end
