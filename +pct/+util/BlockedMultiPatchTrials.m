@@ -76,13 +76,11 @@ classdef BlockedMultiPatchTrials < pct.util.EstablishPatchInfo
     function trial_order = generate_trial_order(obj)
       
       % Initial assignments %
-      
       num_trial_types   = numel(obj.trial_set);
       n_reps            = obj.trial_reps;
       trial_order       = [];
       
       % Operations %
-      
       for rep = 1:n_reps
         % Generate temporary shuffled trial sequence
         temp_trial_seq = randperm(num_trial_types, num_trial_types);

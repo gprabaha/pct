@@ -1,12 +1,21 @@
 function image = default_get_patch_acquired_face_color(patch_info, images)
 
 is_self = strcmp( patch_info.Strategy, 'self' );
+is_compete = strcmp( patch_info.Strategy, 'compete' );
+is_cooperate = strcmp( patch_info.Strategy, 'cooperate' );
 
 if ( is_self && strcmp(patch_info.AcquirableBy, 'm2') )
   im_name = 'm2_self_acquired';
   
 elseif ( is_self && strcmp(patch_info.AcquirableBy, 'm1') )
   im_name = 'm1_self_acquired';
+  
+elseif is_compete
+  im_name = 'compete_acquired';
+  
+elseif is_cooperate
+  im_name = 'cooperate_acquired';
+  
 else
   error( 'No acquired image name specified for strategy "%s" and acquireable-by agents "%s".' ...
     , patch_info.Strategy, strjoin(patch_info.AcquireableBy, ' | ') );
