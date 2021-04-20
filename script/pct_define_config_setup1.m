@@ -81,7 +81,7 @@ conf.INTERFACE.has_m2 = true;
 calibration_rect = [0, 0, 1600, 900];
 
 conf.SCREEN.rect = [];
-conf.SCREEN.index = 2;
+conf.SCREEN.index = 3;
 conf.SCREEN.calibration_rect = calibration_rect;
 % Debug screen
 conf.DEBUG_SCREEN.is_present = true;
@@ -91,7 +91,7 @@ conf.DEBUG_SCREEN.background_color = [ 0 0 0 ];
 conf.DEBUG_SCREEN.rect = calibration_rect;
 % Calib screen
 conf.CALIB_SCREEN.full_rect = [];
-conf.CALIB_SCREEN.index = 2;
+conf.CALIB_SCREEN.index = 3;
 conf.CALIB_SCREEN.calibration_rect = calibration_rect;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -184,5 +184,11 @@ conf.SERIAL.port = 'COM3';
 if ( do_save )
   pct.config.save( conf );
 end
+
+%%%%%%%%%%%%%%%
+% Saving data %
+%%%%%%%%%%%%%%%
+conf.INTERFACE.save_data = true;
+conf.PATHS.remote = 'C:\Users\setup1\Dropbox (ChangLab)\prabaha_changlab\pct-training-hitch\patch-with-dots-training-data\OnePatchOneReward';
 
 end

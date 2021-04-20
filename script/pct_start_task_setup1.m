@@ -16,9 +16,3 @@ conf = pct.config.reconcile( pct.config.load() );
 pct.task.fixation.start( conf, ...
   'training_stage_manager_config_func', @pct.training.configure.noop ...
 );
-
-%%%%%%%%%%%%%%%
-% Saving data %
-%%%%%%%%%%%%%%%
-conf.INTERFACE.save_data = true;
-conf.PATHS.remote = 'C:\Users\setup1\Dropbox (ChangLab)\prabaha_changlab\pct-training-hitch\4_patches\old';

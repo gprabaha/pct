@@ -15,6 +15,7 @@ conf.INTERFACE.gaze_source_type = 'mouse';
 conf.INTERFACE.gaze_source_type_m2 = 'generator';
 conf.INTERFACE.reward_output_type = 'none'; %'none'; 'ni';
 conf.INTERFACE.display_task_progress = false;
+conf.INTERFACE.save_data = false;
 
 conf.SCREEN.rect = [0, 0, 800, 800];
 conf.SCREEN.index = 0;
