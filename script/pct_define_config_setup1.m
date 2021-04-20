@@ -27,8 +27,9 @@ conf.INTERFACE.num_trials_to_display = 5;
 % Generators %
 %%%%%%%%%%%%%%
 
-conf.STRUCTURE.patch_params.trial_reps = 100;
+conf.STRUCTURE.patch_params.trial_reps = 1000;
 conf.STRUCTURE.patch_params.trial_set_generator = pct.util.OnePatchOneReward_TrialSet;
+%conf.STRUCTURE.patch_params.trial_set_generator = pct.util.OnePatchManyReward_TrialSet;
 
 conf.STRUCTURE.patch_generator = ...
   @(program) pct.util.BlockedMultiPatchTrials(conf.STRUCTURE.patch_params);
@@ -151,7 +152,7 @@ conf.STIMULI.images = {...
   )
 };
 
-n_rewards = 1;
+n_rewards = 3;
 for i = 1:n_rewards
   conf.STIMULI.images{end+1} = struct( ...
       'name', sprintf('m1_self_reward%d', i) ...
